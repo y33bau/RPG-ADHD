@@ -1,198 +1,793 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<title>Wetlińska i Smerek</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
-<style>
-/* Layout: karta górska — nagłówek jak drogowskaz, schematyczna mapa, oś czasu tam/z powrotem, zasady na dole */
-:root{
-  --bg:#F2F3EE; --surface:#FFFFFF; --fg:#1C231F; --muted:#5F6963; --line:#D5D9D0;
-  --forest:#2E5A44; --red:#C2342C; --yellow:#D9A514; --sign:#FFFFFF;
-  --font-display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
-  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
-  --font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
-}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#111613; --surface:#1A201C; --fg:#E5E9E3; --muted:#9AA49D; --line:#2E3631;
-  --forest:#7DB596; --red:#E5574E; --yellow:#E9BE3C; --sign:#F4F4F0; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#111613; --surface:#1A201C; --fg:#E5E9E3; --muted:#9AA49D; --line:#2E3631;
-  --forest:#7DB596; --red:#E5574E; --yellow:#E9BE3C; --sign:#F4F4F0; color-scheme:dark}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>NightBrand: Sleek RPG Planner</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="NightBrand">
+    <link rel="apple-touch-icon" href="image_generation_content/6637477624654010166">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:15px;line-height:1.55}
-.wrap{max-width:860px;margin:0 auto;padding-block:28px 48px;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
-  display:flex;flex-direction:column;gap:28px}
-h1,h2,h3{font-family:var(--font-display);font-weight:700;letter-spacing:.01em;text-wrap:balance;margin:0;line-height:1.05}
-h1{font-size:clamp(2.1rem,7vw,3.2rem);text-transform:uppercase}
-h2{font-size:1.55rem;text-transform:uppercase}
-h3{font-size:1.15rem;font-weight:600}
-p{margin:0}
-.eyebrow{font-family:var(--font-display);font-weight:600;text-transform:uppercase;letter-spacing:.12em;font-size:.9rem;color:var(--forest)}
-.muted{color:var(--muted)}
-.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
-/* znak szlaku PTTK: biały–kolor–biały */
-.mark{display:inline-flex;flex-direction:column;width:22px;height:15px;border:1px solid var(--line);border-radius:2px;overflow:hidden;vertical-align:-2px;flex:none}
-.mark i{flex:1;background:var(--sign)}
-.mark i:nth-child(2){background:var(--c)}
-.mark.y{--c:var(--yellow)} .mark.r{--c:var(--red)}
+        :root {
+            --bg-obsidian: #050507;
+            --glass-panel: rgba(18, 18, 24, 0.75);
+            --glass-card: rgba(28, 28, 38, 0.65);
+            --border-subtle: rgba(212, 175, 55, 0.15);
+            --border-active: rgba(212, 175, 55, 0.4);
+            --gold: #d4af37;
+            --gold-glow: rgba(212, 175, 55, 0.25);
+            --text-main: #f3f0ea;
+            --text-muted: #9490a0;
+            --danger: #ef4444;
+            --success: #10b981;
+        }
 
-header{display:flex;flex-direction:column;gap:12px}
-.facts{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:.95rem}
-.facts b{font-family:var(--font-mono);font-weight:500}
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-.mapbox{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:12px;display:flex;flex-direction:column;gap:8px}
-#map{height:min(70vh,520px);min-height:340px;border-radius:4px;background:#2b3a30}
-.pin{width:28px;height:28px;border-radius:50%;background:#1C231F;color:#fff;border:3px solid #fff;display:grid;place-items:center;font-family:var(--font-display);font-weight:700;font-size:15px;box-shadow:0 1px 4px rgba(0,0,0,.5)}
-.pin.ctrl{background:#C2342C}
-.leaflet-tooltip.lbl{background:rgba(20,26,22,.82);color:#fff;border:0;box-shadow:none;font-family:var(--font-display);font-weight:600;font-size:14px;padding:1px 6px}
-.leaflet-tooltip.lbl::before{display:none}
-.leaflet-popup-content{font-family:var(--font-body);font-size:13px;line-height:1.45}
-.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.85rem;color:var(--muted);align-items:center}
-.legend span{display:inline-flex;gap:6px;align-items:center}
+        body {
+            background-color: var(--bg-obsidian);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: calc(100px + env(safe-area-inset-bottom));
+            overflow-x: hidden;
+            background-image: url('image_generation_content/8981768286863944199');
+            background-size: cover;
+            background-attachment: fixed;
+        }
 
-.leg{display:flex;flex-direction:column;gap:10px}
-.leg-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:2px solid var(--fg);padding-bottom:6px}
-ol.tl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
-ol.tl li{display:grid;grid-template-columns:62px 28px minmax(0,1fr);gap:0 10px;padding:12px 0;border-bottom:1px solid var(--line);align-items:start}
-.time{font-family:var(--font-mono);font-size:1.05rem;font-variant-numeric:tabular-nums;padding-top:1px}
-.num{width:24px;height:24px;border-radius:50%;background:var(--fg);color:var(--bg);font-family:var(--font-display);font-weight:700;display:grid;place-items:center;font-size:.95rem}
-.num.ctrl{background:var(--red);color:#fff}
-.poi{min-width:0;display:flex;flex-direction:column;gap:3px}
-.poi .meta{font-family:var(--font-mono);font-size:.8rem;color:var(--muted)}
-.poi a{color:var(--forest);font-size:.85rem;text-underline-offset:2px}
-.poi a:focus-visible{outline:2px solid var(--forest);outline-offset:2px}
-.flag{display:inline-block;font-family:var(--font-display);font-weight:600;text-transform:uppercase;letter-spacing:.06em;font-size:.78rem;padding:1px 7px;border-radius:3px;background:var(--red);color:#fff;margin-right:6px}
+        header {
+            padding: 16px 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(5, 5, 7, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-subtle);
+        }
 
-.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
-.rule{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:14px;display:flex;flex-direction:column;gap:6px;min-width:0}
-.rule.alert{border-color:var(--red)}
-.rule.alert h3{color:var(--red)}
-footer{font-size:.82rem;color:var(--muted);display:flex;flex-direction:column;gap:4px}
-@media (max-width:420px){ol.tl li{grid-template-columns:52px 26px minmax(0,1fr)}}
-</style>
+        .logo-img {
+            max-height: 32px;
+            width: auto;
+            margin: 0 auto 6px auto;
+            display: block;
+            filter: drop-shadow(0 2px 8px rgba(212,175,55,0.3));
+        }
+
+        .subtitle {
+            font-family: 'Cinzel', serif;
+            font-size: 10px;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 440px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        /* PREMIUM WEATHER TILE */
+        .weather-hero-card {
+            position: relative;
+            background: linear-gradient(135deg, rgba(20, 18, 26, 0.9), rgba(10, 8, 14, 0.95)), url('image_generation_content/47208ac9.jpeg');
+            background-size: cover;
+            background-position: center;
+            border: 1px solid var(--border-active);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(212, 175, 55, 0.1);
+            overflow: hidden;
+        }
+
+        .weather-hero-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .location-badge {
+            background: rgba(212, 175, 55, 0.15);
+            border: 1px solid var(--border-active);
+            color: var(--gold);
+            font-family: 'Cinzel', serif;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 20px;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 10px rgba(212, 175, 55, 0.2);
+        }
+
+        .weather-main-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .temp-display {
+            font-family: 'Cinzel', serif;
+            font-size: 38px;
+            font-weight: 700;
+            color: var(--text-main);
+            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+        }
+
+        .condition-text {
+            font-size: 13px;
+            color: var(--gold);
+            font-family: 'Cinzel', serif;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+
+        .weather-graphic-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            border: 1px solid var(--border-subtle);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            object-fit: cover;
+            background: #111;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gold);
+            font-size: 28px;
+        }
+
+        .weather-footer-details {
+            display: flex;
+            gap: 16px;
+            margin-top: 14px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* Glass Cards */
+        .glass-card {
+            background: var(--glass-panel);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .tile-card {
+            background: var(--glass-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tile-card:active {
+            transform: scale(0.97);
+            background: rgba(212, 175, 55, 0.1);
+            border-color: var(--gold);
+        }
+
+        .tile-icon { font-size: 24px; margin-bottom: 8px; display: block; }
+        .tile-title { font-family: 'Cinzel', serif; font-size: 12px; color: var(--gold); font-weight: 600; }
+
+        /* Stats HUD */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            padding: 8px 4px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .stat-label { font-size: 9px; color: var(--text-muted); font-family: 'Cinzel', serif; text-transform: uppercase; }
+        .stat-val { font-size: 14px; font-weight: 700; color: var(--gold); margin-top: 2px; }
+
+        .progress-group { margin-top: 10px; }
+        .progress-label { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-bottom: 4px; font-family: 'Cinzel', serif; }
+        .bar-track { background: rgba(255, 255, 255, 0.05); border-radius: 6px; height: 8px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.05); }
+        .bar-fill { height: 100%; border-radius: 6px; transition: width 0.5s ease; }
+        .fill-hp { background: linear-gradient(90deg, #dc2626, #ef4444); }
+        .fill-xp { background: linear-gradient(90deg, #d4af37, #fde047); }
+        .fill-water { background: linear-gradient(90deg, #2563eb, #38bdf8); }
+
+        /* Action Buttons */
+        .btn-sleek {
+            background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05));
+            border: 1px solid var(--border-active);
+            color: var(--gold);
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-family: 'Cinzel', serif;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            width: 100%;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+        }
+
+        .btn-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .btn-action {
+            background: var(--glass-card);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-main);
+            padding: 10px 6px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .section-title { font-family: 'Cinzel', serif; font-size: 14px; color: var(--gold); }
+
+        .quest-card {
+            background: var(--glass-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .quest-card.completed { opacity: 0.4; border-color: rgba(16, 185, 129, 0.3); text-decoration: line-through; }
+        .quest-title { font-size: 13px; font-weight: 500; color: var(--text-main); margin-bottom: 2px; }
+        .quest-meta { font-size: 10px; color: var(--text-muted); }
+
+        /* Bottom Dock */
+        .bottom-dock {
+            position: fixed;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 32px);
+            max-width: 410px;
+            background: rgba(18, 18, 24, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            padding: 8px;
+            z-index: 1000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+        }
+
+        .dock-btn {
+            background: none; border: none; color: var(--text-muted);
+            font-size: 9px; font-family: 'Cinzel', serif;
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            cursor: pointer; padding: 6px 0; border-radius: 12px; transition: all 0.2s;
+        }
+        .dock-btn.active { color: var(--gold); background: rgba(212, 175, 55, 0.08); border: 1px solid rgba(212, 175, 55, 0.2); }
+        .dock-icon { font-size: 16px; }
+
+        .tab-view { display: none; }
+        .tab-view.active { display: block; }
+
+        .modal-backdrop {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+            display: none; justify-content: center; align-items: center; z-index: 2000; padding: 20px;
+        }
+        .modal-window {
+            background: #14141c; border: 1px solid var(--border-active); border-radius: 20px; padding: 24px; width: 100%; max-width: 360px; text-align: center;
+        }
+        input, select {
+            width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border-subtle); color: var(--text-main); padding: 12px; border-radius: 10px; margin-bottom: 14px; font-size: 13px; outline: none;
+        }
+        #map { height: 240px; border-radius: 12px; border: 1px solid var(--border-subtle); margin-bottom: 12px; }
+    </style>
 </head>
 <body>
 
-<div class="wrap">
-  <header>
-    <p class="eyebrow">Bieszczady · sobota 24 października 2026</p>
-    <h1>Połonina Wetlińska i Smerek</h1>
-    <p class="muted">Z Przełęczy Wyżnej na Smerek i z powrotem tą samą drogą. Start 8:00, powrót do auta ok. 14:25.</p>
-    <div class="facts">
-      <span>Dystans <b>ok. 18,5 km</b></span>
-      <span>Marsz <b>ok. 6 h</b> (z przerwami 6,5 h)</span>
-      <span>Najwyżej <b>1253 m</b> · Osadzki Wierch</span>
-      <span>Zachód słońca <b>ok. 17:20</b></span>
+    <header>
+        <img src="image_generation_content/5530a3e7.jpeg" alt="NightBrand" class="logo-img">
+        <div id="datetime-display" class="subtitle">Łańcut | Inicjalizacja...</div>
+    </header>
+
+    <div class="container">
+        
+        <!-- KAFELOK POGODOWy Z ZABEZPIECZENIEM GRAFIKI -->
+        <div class="weather-hero-card">
+            <div class="weather-hero-header">
+                <div class="location-badge">📍 ŁAŃCUT</div>
+                <div id="biomet-badge" style="background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); color: var(--success); font-size: 9px; padding: 4px 10px; border-radius: 20px; font-weight: 600;">Biometr: Korzystny</div>
+            </div>
+            
+            <div class="weather-main-info">
+                <div>
+                    <div class="temp-display">9°C</div>
+                    <div class="condition-text">Czyste Niebo • Nocny Powiew</div>
+                </div>
+                <img src="image_generation_content/47208ac9.jpeg" alt="Faza Księżyca" class="weather-graphic-icon" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="weather-graphic-icon" style="display:none;">🌙</div>
+            </div>
+
+            <div class="weather-footer-details">
+                <span>🌬️ Wiatr: 12 km/h</span>
+                <span>💧 Wilgotność: 78%</span>
+                <span>🌙 Aura: Spokojna</span>
+            </div>
+        </div>
+
+        <!-- HUD PANEL STATYSTYK -->
+        <div class="glass-card">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-label">Poziom</div>
+                    <div class="stat-val" id="hud-level">1</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Złoto</div>
+                    <div class="stat-val" id="hud-gold">50</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Streak</div>
+                    <div class="stat-val" id="hud-streak">3 d.</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Tarcze</div>
+                    <div class="stat-val" id="hud-shields">1</div>
+                </div>
+            </div>
+
+            <div class="progress-group">
+                <div class="progress-label"><span>PUNKTY ŻYCIA (HP)</span><span id="hp-text">100 / 100</span></div>
+                <div class="bar-track"><div class="bar-fill fill-hp" id="hp-bar" style="width: 100%;"></div></div>
+            </div>
+
+            <div class="progress-group">
+                <div class="progress-label"><span>DOŚWIADCZENIE (XP)</span><span id="xp-text">0 / 100</span></div>
+                <div class="bar-track"><div class="bar-fill fill-xp" id="xp-bar" style="width: 0%;"></div></div>
+            </div>
+
+            <div class="progress-group">
+                <div class="progress-label"><span>ELIXIR NAWODNIENIA</span><span id="water-text">0 / 8 Szklanek</span></div>
+                <div class="bar-track"><div class="bar-fill fill-water" id="water-bar" style="width: 0%;"></div></div>
+            </div>
+        </div>
+
+        <!-- SZYBKIE AKCJE -->
+        <div class="btn-row">
+            <button class="btn-action" onclick="drinkWater()">💧 Woda (+5 XP)</button>
+            <button class="btn-action" onclick="triggerPanicMode()">🚨 Paraliż</button>
+            <button class="btn-action" onclick="openModal('loot-modal')">🎁 Skrzynia</button>
+        </div>
+
+        <!-- KAFELKOWE MENU GŁÓWNE -->
+        <div class="dashboard-grid">
+            <div class="tile-card" onclick="switchTab('quests', document.querySelectorAll('.dock-btn')[0])">
+                <span class="tile-icon">⚔️</span>
+                <div class="tile-title">Questy Dnia</div>
+            </div>
+            <div class="tile-card" onclick="switchTab('map', document.querySelectorAll('.dock-btn')[1])">
+                <span class="tile-icon">🗺️</span>
+                <div class="tile-title">Wyrocznia POI</div>
+            </div>
+            <div class="tile-card" onclick="switchTab('social', document.querySelectorAll('.dock-btn')[2])">
+                <span class="tile-icon">🛡️</span>
+                <div class="tile-title">Anty-Social</div>
+            </div>
+            <div class="tile-card" onclick="switchTab('shop', document.querySelectorAll('.dock-btn')[3])">
+                <span class="tile-icon">🪙</span>
+                <div class="tile-title">Alchemia</div>
+            </div>
+        </div>
+
+        <!-- GŁÓWNE ZAKŁADKI -->
+
+        <!-- TAB 1: QUESTY -->
+        <div id="tab-quests" class="tab-view active">
+            <div class="section-header">
+                <span class="section-title">Zlecenia Cechu</span>
+                <button class="btn-sleek" style="width: auto; padding: 6px 12px; font-size: 10px;" onclick="drawBounties()">Losuj</button>
+            </div>
+            <div class="quest-list" id="bounty-container"></div>
+
+            <div class="section-header" style="margin-top: 20px;">
+                <span class="section-title">Harmonogram Dnia</span>
+                <button class="btn-sleek" style="width: auto; padding: 6px 12px; font-size: 10px;" onclick="openModal('add-quest-modal')">+ Nowy</button>
+            </div>
+            <div class="quest-list" id="quests-container"></div>
+        </div>
+
+        <!-- TAB 2: MAPA I POI -->
+        <div id="tab-map" class="tab-view">
+            <div class="section-header"><span class="section-title">Odkrywca Podkarpacia</span></div>
+            <div id="map"></div>
+            <div class="glass-card" style="margin-bottom: 0;">
+                <h4 id="poi-title" style="color: var(--gold); font-family: 'Cinzel', serif; font-size: 13px; margin-bottom: 4px;">Skanowanie terenu...</h4>
+                <p id="poi-desc" style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">Pobieranie unikalnych punktów z OpenStreetMap.</p>
+                <button class="btn-sleek" onclick="fetchRandomPOD()">Wylosuj Nowy Cel Wyprawy</button>
+            </div>
+        </div>
+
+        <!-- TAB 3: ANTY-SOCIAL -->
+        <div id="tab-social" class="tab-view">
+            <div class="section-header"><span class="section-title">Walka z Klątwą Dopaminy</span></div>
+            <div class="quest-card">
+                <div>
+                    <div class="quest-title">Bezużyteczne Scrollowanie</div>
+                    <div class="quest-meta">Uległeś pokusie? Straciłeś skupienie (-15 HP)</div>
+                </div>
+                <button class="btn-sleek" style="width: auto; padding: 8px 12px; background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.4); color: var(--danger);" onclick="failSocialMedia()">Skapituluj</button>
+            </div>
+            <div class="quest-card">
+                <div>
+                    <div class="quest-title">1h Digital Detox</div>
+                    <div class="quest-meta">Oczyszczenie umysłu (+30 XP, +10 Złota)</div>
+                </div>
+                <button class="btn-sleek" style="width: auto; padding: 8px 12px;" onclick="completeDetox()">Wykonaj</button>
+            </div>
+        </div>
+
+        <!-- TAB 4: SKLEP -->
+        <div id="tab-shop" class="tab-view">
+            <div class="section-header"><span class="section-title">Sklep Alchemiczny</span></div>
+            <div class="quest-card">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <img src="image_generation_content/14885394587259587265" style="width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+                    <div>
+                        <div class="quest-title">Łaska Kostuchy</div>
+                        <div class="quest-meta">Chroni serię streaku (50 Złota)</div>
+                    </div>
+                </div>
+                <button class="btn-sleek" style="width: auto; padding: 8px 12px;" onclick="buyShield()">Kup</button>
+            </div>
+            <div class="quest-card">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <img src="image_generation_content/5594749731608925098" style="width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+                    <div>
+                        <div class="quest-title">Napar Jasnego Umysłu</div>
+                        <div class="quest-meta">Zwiększa skupienie (30 Złota)</div>
+                    </div>
+                </div>
+                <button class="btn-sleek" style="width: auto; padding: 8px 12px;" onclick="buyBuff()">Wypij</button>
+            </div>
+        </div>
+
+        <!-- TAB 5: STATYSTYKI -->
+        <div id="tab-stats" class="tab-view">
+            <div class="section-header"><span class="section-title">Dziennik Refleksji</span></div>
+            <div class="glass-card">
+                <canvas id="statsChart" style="max-height: 180px;"></canvas>
+            </div>
+        </div>
     </div>
-  </header>
 
-  <section class="mapbox" aria-label="Mapa topograficzna trasy">
-    <div id="map"></div>
-    <div class="legend">
-      <span><i class="mark y"><i></i><i></i><i></i></i> szlak żółty</span>
-      <span><i class="mark r"><i></i><i></i><i></i></i> szlak czerwony</span>
-      <span>Punkty są w dokładnych miejscach, ale linia łączy je prostymi odcinkami i nie pokazuje przebiegu ścieżki w terenie. Przełącznik warstw w prawym górnym rogu mapy.</span>
+    <!-- DOLNY DOCK NAWIGACYJNY -->
+    <nav class="bottom-dock">
+        <button class="dock-btn active" onclick="switchTab('quests', this)">
+            <span class="dock-icon">⚔️</span>Questy
+        </button>
+        <button class="dock-btn" onclick="switchTab('map', this)">
+            <span class="dock-icon">🗺️</span>Wyprawy
+        </button>
+        <button class="dock-btn" onclick="switchTab('social', this)">
+            <span class="dock-icon">🛡️</span>Detox
+        </button>
+        <button class="dock-btn" onclick="switchTab('shop', this)">
+            <span class="dock-icon">🪙</span>Alchemia
+        </button>
+        <button class="dock-btn" onclick="switchTab('stats', this)">
+            <span class="dock-icon">📜</span>Analiza
+        </button>
+    </nav>
+
+    <!-- MODALE -->
+    <div id="add-quest-modal" class="modal-backdrop">
+        <div class="modal-window">
+            <h3 style="font-family: 'Cinzel', serif; color: var(--gold); margin-bottom: 16px;">Nowy Quest</h3>
+            <input type="text" id="new-quest-title" placeholder="Nazwa zadania...">
+            <select id="new-quest-diff">
+                <option value="10">Łatwe (10 XP)</option>
+                <option value="25">Średnie (25 XP)</option>
+                <option value="50">Trudne (50 XP)</option>
+            </select>
+            <button class="btn-sleek" onclick="addQuest()" style="margin-bottom: 8px;">Dodaj do Harmonogramu</button>
+            <button class="btn-action" onclick="closeModal('add-quest-modal')" style="width: 100%;">Anuluj</button>
+        </div>
     </div>
-  </section>
 
-  <section class="leg">
-    <div class="leg-head"><h2>Tam: na Smerek</h2><span class="mono muted">8:00 → 11:30</span></div>
-    <ol class="tl" id="tl-up"></ol>
-  </section>
-
-  <section class="leg">
-    <div class="leg-head"><h2>Z powrotem: do auta</h2><span class="mono muted">11:45 → 14:25</span></div>
-    <ol class="tl" id="tl-down"></ol>
-  </section>
-
-  <section class="leg">
-    <div class="leg-head"><h2>Zanim wyjdziecie</h2></div>
-    <div class="rules">
-      <div class="rule alert"><h3>Godzina kontrolna 11:30</h3><p>Jeśli na Przełęczy Orłowicza jesteście później, odpuśćcie Smerek i wracajcie. Sama przełęcz też daje świetne widoki.</p></div>
-      <div class="rule"><h3>Zejście awaryjne</h3><p>Z Przełęczy Orłowicza żółtym szlakiem do Wetliny, ok. 1 h 15 min. Auto zostaje wtedy na Przełęczy Wyżnej, ok. 7 km drogą.</p></div>
-      <div class="rule"><h3>Dojazd i parking</h3><p>Wyjazd z Bukowca ok. 6:30 (jeszcze przed świtem), ok. 1 h przez Baligród, Cisnę i Wetlinę. Płatny parking na Przełęczy Wyżnej (orientacyjnie 30–40 zł), kasa BdPN na miejscu, ale o 8:00 może być jeszcze zamknięta, więc bilety kup wcześniej online. Nie myl z Przełęczą Wyżniańską kilka km dalej.</p></div>
-      <div class="rule"><h3>Pogoda i sprzęt</h3><p>Sucho, w dolinach do ok. 10°C, na grzbiecie chłodniej i wietrznie. Po czwartkowym deszczu ślisko w lesie. Kurtka przeciwwiatrowa, czapka, rękawiczki, kijki, czołówka.</p></div>
+    <div id="loot-modal" class="modal-backdrop">
+        <div class="modal-window">
+            <h3 style="font-family: 'Cinzel', serif; color: var(--gold); margin-bottom: 16px;">Skrzynia z Łupem</h3>
+            <p id="loot-result" style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Dotknij skrzyni, aby odkryć zawartość...</p>
+            <button class="btn-sleek" onclick="openLootBox()" style="margin-bottom: 8px;">Otwórz Skrzynię</button>
+            <button class="btn-action" onclick="closeModal('loot-modal')" style="width: 100%;">Zamknij</button>
+        </div>
     </div>
-  </section>
 
-  <footer>
-    <p>Czasy przejść do Smereka wg mapa-turystyczna.pl, powrót szacowany. Pozycja rozwidlenia ze szlakiem zielonym jest przybliżona.</p>
-    <p>Sprawdź komunikat Bieszczadzkiego Parku Narodowego (bdpn.gov.pl) w piątek wieczorem.</p>
-  </footer>
-</div>
+    <script>
+        let player = JSON.parse(localStorage.getItem('nightbrand_player')) || {
+            level: 1, xp: 0, maxXp: 100, hp: 100, maxHp: 100,
+            gold: 50, streak: 3, shields: 1, water: 0
+        };
 
-<script>
-const P = [
-  {id:1, name:"Przełęcz Wyżna", sub:"parking, kasa BdPN, start", lat:49.14155, lon:22.54808, lx:12, ly:4, anchor:"start"},
-  {id:2, name:"Końska Droga", sub:"skrzyżowanie z zielonym", lat:49.15068, lon:22.55162, lx:12, ly:4, anchor:"start"},
-  {id:3, name:"Chatka Puchatka", sub:"schron, bufet", lat:49.15806, lon:22.55121, lx:12, ly:4, anchor:"start"},
-  {id:4, name:"Rozwidlenie", sub:"zielony w dół", lat:49.16200, lon:22.54000, lx:0, ly:24, anchor:"middle"},
-  {id:5, name:"Osadzki Wierch", sub:"1253 m", lat:49.16585, lon:22.52399, lx:0, ly:24, anchor:"middle"},
-  {id:6, name:"Przełęcz Orłowicza", sub:"żółty do Wetliny", lat:49.18074, lon:22.49188, lx:-16, ly:4, anchor:"end"},
-  {id:7, name:"Smerek", sub:"1222 m, zawrót", lat:49.18560, lon:22.47840, lx:12, ly:-8, anchor:"start"}
-];
-const gm = p => `https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lon}`;
+        let quests = JSON.parse(localStorage.getItem('nightbrand_quests')) || [
+            { id: 1, title: 'Poranna rozgrzewka i woda', xp: 10, completed: false, category: 'Poranek' },
+            { id: 2, title: 'Praca nad kodem NightBrand (45 min)', xp: 50, completed: false, category: 'Popołudnie' }
+        ];
 
-const sat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-  {maxZoom:18, attribution:'Zdjęcia satelitarne &copy; Esri, Maxar, Earthstar Geographics'});
-const topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
-  {maxZoom:17, attribution:'&copy; OpenStreetMap, SRTM | styl &copy; OpenTopoMap (CC-BY-SA)'});
-const map = L.map('map', {layers:[topo], scrollWheelZoom:false});
-L.control.layers({'Mapa topograficzna':topo, 'Satelita':sat}).addTo(map);
-L.control.scale({imperial:false}).addTo(map);
-const ll = p => [p.lat, p.lon];
-L.polyline(P.slice(0,3).map(ll), {color:'#000', weight:9, opacity:.35}).addTo(map);
-L.polyline(P.slice(2).map(ll), {color:'#000', weight:9, opacity:.35}).addTo(map);
-L.polyline(P.slice(0,3).map(ll), {color:'#F2C230', weight:5}).addTo(map);
-L.polyline(P.slice(2).map(ll), {color:'#E0382F', weight:5}).addTo(map);
-const timesUp = ["8:00","8:30","9:15","9:40","10:05","11:00","11:30"];
-const timesDown = ["14:25","14:10","13:40",null,"13:05","12:05",null];
-P.forEach((p,i)=>{
-  const ctrl = p.id===6;
-  const icon = L.divIcon({className:'', iconSize:[28,28], iconAnchor:[14,14],
-    html:`<div class="pin${ctrl?' ctrl':''}">${p.id}</div>`});
-  const back = timesDown[i] ? `<br>z powrotem: <b>${timesDown[i]}</b>` : '';
-  L.marker(ll(p), {icon}).addTo(map).bindPopup(
-    `<strong>${p.id}. ${p.name}</strong><br><span>${p.sub}</span><br>tam: <b>${timesUp[i]}</b>${back}`);
-  L.tooltip({permanent:true, direction:'right', offset:[14,0], className:'lbl'})
-    .setContent(p.name).setLatLng(ll(p)).addTo(map);
-});
-map.fitBounds(L.latLngBounds(P.map(ll)), {padding:[30,30]});
+        let bounties = [];
+        const bountyPool = [
+            { title: 'Porządek na biurku (Stajnia Augiasza)', xp: 30 },
+            { title: 'Odpisanie na 3 zaległe maile', xp: 25 },
+            { title: 'Wyniesienie śmieci i przewietrzenie pokoju', xp: 15 },
+            { title: 'Sesja głębokiego skupienia (30 min)', xp: 40 }
+        ];
 
-const mk = c => `<i class="mark ${c}"><i></i><i></i><i></i></i>`;
-const up = [
-  {t:"8:00", p:0, title:"Przełęcz Wyżna", meta:"0:00 · 0 km", txt:`Parking i kasa BdPN. Start ${mk('y')} żółtym szlakiem z parkingu, przez las bukowy.`},
-  {t:"8:30", p:1, title:"Końska Droga", meta:"0:30 · 1,1 km", txt:`Skrzyżowanie z zielonym. Dalej ${mk('y')} żółtym w górę, przed Tobą najbardziej strome i kamieniste podejście.`},
-  {t:"9:15", p:2, title:"Chatka Puchatka i Hasiakowa Skała", meta:"1:15 · 2,5 km · 1219 m", txt:`Schron BdPN z bufetem, jedyne zadaszenie na trasie. Krótka przerwa, potem w lewo na ${mk('r')} czerwony, grzbietem na zachód.`},
-  {t:"9:40", p:3, title:"Rozwidlenie ze szlakiem zielonym", meta:"ok. 1:30 · 3,6 km", txt:`Zielony schodzi w dół, Ty idziesz prosto ${mk('r')} czerwonym.`},
-  {t:"10:05", p:4, title:"Osadzki Wierch", meta:"ok. 1:55 · ok. 4,7 km · 1253 m", txt:"Najwyższy punkt trasy, skaliste wierzchołki."},
-  {t:"11:00", p:5, title:"Przełęcz Orłowicza", meta:"ok. 2:50 · ok. 8 km", ctrl:true, txt:`Drogowskaz: ${mk('y')} żółty w dół do Wetliny, ${mk('r')} czerwony prosto na Smerek. Bardzo wietrznie.`},
-  {t:"11:30", p:6, title:"Smerek", meta:"ok. 3:20 · ok. 9,2 km · 1222 m", txt:"Niższy wierzchołek (wyższy jest zamknięty). Panorama na Wetlińską i Caryńską. Przerwa ok. 15 min."}
-];
-const down = [
-  {t:"12:05", p:5, title:"Przełęcz Orłowicza", meta:"ok. 20 min ze Smereka", txt:`Dalej ${mk('r')} czerwonym na wschód.`},
-  {t:"13:05", p:4, title:"Osadzki Wierch", meta:"ok. 1 h od przełęczy", txt:"Przeważnie lekko pod górę."},
-  {t:"13:40", p:2, title:"Chatka Puchatka", meta:"ok. 35–40 min", txt:`Ciepła herbata, potem w prawo na ${mk('y')} żółty, w dół.`},
-  {t:"14:10", p:1, title:"Końska Droga", meta:"ok. 20 min", txt:`Nie skręcaj w zielony, dalej ${mk('y')} żółtym.`},
-  {t:"14:25", p:0, title:"Przełęcz Wyżna", meta:"ok. 15 min", txt:"Koniec trasy, ok. 3 h przed zachodem słońca."}
-];
-const row = r => {
-  const p = P[r.p];
-  return `<li><span class="time">${r.t}</span><span class="num${r.ctrl?' ctrl':''}">${p.id}</span>
-  <div class="poi"><h3>${r.ctrl?'<span class="flag">kontrola 11:30</span>':''}${r.title}</h3>
-  <span class="meta">${r.meta}</span><p>${r.txt}</p>
-  <a href="${gm(p)}" target="_blank" rel="noopener">Pokaż w Google Maps</a></div></li>`;
-};
-document.getElementById('tl-up').innerHTML = up.map(row).join('');
-document.getElementById('tl-down').innerHTML = down.map(row).join('');
-</script>
+        function saveGame() {
+            localStorage.setItem('nightbrand_player', JSON.stringify(player));
+            localStorage.setItem('nightbrand_quests', JSON.stringify(quests));
+            updateHUD();
+        }
 
+        function updateHUD() {
+            document.getElementById('hud-level').innerText = player.level;
+            document.getElementById('hud-gold').innerText = player.gold;
+            document.getElementById('hud-streak').innerText = player.streak + ' d.';
+            document.getElementById('hud-shields').innerText = player.shields;
+
+            document.getElementById('hp-bar').style.width = (player.hp / player.maxHp * 100) + '%';
+            document.getElementById('hp-text').innerText = `${player.hp} / ${player.maxHp}`;
+
+            document.getElementById('xp-bar').style.width = (player.xp / player.maxXp * 100) + '%';
+            document.getElementById('xp-text').innerText = `${player.xp} / ${player.maxXp}`;
+
+            document.getElementById('water-bar').style.width = (player.water / 8 * 100) + '%';
+            document.getElementById('water-text').innerText = `${player.water} / 8 Szklanek`;
+        }
+
+        function drawBounties() {
+            const shuffled = [...bountyPool].sort(() => 0.5 - Math.random());
+            bounties = shuffled.slice(0, 3).map((b, idx) => ({ id: 100 + idx, ...b, completed: false }));
+            renderBounties();
+        }
+
+        function renderBounties() {
+            const container = document.getElementById('bounty-container');
+            container.innerHTML = '';
+            bounties.forEach(q => {
+                container.innerHTML += `
+                    <div class="quest-card ${q.completed ? 'completed' : ''}">
+                        <div>
+                            <div class="quest-title">${q.title}</div>
+                            <div class="quest-meta">Zlecenie • +${q.xp} XP</div>
+                        </div>
+                        <button class="btn-sleek" style="width: auto; padding: 6px 12px; font-size: 10px;" onclick="toggleBounty(${q.id})">${q.completed ? 'Cofnij' : 'Zrobione'}</button>
+                    </div>
+                `;
+            });
+        }
+
+        function toggleBounty(id) {
+            const q = bounties.find(item => item.id === id);
+            if (!q) return;
+            q.completed = !q.completed;
+            processXpReward(q.xp, q.completed);
+            renderBounties();
+        }
+
+        function renderQuests() {
+            const container = document.getElementById('quests-container');
+            container.innerHTML = '';
+            quests.forEach(q => {
+                container.innerHTML += `
+                    <div class="quest-card ${q.completed ? 'completed' : ''}">
+                        <div>
+                            <div class="quest-title">${q.title}</div>
+                            <div class="quest-meta">${q.category} • +${q.xp} XP</div>
+                        </div>
+                        <button class="btn-sleek" style="width: auto; padding: 6px 12px; font-size: 10px;" onclick="toggleQuest(${q.id})">${q.completed ? 'Cofnij' : 'Zrobione'}</button>
+                    </div>
+                `;
+            });
+        }
+
+        function toggleQuest(id) {
+            const q = quests.find(item => item.id === id);
+            if (!q) return;
+            q.completed = !q.completed;
+            processXpReward(q.xp, q.completed);
+            renderQuests();
+        }
+
+        function processXpReward(baseXp, isCompleted) {
+            if (isCompleted) {
+                player.xp += baseXp;
+                player.gold += Math.floor(baseXp / 2);
+                if (player.xp >= player.maxXp) {
+                    player.level++;
+                    player.xp -= player.maxXp;
+                    player.maxXp = Math.floor(player.maxXp * 1.2);
+                    alert(`AWANS! Osiągnąłeś poziom ${player.level}!`);
+                }
+            } else {
+                player.xp = Math.max(0, player.xp - baseXp);
+            }
+            saveGame();
+        }
+
+        function drinkWater() {
+            if (player.water < 8) {
+                player.water++;
+                player.xp += 5;
+                player.gold += 2;
+                saveGame();
+            }
+        }
+
+        function failSocialMedia() {
+            player.hp = Math.max(0, player.hp - 15);
+            saveGame();
+            alert('Klątwa Dopaminy! Straciłeś 15 HP.');
+        }
+
+        function completeDetox() {
+            player.xp += 30;
+            player.gold += 10;
+            saveGame();
+            alert('Sukces! Oczyszczenie umysłu (+30 XP).');
+        }
+
+        function buyShield() {
+            if (player.gold >= 50) {
+                player.gold -= 50;
+                player.shields++;
+                saveGame();
+                alert('Zakupiono Łaskę Kostuchy!');
+            } else { alert('Za mało złota!'); }
+        }
+
+        function buyBuff() {
+            if (player.gold >= 30) {
+                player.gold -= 30;
+                saveGame();
+                alert('Wypito Napar Jasnego Umysłu!');
+            } else { alert('Za mało złota!'); }
+        }
+
+        function openLootBox() {
+            const win = Math.floor(Math.random() * 30) + 10;
+            player.gold += win;
+            saveGame();
+            document.getElementById('loot-result').innerText = `Odkryto ${win} sztuk złota w skrzyni!`;
+        }
+
+        function triggerPanicMode() {
+            alert('TRYB PARALIŻ: Wstań, zrób 3 głębokie oddechi i napij się wody. Skup się tylko na jednej minucie.');
+        }
+
+        function addQuest() {
+            const title = document.getElementById('new-quest-title').value;
+            const xp = parseInt(document.getElementById('new-quest-diff').value);
+            if (!title) return;
+            quests.push({ id: Date.now(), title, xp, completed: false, category: 'Własne' });
+            closeModal('add-quest-modal');
+            document.getElementById('new-quest-title').value = '';
+            saveGame();
+            renderQuests();
+        }
+
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-view').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.dock-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+            btn.classList.add('active');
+            if (tabId === 'map' && !mapInitialized) {
+                initMap();
+            }
+        }
+
+        let map, mapInitialized = false, currentMarker = null;
+
+        function initMap() {
+            map = L.map('map').setView([50.067, 22.233], 9);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(map);
+            fetchRandomPOD();
+            mapInitialized = true;
+        }
+
+        async function fetchRandomPOD() {
+            document.getElementById('poi-title').innerText = "Skanowanie ostępów Podkarpacia...";
+            document.getElementById('poi-desc').innerText = "Łączenie z OpenStreetMap...";
+
+            const randomLat = (49.3 + Math.random() * 1.4).toFixed(4);
+            const randomLon = (21.3 + Math.random() * 1.5).toFixed(4);
+
+            try {
+                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${randomLat}&lon=${randomLon}&zoom=12&addressdetails=1`);
+                const data = await response.json();
+
+                let placeName = data.display_name ? data.display_name.split(',')[0] : "Zagubiana Polana";
+                let category = data.type ? `Typ: ${data.type}` : "Teren odkryty";
+                let lat = parseFloat(data.lat || randomLat);
+                let lon = parseFloat(data.lon || randomLon);
+
+                document.getElementById('poi-title').innerText = placeName;
+                document.getElementById('poi-desc').innerText = `${category} • Współrzędne: ${lat.toFixed(2)}, ${lon.toFixed(2)}`;
+
+                if (map) {
+                    map.setView([lat, lon], 12);
+                    if (currentMarker) map.removeLayer(currentMarker);
+                    currentMarker = L.marker([lat, lon]).addTo(map).bindPopup(`<b>${placeName}</b><br>Cel wyprawy!`).openPopup();
+                }
+            } catch (e) {
+                document.getElementById('poi-title').innerText = "Pustelnia w Bieszczadach";
+                document.getElementById('poi-desc').innerText = "Brak sygnału z map, miejsce odkryte offline.";
+            }
+        }
+
+        const now = new Date();
+        document.getElementById('datetime-display').innerText = `Łańcut | ${now.toLocaleDateString('pl-PL', { weekday: 'long', month: 'long', day: 'numeric' })}`;
+
+        const ctx = document.getElementById('statsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Pon', 'Wt', 'Śr', 'Czw', 'Pt', 'Sob', 'Ndz'],
+                datasets: [{ label: 'Skupienie', data: [60, 40, 80, 50, 90, 70, 85], borderColor: '#d4af37', tension: 0.3 }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        });
+
+        drawBounties();
+        updateHUD();
+        renderQuests();
+        renderBounties();
+    </script>
 </body>
 </html>
