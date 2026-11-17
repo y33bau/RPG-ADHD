@@ -244,3 +244,6 @@ if('serviceWorker' in navigator&&location.protocol!=='file:'){
  if(reg.active)ready();else reg.addEventListener('updatefound',()=>reg.installing?.addEventListener('statechange',e=>{if(e.target.state==='activated')ready();}));
  }).catch(()=>toast('Tryb offline jest chwilowo niedostępny. Zadania nadal zapisują się na urządzeniu.'));
 }
+
+// Shared add-ons use the existing validator and persistence path.
+document.addEventListener('companion-state',e=>{const q=e.detail;if(q.action==='read'){q.result=structuredClone(state);return;}try{if(loadFailed)throw Error('Najpierw odzyskaj oryginalny zapis w ustawieniach.');const before=state,next=structuredClone(state);q.update(next);C.validate(next);state=next;if(!save()){state=before;throw Error('Nie udało się zapisać zmiany.');}render();q.result=true;}catch(err){q.error=err.message;}});
