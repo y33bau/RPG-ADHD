@@ -1,4 +1,4 @@
-const CACHE='synapse-v2.1.0';
+const CACHE='synapse-v2.1.1';
 const CORE=['./','./index.html','./app.js','./notifications.js','./notification-core.js','./core.js','./styles.css','./manifest.webmanifest','./assets/synapse.svg','./assets/synapse-maskable.svg','./adhd.html'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE))));
 // Activate the new version only after all old tabs have closed: avoid mixing old UI and new modules.

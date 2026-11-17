@@ -9,3 +9,14 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:Synapse,system-
 
 .water-panel{background:radial-gradient(ellipse at 100% 0,#6bbdc221,transparent 65%),linear-gradient(140deg,#1d2939,#192232);border-color:#88d8e326}
 .water-heading{display:flex;align-items:center;gap:11px}.water-heading .eyebrow{font-size:7px;letter-spacing:.12em;color:#a3dce5;margin-bottom:5px}.water-heading h2{font-size:16px}.water-droplet{width:38px;height:43px;background:#a2dce80f;border:1px solid #a2dce822;border-radius:12px;display:grid;place-items:center;color:#a2dce8;font-size:26px}.water-goal{font-size:8px;color:#b3e4e9;background:#a2dce810;border:1px solid #a2dce81b;border-radius:20px;padding:5px 8px;margin-left:auto;white-space:nowrap}.water-main{display:flex;justify-content:space-between;align-items:end;margin:22px 0 16px}.water-main strong{font-size:36px;letter-spacing:-.05em;color:#c8edf1;font-weight:550;line-height:1}.water-main strong small{font-size:16px;color:#90b6c2;font-weight:400;letter-spacing:-.02em}.water-portions{display:grid;grid-template-columns:repeat(10,1fr);gap:5px;margin-bottom:20px}.water-portion{height:24px;border:1px solid #a2dce820;border-radius:4px;background:#a2dce806}.water-portion.filled{background:linear-gradient(#a4dee7,#6ca9c4);border-color:#c3eaf955;box-shadow:0 0 12px #a2dce80b}.water-add{background:#b0dee5;color:#203844;border-color:transparent;font-size:11px;min-height:37px;padding:9px 13px}.water-footnote{font-size:9px;color:#8caeba;margin-top:14px;text-align:center}
+
+/* Keep app settings reachable in the iPhone standalone safe area. */
+.mobile-settings{display:none}
+@media(max-width:850px){
+.topbar{position:sticky;top:0;z-index:30;min-height:calc(70px + env(safe-area-inset-top,0px));height:auto;padding-top:env(safe-area-inset-top,0px);padding-bottom:0;background:#101322;gap:12px}
+.topbar>.top-actions,.topbar>.top-right{flex-shrink:0}
+.topbar .avatar{display:none}
+.mobile-settings{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-width:110px;min-height:44px;padding:10px 12px;background:var(--mint);color:#101322;border-radius:12px;font-size:12px;font-weight:650;white-space:nowrap}
+.mobile-settings>span:first-child{font-size:19px;line-height:1}
+.workspace{padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px))}
+}
