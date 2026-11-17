@@ -344,4 +344,466 @@
             background: #14141c; border: 1px solid var(--border-active); border-radius: 20px; padding: 24px; width: 100%; max-width: 360px; text-align: center;
         }
         input, select {
-            width: 100%; background:
+            width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border-subtle); color: var(--text-main); padding: 12px; border-radius: 10px; margin-bottom: 14px; font-size: 13px; outline: none;
+        }
+        #map { height: 240px; border-radius: 12px; border: 1px solid var(--border-subtle); margin-bottom: 12px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-title">REVENUE & EMPIRE</div>
+        <div id="datetime-display" class="subtitle">Rynek Nieruchomości | Łańcut</div>
+    </header>
+
+    <div class="container">
+        
+        <!-- DYNAMICZNA POGODA NA ŻYWO (OPEN-METEO API) -->
+        <div class="weather-hero-card">
+            <div class="weather-hero-header">
+                <div class="location-badge">📍 ŁAŃCUT / PODKARPACIE</div>
+                <div id="market-badge" style="background: rgba(212, 175, 55, 0.2); border: 1px solid rgba(212, 175, 55, 0.4); color: var(--gold); font-size: 9px; padding: 4px 10px; border-radius: 20px; font-weight: 600;">Popyt: Wysoki</div>
+            </div>
+            
+            <div class="weather-main-info">
+                <div>
+                    <div class="temp-display" id="live-temp">--°C</div>
+                    <div class="condition-text" id="live-condition">Pobieranie danych pogodowych...</div>
+                </div>
+                <img src="image_generation_content/47208ac9.jpeg" alt="Faza Księżyca" class="weather-graphic-icon" onerror="this.style.display='none';">
+            </div>
+
+            <div class="weather-footer-details">
+                <span id="live-wind">🌬️ Wiatr: -- km/h</span>
+                <span>📞 Cele na dziś: 15 kontaktów</span>
+            </div>
+        </div>
+
+        <!-- OPIERDALACZ / ALARM -->
+        <div id="roast-banner">
+            <div class="roast-title">🚨 PROTOKÓŁ DYSCYPLINY SYNDYKATU</div>
+            <div id="roast-text" class="roast-text">Mija kolejna godzina, a brak wpisu o kontakcie z klientem! Prowizje same nie wskoczą na konto. Weź telefon do ręki i wykręć numer do nowego leada, dopóki konkurencja śpi! (-5 HP)</div>
+        </div>
+
+        <!-- HUD STATYSTYK -->
+        <div class="glass-card">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-label">Ranga</div>
+                    <div class="stat-val" id="hud-level">Agent</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Prowizja</div>
+                    <div class="stat-val" id="hud-gold">1450 zł</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Seria Dni</div>
+                    <div class="stat-val" id="hud-streak">5 d.</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Tarcze</div>
+                    <div class="stat-val" id="hud-shields">2</div>
+                </div>
+            </div>
+
+            <div class="progress-group">
+                <div class="progress-label"><span>ENERGIACJA / HP</span><span id="hp-text">85 / 100</span></div>
+                <div class="bar-track"><div class="bar-fill fill-hp" id="hp-bar" style="width: 85%;"></div></div>
+            </div>
+
+            <div class="progress-group">
+                <div class="progress-label"><span>AWANS NA DYREKTORA (XP)</span><span id="xp-text">40 / 100</span></div>
+                <div class="bar-track"><div class="bar-fill fill-xp" id="xp-bar" style="width: 40%;"></div></div>
+            </div>
+
+            <div class="progress-group">
+                <div class="progress-label"><span>NAWODNIENIE (KAWA / WODA)</span><span id="water-text">3 / 6 Szklanek</span></div>
+                <div class="bar-track"><div class="bar-fill fill-water" id="water-bar" style="width: 50%;"></div></div>
+            </div>
+        </div>
+
+        <!-- SZYBKIE AKCJE -->
+        <div class="btn-row">
+            <button class="btn-action" onclick="logClientContact()">📞 Kontakt (+15 XP)</button>
+            <button class="btn-action" onclick="drinkWater()">☕ Woda/Kawa</button>
+            <button class="btn-action" onclick="openModal('loot-modal')">🎁 Bonus Biura</button>
+        </div>
+
+        <!-- KAFELKOWE MENU GŁÓWNE -->
+        <div class="dashboard-grid">
+            <div class="tile-card" onclick="switchTab('quests', document.querySelectorAll('.dock-btn')[0])">
+                <span class="tile-icon">📞</span>
+                <div class="tile-title">Leady i Dzwonienie</div>
+            </div>
+            <div class="tile-card" onclick="switchTab('map', document.querySelectorAll('.dock-btn')[1])">
+                <span class="tile-icon">🗺️</span>
+                <div class="tile-title">Elitarne Rewiry</div>
+            </div>
+            <div class="tile-card" onclick="switchTab('social', document.querySelectorAll('.dock-btn')[2])">
+                <span class="tile-icon">🔥</span>
+                <div class="tile-title">Blokada Prokrastynacji</div>
+            </div>
+            <div class="tile-card" onclick="switchTab('shop', document.querySelectorAll('.dock-btn')[3])">
+                <span class="tile-icon">🏆</span>
+                <div class="tile-title">Sklep / Nagrody</div>
+            </div>
+        </div>
+
+        <!-- ZAKŁADKI -->
+
+        <!-- TAB 1: QUESTY -->
+        <div id="tab-quests" class="tab-view active">
+            <div class="section-header">
+                <span class="section-title">Codzienne Zadania Akwizycyjne</span>
+                <button class="btn-sleek" style="width: auto; padding: 6px 12px; font-size: 10px;" onclick="openModal('add-quest-modal')">+ Nowy Cel</button>
+            </div>
+            <div class="quest-list" id="quests-container"></div>
+        </div>
+
+        <!-- TAB 2: MAPA / WYSELEKCJONOWANE PEREŁKI PODKARPACIA -->
+        <div id="tab-map" class="tab-view">
+            <div class="section-header"><span class="section-title">Skaner Atrakcji i Okazji Terenowych</span></div>
+            <div id="map"></div>
+            <div class="glass-card" style="margin-bottom: 0;">
+                <h4 id="poi-title" style="color: var(--gold); font-family: 'Cinzel', serif; font-size: 13px; margin-bottom: 4px;">Ładowanie atrakcji...</h4>
+                <p id="poi-desc" style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">Wyszukiwanie topowych miejsc regionu.</p>
+                <button class="btn-sleek" onclick="fetchElitePOI()">Wylosuj Inną Perełkę Podkarpacia</button>
+            </div>
+        </div>
+
+        <!-- TAB 3: BLOKADA -->
+        <div id="tab-social" class="tab-view">
+            <div class="section-header"><span class="section-title">Strefa Bez Skrollowania (Cold Calling Mode)</span></div>
+            <div class="quest-card">
+                <div>
+                    <div class="quest-title">Przeglądanie portali społecznościowych w godzinach pracy</div>
+                    <div class="quest-meta">Uległeś rozpraszaczom? Tracisz energię (-20 HP)</div>
+                </div>
+                <button class="btn-sleek" style="width: auto; padding: 8px 12px; background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.4); color: var(--danger);" onclick="failSocialMedia()">Przyznaj się</button>
+            </div>
+            <div class="quest-card">
+                <div>
+                    <div class="quest-title">Blok 60 minut nieprzerwanych telefonów</div>
+                    <div class="quest-meta">Czysta akwizycja (+50 XP, +100 zł prowizji)</div>
+                </div>
+                <button class="btn-sleek" style="width: auto; padding: 8px 12px;" onclick="completeDetox()">Zaliczone</button>
+            </div>
+        </div>
+
+        <!-- TAB 4: SKLEP -->
+        <div id="tab-shop" class="tab-view">
+            <div class="section-header"><span class="section-title">Wydaj Zarobioną Prowizję</span></div>
+            <div class="quest-card">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <img src="image_generation_content/14885394587259587265" style="width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+                    <div>
+                        <div class="quest-title">Wyjście na obiad / restaurację</div>
+                        <div class="quest-meta">Nagroda za domknięte cele (Koszt: 300 zł)</div>
+                    </div>
+                </div>
+                <button class="btn-sleek" style="width: auto; padding: 8px 12px;" onclick="buyReward(300, 'Obiad w restauracji')">Kup</button>
+            </div>
+            <div class="quest-card">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <img src="image_generation_content/5594749731608925098" style="width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+                    <div>
+                        <div class="quest-title">2 godziny wolnego / Gry / Netflix</div>
+                        <div class="quest-meta">Regeneracja sił (Koszt: 500 zł)</div>
+                    </div>
+                </div>
+                <button class="btn-sleek" style="width: auto; padding: 8px 12px;" onclick="buyReward(500, '2h Wolnego')">Kup</button>
+            </div>
+        </div>
+
+        <!-- TAB 5: STATYSTYKI -->
+        <div id="tab-stats" class="tab-view">
+            <div class="section-header"><span class="section-title">Skuteczność Działania</span></div>
+            <div class="glass-card">
+                <canvas id="statsChart" style="max-height: 180px;"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- DOLNY DOCK -->
+    <nav class="bottom-dock">
+        <button class="dock-btn active" onclick="switchTab('quests', this)">
+            <span class="dock-icon">📞</span>Leady
+        </button>
+        <button class="dock-btn" onclick="switchTab('map', this)">
+            <span class="dock-icon">🗺️</span>Rewiry
+        </button>
+        <button class="dock-btn" onclick="switchTab('social', this)">
+            <span class="dock-icon">🔥</span>Blokada
+        </button>
+        <button class="dock-btn" onclick="switchTab('shop', this)">
+            <span class="dock-icon">🏆</span>Nagrody
+        </button>
+        <button class="dock-btn" onclick="switchTab('stats', this)">
+            <span class="dock-icon">📊</span>Staty
+        </button>
+    </nav>
+
+    <!-- MODALE -->
+    <div id="add-quest-modal" class="modal-backdrop">
+        <div class="modal-window">
+            <h3 style="font-family: 'Cinzel', serif; color: var(--gold); margin-bottom: 16px;">Nowy Cel Akwizycyjny</h3>
+            <input type="text" id="new-quest-title" placeholder="np. Telefon do 5 nowych właścicieli...">
+            <select id="new-quest-diff">
+                <option value="15">Łatwe (15 XP, +50 zł)</option>
+                <option value="30">Średnie (30 XP, +150 zł)</option>
+                <option value="60">Trudne - Umówione Spotkanie (60 XP, +400 zł)</option>
+            </select>
+            <button class="btn-sleek" onclick="addQuest()" style="margin-bottom: 8px;">Dodaj Zadanie</button>
+            <button class="btn-action" onclick="closeModal('add-quest-modal')" style="width: 100%;">Anuluj</button>
+        </div>
+    </div>
+
+    <div id="loot-modal" class="modal-backdrop">
+        <div class="modal-window">
+            <h3 style="font-family: 'Cinzel', serif; color: var(--gold); margin-bottom: 16px;">Premia Biura Nieruchomości</h3>
+            <p id="loot-result" style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Otwórz kopertę z premią za aktywność...</p>
+            <button class="btn-sleek" onclick="openLootBox()" style="margin-bottom: 8px;">Otwórz Kopertę</button>
+            <button class="btn-action" onclick="closeModal('loot-modal')" style="width: 100%;">Zamknij</button>
+        </div>
+    </div>
+
+    <script>
+        let agent = JSON.parse(localStorage.getItem('realestate_agent')) || {
+            level: 'Agent', xp: 40, maxXp: 100, hp: 85, maxHp: 100,
+            gold: 1450, streak: 5, shields: 2, water: 3, lastActionTime: Date.now()
+        };
+
+        let quests = JSON.parse(localStorage.getItem('realestate_quests')) || [
+            { id: 1, title: 'Wykonaj 5 telefonów do nowych leadów z OLX/Otodom', xp: 25, reward: 100, completed: false },
+            { id: 2, title: 'Zrób follow-up z wczorajszymi klientami kupującymi', xp: 20, reward: 80, completed: false },
+            { id: 3, title: 'Wystaw 1 nowe ogłoszenie na portalach', xp: 35, reward: 150, completed: false }
+        ];
+
+        // POBIERANIE PRAWDZIWEJ POGODY NA ŻYWO (OPEN-METEO DLA ŁAŃCUTA: 50.067, 22.233)
+        async function fetchLiveWeather() {
+            try {
+                const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=50.067&longitude=22.233&current=temperature_2m,weather_code,wind_speed_10m');
+                const data = await res.json();
+                const temp = Math.round(data.current.temperature_2m);
+                const wind = Math.round(data.current.wind_speed_10m);
+                const code = data.current.weather_code;
+
+                // Tłumaczenie kodów WMO na polski
+                let condition = "Umiarkowanie";
+                if (code === 0) condition = "Czyste Niebo";
+                else if (code >= 1 && code <= 3) condition = "Lekkie Zachmurzenie";
+                else if (code >= 51 && code <= 67) condition = "Opady Deszczu";
+                else if (code >= 71 && code <= 77) condition = "Śnieg";
+                else if (code >= 95) condition = "Burza";
+
+                document.getElementById('live-temp').innerText = temp + "°C";
+                document.getElementById('live-condition').innerText = condition + " • Rynek Aktywny";
+                document.getElementById('live-wind').innerText = `🌬️ Wiatr: ${wind} km/h`;
+            } catch (e) {
+                document.getElementById('live-temp').innerText = "9°C";
+                document.getElementById('live-condition').innerText = "Czyste Niebo • Dane lokalne";
+            }
+        }
+        fetchLiveWeather();
+
+        // BAZA PRAWDZIWYCH, CIEKAWYCH MIEJSC NA PODKARPACIU (BEZ WIOCH)
+        const eliteSpots = [
+            { title: "Zamek w Łańcucie", desc: "Magnacka rezydencja z parkiem i stajniami.", lat: 50.067, lon: 22.233 },
+            { title: "Zamek w Krasiczynie", desc: "Renesansowy klejnot architektoniczny nad Sanem.", lat: 49.775, lon: 22.633 },
+            { title: "Rezerwat Skalny Prządki", desc: "Malownicze formacje piaskowcowe koło Krosna.", lat: 49.716, lon: 21.800 },
+            { title: "Zapora Wodna w Solinie", desc: "Bieszczadzkie morze i potężna hydrotechnika.", lat: 49.383, lon: 22.450 },
+            { title: "Zamek Kamieniec w Odrzykoniu", desc: "Ruiny średniowiecznej warowni Fredry.", lat: 49.733, lon: 21.783 },
+            { title: "Rynek w Przemyślu", desc: "Historyczne zabytkowe kamienice i klimat pogranicza.", lat: 49.783, lon: 22.766 },
+            { title: "Skansen w Sanoku (Muzeum Budownictwa Ludowego)", desc: "Jedno z najlepszych muzeów etnograficznych w Europie.", lat: 49.566, lon: 22.216 }
+        ];
+
+        // OPIERDALACZ CO GODZINĘ
+        setInterval(() => {
+            const hoursSinceLastAction = (Date.now() - agent.lastActionTime) / (1000 * 60 * 60);
+            const banner = document.getElementById('roast-banner');
+            if (hoursSinceLastAction >= 1) {
+                banner.style.display = 'block';
+                agent.hp = Math.max(0, agent.hp - 5);
+                saveAgent();
+            } else {
+                banner.style.display = 'none';
+            }
+        }, 10000);
+
+        function saveAgent() {
+            localStorage.setItem('realestate_agent', JSON.stringify(agent));
+            localStorage.setItem('realestate_quests', JSON.stringify(quests));
+            updateHUD();
+        }
+
+        function updateHUD() {
+            document.getElementById('hud-level').innerText = agent.level;
+            document.getElementById('hud-gold').innerText = agent.gold + ' zł';
+            document.getElementById('hud-streak').innerText = agent.streak + ' d.';
+            document.getElementById('hud-shields').innerText = agent.shields;
+
+            document.getElementById('hp-bar').style.width = (agent.hp / agent.maxHp * 100) + '%';
+            document.getElementById('hp-text').innerText = `${agent.hp} / ${agent.maxHp}`;
+
+            document.getElementById('xp-bar').style.width = (agent.xp / agent.maxXp * 100) + '%';
+            document.getElementById('xp-text').innerText = `${agent.xp} / ${agent.maxXp}`;
+
+            document.getElementById('water-bar').style.width = (agent.water / 6 * 100) + '%';
+            document.getElementById('water-text').innerText = `${agent.water} / 6`;
+        }
+
+        function renderQuests() {
+            const container = document.getElementById('quests-container');
+            container.innerHTML = '';
+            quests.forEach(q => {
+                container.innerHTML += `
+                    <div class="quest-card ${q.completed ? 'completed' : ''}">
+                        <div>
+                            <div class="quest-title">${q.title}</div>
+                            <div class="quest-meta">+${q.xp} XP • +${q.reward} zł prowizji</div>
+                        </div>
+                        <button class="btn-sleek" style="width: auto; padding: 6px 12px; font-size: 10px;" onclick="toggleQuest(${q.id})">${q.completed ? 'Cofnij' : 'Zrobione'}</button>
+                    </div>
+                `;
+            });
+        }
+
+        function toggleQuest(id) {
+            const q = quests.find(item => item.id === id);
+            if (!q) return;
+            q.completed = !q.completed;
+            
+            agent.lastActionTime = Date.now();
+            document.getElementById('roast-banner').style.display = 'none';
+
+            if (q.completed) {
+                agent.xp += q.xp;
+                agent.gold += q.reward;
+                agent.hp = Math.min(agent.maxHp, agent.hp + 5);
+                if (agent.xp >= agent.maxXp) {
+                    agent.level = 'Starszy Agent';
+                    agent.xp -= agent.maxXp;
+                    agent.maxXp = Math.floor(agent.maxXp * 1.3);
+                    alert(`AWANS! Twoja pozycja w agencji wzrosła na: ${agent.level}!`);
+                }
+            } else {
+                agent.xp = Math.max(0, agent.xp - q.xp);
+                agent.gold = Math.max(0, agent.gold - q.reward);
+            }
+            saveAgent();
+            renderQuests();
+        }
+
+        function logClientContact() {
+            agent.lastActionTime = Date.now();
+            document.getElementById('roast-banner').style.display = 'none';
+            agent.xp += 15;
+            agent.gold += 50;
+            saveAgent();
+            alert('Zarejestrowano kontakt z klientem! +15 XP, +50 zł prowizji.');
+        }
+
+        function drinkWater() {
+            if (agent.water < 6) {
+                agent.water++;
+                agent.hp = Math.min(agent.maxHp, agent.hp + 5);
+                saveAgent();
+            }
+        }
+
+        function failSocialMedia() {
+            agent.hp = Math.max(0, agent.hp - 20);
+            saveAgent();
+            alert('Stracone 20 HP na bezmyślne scrollowanie! Wracaj do dzwonienia.');
+        }
+
+        function completeDetox() {
+            agent.xp += 50;
+            agent.gold += 100;
+            agent.lastActionTime = Date.now();
+            document.getElementById('roast-banner').style.display = 'none';
+            saveAgent();
+            alert('Świetna robota! 60 minut bez rozpraszaczy zaliczone.');
+        }
+
+        function buyReward(cost, name) {
+            if (agent.gold >= cost) {
+                agent.gold -= cost;
+                saveAgent();
+                alert(`Odebrano nagrodę: ${name}! Zasłużyłeś.`);
+            } else { alert('Za mało środków z prowizji!'); }
+        }
+
+        function openLootBox() {
+            const win = Math.floor(Math.random() * 200) + 100;
+            agent.gold += win;
+            saveAgent();
+            document.getElementById('loot-result').innerText = `W kopercie znajdowała się premia biura: ${win} zł!`;
+        }
+
+        function addQuest() {
+            const title = document.getElementById('new-quest-title').value;
+            const xp = parseInt(document.getElementById('new-quest-diff').value);
+            const reward = xp * 5;
+            if (!title) return;
+            quests.push({ id: Date.now(), title, xp, reward, completed: false });
+            closeModal('add-quest-modal');
+            document.getElementById('new-quest-title').value = '';
+            saveAgent();
+            renderQuests();
+        }
+
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-view').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.dock-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+            btn.classList.add('active');
+            if (tabId === 'map' && !mapInitialized) {
+                initMap();
+            }
+        }
+
+        let map, mapInitialized = false, currentMarker = null;
+
+        function initMap() {
+            map = L.map('map').setView([50.067, 22.233], 9);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(map);
+            fetchElitePOI();
+            mapInitialized = true;
+        }
+
+        function fetchElitePOI() {
+            // Losuj z eleganckiej bazy perełek, a nie ze ślepych współrzędnych
+            const spot = eliteSpots[Math.floor(Math.random() * eliteSpots.length)];
+            
+            document.getElementById('poi-title').innerText = spot.title;
+            document.getElementById('poi-desc').innerText = spot.desc;
+
+            if (map) {
+                map.setView([spot.lat, spot.lon], 12);
+                if (currentMarker) map.removeLayer(currentMarker);
+                currentMarker = L.marker([spot.lat, spot.lon]).addTo(map).bindPopup(`<b>${spot.title}</b><br>${spot.desc}`).openPopup();
+            }
+        }
+
+        const now = new Date();
+        document.getElementById('datetime-display').innerText = `Łańcut | ${now.toLocaleDateString('pl-PL', { weekday: 'long', month: 'long', day: 'numeric' })}`;
+
+        const ctx = document.getElementById('statsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Pon', 'Wt', 'Śr', 'Czw', 'Pt', 'Sob', 'Ndz'],
+                datasets: [{ label: 'Wykonane telefony', data: [12, 18, 25, 10, 30, 15, 20], borderColor: '#d4af37', tension: 0.3 }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        });
+
+        updateHUD();
+        renderQuests();
+    </script>
+</body>
+</html>
