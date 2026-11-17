@@ -1,15 +1,22 @@
-const CACHE='synapse-v2.1.1';
-const CORE=['./','./index.html','./app.js','./notifications.js','./notification-core.js','./core.js','./styles.css','./manifest.webmanifest','./assets/synapse.svg','./assets/synapse-maskable.svg','./adhd.html'];
-self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE))));
-// Activate the new version only after all old tabs have closed: avoid mixing old UI and new modules.
+const CACHE='synapse-v2.1.2';
+const CORE=['./updates.js','./','./index.html','./app.js','./notifications.js','./notification-core.js','./core.js','./styles.css','./manifest.webmanifest','./assets/synapse.svg','./assets/synapse-maskable.svg','./adhd.html'];
+self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE.map(url=>new Request(url,{cache:'reload'})))).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('synapse-')&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
+self.addEventListener('message',event=>{if(event.data?.type==='SKIP_WAITING')event.waitUntil(self.skipWaiting());});
 self.addEventListener('fetch',event=>{
- const request=event.request,url=new URL(request.url);
- if(request.method!=='GET'||url.origin!==self.location.origin)return;
- if(request.mode==='navigate'){
-  event.respondWith(caches.match(request).then(cached=>cached||caches.match('./index.html')).then(cached=>cached||fetch(request)));return;
+ const req=event.request,url=new URL(req.url);
+ if(req.method!=='GET'||url.origin!==self.location.origin||!url.href.startsWith(self.registration.scope))return;
+ // Read only this release's complete cache: never combine two app versions.
+ event.respondWith((async()=>{
+ const cache=await caches.open(CACHE);
+ const cached=await cache.match(req);
+ if(cached)return cached;
+ if(req.mode==='navigate'){
+ const shell=await cache.match(new URL('./index.html',self.registration.scope).href);
+ if(shell)return shell;
  }
- event.respondWith(caches.match(request).then(cached=>cached||fetch(request)));
+ return fetch(req);
+ })());
 });
 
 self.addEventListener('push',event=>{
