@@ -3,51 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>NightBrand: ADHD RPG Planner</title>
+    <title>SYNAPSE // PROTOCOL: ADHD RPG</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="NightBrand RPG">
-    <link rel="apple-touch-icon" href="image_generation_content/6637477624654010166">
+    <meta name="apple-mobile-web-app-title" content="SYNAPSE">
+    <link rel="apple-touch-icon" href="./assets/icon_pwa.png">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Bungee+Spice&family=Inter:wght@300;400;500;600;700&display=swap');
 
         :root {
-            --bg-obsidian: #050507;
-            --glass-panel: rgba(18, 18, 24, 0.85);
-            --glass-card: rgba(28, 28, 38, 0.8);
-            --border-subtle: rgba(212, 175, 55, 0.2);
-            --border-active: rgba(212, 175, 55, 0.5);
-            --gold: #d4af37;
-            --gold-glow: rgba(212, 175, 55, 0.35);
-            --text-main: #f3f0ea;
-            --text-muted: #9490a0;
-            --danger: #ef4444;
-            --success: #10b981;
+            --bg-dark: #030305;
+            --panel-glitch: rgba(15, 15, 20, 0.95);
+            --card-glitch: rgba(25, 25, 35, 0.85);
+            --border-subtle: rgba(100, 255, 218, 0.2);
+            --border-active: rgba(100, 255, 218, 0.6);
+            --neon-cyan: #64ffda;
+            --neon-magenta: #ff00ff;
+            --neon-yellow: #ffff00;
+            --text-main: #e0f7fa;
+            --text-muted: #80cbc4;
+            --roast-red: #ff5252;
+            --success-green: #00e676;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            background-color: var(--bg-obsidian);
+            background-color: var(--bg-dark);
+            /* TŁO Z OBRAZKA .png */
+            background-image: url('./assets/bg_obsidian.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
             color: var(--text-main);
             min-height: 100vh;
             padding-top: env(safe-area-inset-top);
             padding-bottom: calc(110px + env(safe-area-inset-bottom));
             overflow-x: hidden;
-            background-image: url('image_generation_content/8981768286863944199');
-            background-size: cover;
-            background-attachment: fixed;
         }
 
         header {
@@ -56,25 +59,26 @@
             position: sticky;
             top: 0;
             z-index: 1000;
-            background: rgba(5, 5, 7, 0.92);
-            backdrop-filter: blur(14px);
+            background: rgba(3, 3, 5, 0.95);
+            backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--border-subtle);
         }
 
-        .logo-img {
-            max-height: 28px;
-            width: auto;
-            margin: 0 auto 4px auto;
-            display: block;
-            filter: drop-shadow(0 2px 8px rgba(212,175,55,0.4));
+        .logo-title {
+            font-family: 'Bungee Spice', cursive;
+            font-size: 20px;
+            color: var(--neon-cyan);
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(100,255,218,0.7), 0 0 20px rgba(255,0,255,0.5);
         }
 
         .subtitle {
-            font-family: 'Cinzel', serif;
-            font-size: 9px;
-            letter-spacing: 2px;
+            font-size: 10px;
+            letter-spacing: 3px;
             color: var(--text-muted);
             text-transform: uppercase;
+            margin-top: 4px;
+            font-weight: 600;
         }
 
         .container {
@@ -84,67 +88,72 @@
             padding: 16px;
         }
 
-        /* POGODA HERO TILE */
-        .weather-hero-card {
+        /* KAFELEK HERO - FOCUS */
+        .hero-focus-card {
             position: relative;
-            background: linear-gradient(135deg, rgba(20, 18, 26, 0.95), rgba(10, 8, 14, 0.98)), url('image_generation_content/47208ac9.jpeg');
+            /* TŁO Z OBRAZKA .png */
+            background: linear-gradient(135deg, rgba(10, 8, 14, 0.9), rgba(10, 8, 14, 0.98)), url('./assets/header_moon.png');
             background-size: cover;
             background-position: center;
             border: 1px solid var(--border-active);
             border-radius: 20px;
             padding: 20px;
             margin-bottom: 16px;
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7);
+            box-shadow: 0 0 25px rgba(100, 255, 218, 0.3);
         }
 
-        .weather-hero-header {
+        .focus-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 12px;
         }
 
-        .location-badge {
-            background: rgba(212, 175, 55, 0.15);
+        .mode-badge {
+            background: rgba(100, 255, 218, 0.15);
             border: 1px solid var(--border-active);
-            color: var(--gold);
-            font-family: 'Cinzel', serif;
-            font-size: 11px;
+            color: var(--neon-cyan);
+            font-size: 10px;
             font-weight: 700;
             padding: 6px 14px;
             border-radius: 20px;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
         }
 
-        .weather-main-info {
+        .focus-main-info {
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
 
-        .temp-display {
-            font-family: 'Cinzel', serif;
-            font-size: 38px;
+        .time-display {
+            font-size: 32px;
             font-weight: 700;
             color: var(--text-main);
+            letter-spacing: -1px;
+            font-family: 'Bungee Spice', cursive;
         }
 
         .condition-text {
-            font-size: 12px;
-            color: var(--gold);
-            font-family: 'Cinzel', serif;
+            font-size: 13px;
+            color: var(--neon-yellow);
             margin-top: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .weather-graphic-icon {
-            width: 54px;
-            height: 54px;
-            border-radius: 14px;
+        .focus-graphic-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
             border: 1px solid var(--border-subtle);
             object-fit: cover;
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.4);
         }
 
-        .weather-footer-details {
+        .focus-footer-details {
             display: flex;
             justify-content: space-between;
             margin-top: 14px;
@@ -152,9 +161,46 @@
             border-top: 1px solid rgba(255,255,255,0.08);
             font-size: 11px;
             color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        /* DUŻE KAFELKI MENU GŁÓWNEGO */
+        /* OPIERDALACZ BANNER */
+        #roast-banner {
+            display: none;
+            background: linear-gradient(135deg, rgba(255, 82, 82, 0.25), rgba(139, 0, 0, 0.5));
+            border: 1px solid var(--roast-red);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            animation: glitchAlert 0.5s infinite;
+        }
+
+        @keyframes glitchAlert {
+            0% { box-shadow: 0 0 10px var(--roast-red); transform: translate(1px, 1px); }
+            50% { box-shadow: 0 0 20px var(--roast-red); transform: translate(-1px, -1px); }
+            100% { box-shadow: 0 0 10px var(--roast-red); transform: translate(1px, 1px); }
+        }
+
+        .roast-title {
+            font-size: 12px;
+            color: #ffcdd2;
+            font-weight: 700;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .roast-text {
+            font-size: 11px;
+            color: var(--text-main);
+            line-height: 1.4;
+        }
+
+        /* KAFELKI */
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -163,37 +209,35 @@
         }
 
         .tile-card {
-            background: var(--glass-card);
+            background: var(--card-glitch);
             border: 1px solid var(--border-subtle);
             border-radius: 18px;
             padding: 20px 16px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.25s ease;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            transition: all 0.2s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
 
         .tile-card:active {
-            transform: scale(0.96);
-            background: rgba(212, 175, 55, 0.12);
-            border-color: var(--gold);
+            transform: scale(0.95);
+            background: rgba(100, 255, 218, 0.1);
+            border-color: var(--neon-cyan);
         }
 
-        .tile-icon { font-size: 32px; margin-bottom: 10px; display: block; }
-        .tile-title { font-family: 'Cinzel', serif; font-size: 12px; color: var(--gold); font-weight: 700; letter-spacing: 0.5px; }
+        .tile-icon { font-size: 32px; margin-bottom: 10px; display: block; filter: hue-rotate(90deg); }
+        .tile-title { font-size: 11px; color: var(--text-main); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
 
-        /* Glass Cards */
         .glass-card {
-            background: var(--glass-panel);
+            background: var(--panel-glitch);
             backdrop-filter: blur(16px);
             border: 1px solid var(--border-subtle);
             border-radius: 18px;
             padding: 18px;
             margin-bottom: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
         }
 
-        /* Stats HUD */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -202,37 +246,38 @@
         }
 
         .stat-item {
-            background: rgba(255, 255, 255, 0.04);
+            background: rgba(255, 255, 255, 0.03);
             border-radius: 12px;
             padding: 10px 4px;
             text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .stat-label { font-size: 8px; color: var(--text-muted); font-family: 'Cinzel', serif; text-transform: uppercase; }
-        .stat-val { font-size: 13px; font-weight: 700; color: var(--gold); margin-top: 3px; }
+        .stat-label { font-size: 8px; color: var(--text-muted); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+        .stat-val { font-size: 13px; font-weight: 700; color: var(--neon-cyan); margin-top: 3px; }
 
         .progress-group { margin-top: 12px; }
-        .progress-label { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-bottom: 5px; font-family: 'Cinzel', serif; }
-        .bar-track { background: rgba(255, 255, 255, 0.06); border-radius: 6px; height: 9px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.06); }
-        .bar-fill { height: 100%; border-radius: 6px; transition: width 0.5s ease; }
-        .fill-hp { background: linear-gradient(90deg, #dc2626, #ef4444); }
-        .fill-xp { background: linear-gradient(90deg, #d4af37, #fde047); }
-        .fill-water { background: linear-gradient(90deg, #2563eb, #38bdf8); }
+        .progress-label { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-bottom: 5px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        .bar-track { background: rgba(255, 255, 255, 0.05); border-radius: 6px; height: 9px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.05); }
+        .bar-fill { height: 100%; border-radius: 6px; transition: width 0.3s ease; }
+        .fill-hp { background: linear-gradient(90deg, #ff5252, #ff1744); box-shadow: 0 0 10px #ff5252; }
+        .fill-xp { background: linear-gradient(90deg, #64ffda, #00e676); box-shadow: 0 0 10px #64ffda; }
+        .fill-water { background: linear-gradient(90deg, #2979ff, #00bcd4); box-shadow: 0 0 10px #2979ff; }
 
         .btn-sleek {
-            background: linear-gradient(135deg, rgba(212,175,55,0.2), rgba(212,175,55,0.05));
+            background: linear-gradient(135deg, rgba(100, 255, 218, 0.15), rgba(100, 255, 218, 0.02));
             border: 1px solid var(--border-active);
-            color: var(--gold);
+            color: var(--neon-cyan);
             padding: 14px 18px;
             border-radius: 14px;
-            font-size: 12px;
-            font-family: 'Cinzel', serif;
+            font-size: 11px;
             font-weight: 700;
             cursor: pointer;
             text-align: center;
             width: 100%;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
         }
 
         .btn-row {
@@ -243,23 +288,25 @@
         }
 
         .btn-action {
-            background: var(--glass-card);
+            background: var(--card-glitch);
             border: 1px solid var(--border-subtle);
             color: var(--text-main);
             padding: 12px 8px;
             border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
+            font-size: 10px;
+            font-weight: 700;
             cursor: pointer;
             text-align: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-        .section-title { font-family: 'Cinzel', serif; font-size: 14px; color: var(--gold); letter-spacing: 0.5px; }
+        .section-title { font-size: 12px; color: var(--neon-cyan); letter-spacing: 2px; text-transform: uppercase; font-weight: 700; }
 
         .quest-card {
-            background: var(--glass-card);
+            background: var(--card-glitch);
             border: 1px solid var(--border-subtle);
             border-radius: 14px;
             padding: 14px 16px;
@@ -268,11 +315,10 @@
             justify-content: space-between;
             align-items: center;
         }
-        .quest-card.completed { opacity: 0.4; border-color: rgba(16, 185, 129, 0.3); text-decoration: line-through; }
-        .quest-title { font-size: 12px; font-weight: 600; color: var(--text-main); margin-bottom: 3px; }
-        .quest-meta { font-size: 10px; color: var(--text-muted); }
+        .quest-card.completed { opacity: 0.4; border-color: rgba(0, 230, 118, 0.3); text-decoration: line-through; }
+        .quest-title { font-size: 12px; font-weight: 700; color: var(--text-main); margin-bottom: 3px; }
+        .quest-meta { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
 
-        /* DOLNY PANEL NAWIGACYJNY (DOCK) - 5 PRZYCISKÓW */
         .bottom-dock {
             position: fixed;
             bottom: 16px;
@@ -280,7 +326,7 @@
             transform: translateX(-50%);
             width: calc(100% - 24px);
             max-width: 420px;
-            background: rgba(15, 15, 20, 0.95);
+            background: rgba(15, 15, 20, 0.98);
             backdrop-filter: blur(25px);
             border: 1px solid var(--border-active);
             border-radius: 22px;
@@ -288,17 +334,17 @@
             grid-template-columns: repeat(5, 1fr);
             padding: 10px 6px;
             z-index: 1000;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
 
         .dock-btn {
             background: none; border: none; color: var(--text-muted);
-            font-size: 10px; font-family: 'Cinzel', serif; font-weight: 600;
+            font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
             display: flex; flex-direction: column; align-items: center; gap: 5px;
             cursor: pointer; padding: 8px 0; border-radius: 14px; transition: all 0.2s;
         }
-        .dock-btn.active { color: var(--gold); background: rgba(212, 175, 55, 0.12); border: 1px solid rgba(212, 175, 55, 0.3); }
-        .dock-icon { font-size: 20px; }
+        .dock-btn.active { color: var(--neon-cyan); background: rgba(100, 255, 218, 0.1); border: 1px solid rgba(100, 255, 218, 0.3); }
+        .dock-icon { font-size: 18px; }
 
         .tab-view { display: none; }
         .tab-view.active { display: block; }
@@ -309,10 +355,12 @@
             display: none; justify-content: center; align-items: center; z-index: 2000; padding: 20px;
         }
         .modal-window {
-            background: #14141c; border: 1px solid var(--border-active); border-radius: 22px; padding: 24px; width: 100%; max-width: 360px; text-align: center;
+            background: #0a0a0c; border: 1px solid var(--border-active); border-radius: 22px; padding: 24px; width: 100%; max-width: 360px; text-align: center;
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.3);
         }
         input, select {
-            width: 100%; background: rgba(0,0,0,0.5); border: 1px solid var(--border-subtle); color: var(--text-main); padding: 14px; border-radius: 12px; margin-bottom: 14px; font-size: 13px; outline: none;
+            width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); color: var(--text-main); padding: 14px; border-radius: 12px; margin-bottom: 14px; font-size: 13px; outline: none;
+            font-family: 'Inter', sans-serif;
         }
         #map { height: 240px; border-radius: 14px; border: 1px solid var(--border-subtle); margin-bottom: 12px; }
     </style>
@@ -320,310 +368,284 @@
 <body>
 
     <header>
-        <img src="image_generation_content/5530a3e7.jpeg" alt="NightBrand" class="logo-img">
-        <div id="datetime-display" class="subtitle">Łańcut | System ADHD RPG</div>
+        <div class="logo-title">SYNAPSE // PROTOCOL</div>
+        <div id="datetime-display" class="subtitle">System Zarządzania Zadaniami (ADHD Edition)</div>
     </header>
 
     <div class="container">
         
-        <!-- POGODA HERO TILE -->
-        <div class="weather-hero-card">
-            <div class="weather-hero-header">
-                <div class="location-badge">📍 ŁAŃCUT / PODKARPACIE</div>
-                <div style="background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); color: var(--success); font-size: 9px; padding: 5px 12px; border-radius: 20px; font-weight: 700;">Biometr: Sprzyjający</div>
+        <!-- POGODA HERO TILE -> ZASÓB .png -->
+        <div class="hero-focus-card">
+            <div class="focus-header">
+                <div class="mode-badge">STAN: HYPE // FOCUS</div>
+                <div style="background: rgba(255, 215, 0, 0.2); border: 1px solid rgba(255, 215, 0, 0.4); color: var(--neon-yellow); font-size: 9px; padding: 5px 12px; border-radius: 20px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">POZIOM DOPAMINY: WYSOKI</div>
             </div>
             
-            <div class="weather-main-info">
+            <div class="focus-main-info">
                 <div>
-                    <div class="temp-display" id="live-temp">--°C</div>
-                    <div class="condition-text" id="live-condition">Pobieranie aury regionu...</div>
+                    <div class="time-display" id="live-time">--:--</div>
+                    <div class="condition-text" id="live-state">Ładowanie protokołu...</div>
                 </div>
-                <img src="image_generation_content/47208ac9.jpeg" alt="Faza Księżyca" class="weather-graphic-icon" onerror="this.style.display='none';">
+                <!-- OBRAZEK .png -->
+                <img src="./assets/header_moon.png" alt="Faza Synapsy" class="focus-graphic-icon" onerror="this.style.display='none';">
             </div>
 
-            <div class="weather-footer-details">
-                <span id="live-wind">🌬️ Wiatr: -- km/h</span>
-                <span>🧠 Stan: Skupienie</span>
+            <div class="focus-footer-details">
+                <span id="live-date">🗓️ --.--.----</span>
+                <span>⏳ Okno Skupienia: Aktywne</span>
             </div>
         </div>
 
-        <!-- STATYSTYKI HUD -->
+        <!-- OPIERDALACZ / ALARM -->
+        <div id="roast-banner">
+            <div class="roast-title">⚠️ BŁĄD SYSTEMU // NUDNOŚĆ ⚠️</div>
+            <div id="roast-text" class="roast-text">Wykryto spadek dopaminy! Mija czas, a Ty nie wykonałeś zadania. Grozi to przełączeniem na "Social Media Scroll". Kliknij szybko cokolwiek stymulującego! (-10 HP)</div>
+        </div>
+
+        <!-- HUD STATYSTYK -->
         <div class="glass-card">
             <div class="stats-grid">
                 <div class="stat-item">
-                    <div class="stat-label">Poziom</div>
-                    <div class="stat-val" id="hud-level">1</div>
+                    <div class="stat-label">Ranga</div>
+                    <div class="stat-val" id="hud-level">Łowca</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-label">Złoto</div>
-                    <div class="stat-val" id="hud-gold">50</div>
+                    <div class="stat-label">Złoto/Punkty</div>
+                    <div class="stat-val" id="hud-gold">750</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-label">Streak</div>
-                    <div class="stat-val" id="hud-streak">3 d.</div>
+                    <div class="stat-label">Dni Hype'u</div>
+                    <div class="stat-val" id="hud-streak">3</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-label">Tarcze</div>
-                    <div class="stat-val" id="hud-shields">1</div>
+                    <div class="stat-label">Hyperfixacje</div>
+                    <div class="stat-val" id="hud-shields">5</div>
                 </div>
             </div>
 
             <div class="progress-group">
-                <div class="progress-label"><span>PUNKTY ŻYCIA (HP)</span><span id="hp-text">100 / 100</span></div>
-                <div class="bar-track"><div class="bar-fill fill-hp" id="hp-bar" style="width: 100%;"></div></div>
+                <div class="progress-label"><span>STABILNOŚĆ (HP)</span><span id="hp-text">90 / 100</span></div>
+                <div class="bar-track"><div class="bar-fill fill-hp" id="hp-bar" style="width: 90%;"></div></div>
             </div>
 
             <div class="progress-group">
-                <div class="progress-label"><span>DOŚWIADCZENIE (XP)</span><span id="xp-text">0 / 100</span></div>
-                <div class="bar-track"><div class="bar-fill fill-xp" id="xp-bar" style="width: 0%;"></div></div>
+                <div class="progress-label"><span>ROZWÓJ (XP)</span><span id="xp-text">60 / 100</span></div>
+                <div class="bar-track"><div class="bar-fill fill-xp" id="xp-bar" style="width: 60%;"></div></div>
             </div>
 
             <div class="progress-group">
-                <div class="progress-label"><span>ELIXIR NAWODNIENIA</span><span id="water-text">0 / 8 Szklanek</span></div>
-                <div class="bar-track"><div class="bar-fill fill-water" id="water-bar" style="width: 0%;"></div></div>
+                <div class="progress-label"><span>NAWODNIENIE</span><span id="water-text">2 / 6 Szklanek</span></div>
+                <div class="bar-track"><div class="bar-fill fill-water" id="water-bar" style="width: 33%;"></div></div>
             </div>
         </div>
 
         <!-- SZYBKIE AKCJE -->
         <div class="btn-row">
-            <button class="btn-action" onclick="drinkWater()">💧 Woda (+5 XP)</button>
-            <button class="btn-action" onclick="triggerPanicMode()">🚨 Paraliż</button>
-            <button class="btn-action" onclick="openModal('loot-modal')">🎁 Skrzynia</button>
+            <button class="btn-action" onclick="logClientContact()">⚡ Mikrozadanie (+15 XP)</button>
+            <button class="btn-action" onclick="drinkWater()">☕ Woda/Stymulant</button>
+            <button class="btn-action" onclick="openModal('loot-modal')">🎁 Losowa Nagroda</button>
         </div>
 
-        <!-- GŁÓWNE ZAKŁADKI (START / DASHBOARD) -->
+        <!-- DASHBOARD (START) -->
         <div id="tab-home" class="tab-view active">
-            <div class="section-header"><span class="section-title">Centrum Dowodzenia ADHD</span></div>
+            <div class="section-header"><span class="section-title">Panel Sterowania Umysłem</span></div>
             <div class="dashboard-grid">
                 <div class="tile-card" onclick="switchTab('quests', document.querySelectorAll('.dock-btn')[1])">
-                    <span class="tile-icon">⚔️</span>
-                    <div class="tile-title">Questy Dnia</div>
+                    <span class="tile-icon">🎯</span>
+                    <div class="tile-title">Główne Zadania</div>
                 </div>
                 <div class="tile-card" onclick="switchTab('map', document.querySelectorAll('.dock-btn')[2])">
-                    <span class="tile-icon">🗺️</span>
-                    <div class="tile-title">Wyprawy POI</div>
+                    <span class="tile-icon">🌌</span>
+                    <div class="tile-title">Pałac Pamięci</div>
                 </div>
                 <div class="tile-card" onclick="switchTab('social', document.querySelectorAll('.dock-btn')[3])">
                     <span class="tile-icon">🛡️</span>
-                    <div class="tile-title">Anty-Social</div>
+                    <div class="tile-title">Blokada Rozpraszaczy</div>
                 </div>
                 <div class="tile-card" onclick="switchTab('shop', document.querySelectorAll('.dock-btn')[4])">
-                    <span class="tile-icon">🪙</span>
-                    <div class="tile-title">Sklep / Alchemia</div>
+                    <span class="tile-icon">💎</span>
+                    <div class="tile-title">Sklep Nagród</div>
                 </div>
             </div>
-            
-            <!-- PRZYCISK RESETU APLIKACJI -->
-            <button class="btn-action" style="width: 100%; background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.3); color: var(--danger); margin-top: 10px;" onclick="resetApp()">⚠️ Wyzeruj / Zresetuj Aplikację</button>
+
+            <button class="btn-action" style="width: 100%; background: rgba(255, 82, 82, 0.1); border-color: var(--roast-red); color: var(--roast-red); margin-top: 10px; font-family: 'Bungee Spice', cursive; letter-spacing: 0px;" onclick="resetApp()">⚠️ Hard Reset Protokołu ⚠️</button>
         </div>
 
         <!-- TAB 1: QUESTY -->
         <div id="tab-quests" class="tab-view">
             <div class="section-header">
-                <span class="section-title">Zlecenia Cechu</span>
-                <button class="btn-sleek" style="width: auto; padding: 6px 12px; font-size: 10px;" onclick="drawBounties()">Losuj</button>
-            </div>
-            <div class="quest-list" id="bounty-container"></div>
-
-            <div class="section-header" style="margin-top: 20px;">
-                <span class="section-title">Harmonogram Dnia</span>
-                <button class="btn-sleek" style="width: auto; padding: 6px 12px; font-size: 10px;" onclick="openModal('add-quest-modal')">+ Nowy</button>
+                <span class="section-title">Codzienna Lista Zadań</span>
+                <button class="btn-sleek" style="width: auto; padding: 6px 12px; font-size: 9px;" onclick="openModal('add-quest-modal')">+ Nowy Cel</button>
             </div>
             <div class="quest-list" id="quests-container"></div>
         </div>
 
         <!-- TAB 2: MAPA -->
         <div id="tab-map" class="tab-view">
-            <div class="section-header"><span class="section-title">Odkrywca Podkarpacia</span></div>
+            <div class="section-header"><span class="section-title">Eksploracja Pałacu Pamięci</span></div>
             <div id="map"></div>
             <div class="glass-card" style="margin-bottom: 0;">
-                <h4 id="poi-title" style="color: var(--gold); font-family: 'Cinzel', serif; font-size: 13px; margin-bottom: 4px;">Ładowanie atrakcji...</h4>
-                <p id="poi-desc" style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">Wyszukiwanie topowych miejsc regionu.</p>
-                <button class="btn-sleek" onclick="fetchElitePOI()">Wylosuj Nowy Cel Wyprawy</button>
+                <h4 id="poi-title" style="color: var(--neon-cyan); font-family: 'Inter', sans-serif; font-size: 13px; margin-bottom: 4px;">Ładowanie lokacji...</h4>
+                <p id="poi-desc" style="font-size: 10px; color: var(--text-muted); margin-bottom: 12px;">Wyszukiwanie wspomnień w twoim umyśle.</p>
+                <button class="btn-sleek" onclick="fetchElitePOI()">Zmień Perspektywę</button>
             </div>
         </div>
 
-        <!-- TAB 3: ANTY-SOCIAL -->
+        <!-- TAB 3: BLOKADA -->
         <div id="tab-social" class="tab-view">
-            <div class="section-header"><span class="section-title">Walka z Klątwą Dopaminy</span></div>
+            <div class="section-header"><span class="section-title">Strefa Skupienia (Focus Mode)</span></div>
             <div class="quest-card">
                 <div>
-                    <div class="quest-title">Bezużyteczne Scrollowanie</div>
-                    <div class="quest-meta">Uległeś pokusie? Straciłeś skupienie (-15 HP)</div>
+                    <div class="quest-title">Otwarcie "tylko jednej" karty z social media w pracy</div>
+                    <div class="quest-meta">Błąd Dopaminowy! Tracisz stabilność systemu (-20 HP)</div>
                 </div>
-                <button class="btn-sleek" style="width: auto; padding: 8px 12px; background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.4); color: var(--danger);" onclick="failSocialMedia()">Skapituluj</button>
+                <button class="btn-sleek" style="width: auto; padding: 8px 12px; background: rgba(255, 82, 82, 0.15); border-color: var(--roast-red); color: var(--roast-red);" onclick="failSocialMedia()">Reset Hype'u</button>
             </div>
             <div class="quest-card">
                 <div>
-                    <div class="quest-title">1h Digital Detox</div>
-                    <div class="quest-meta">Oczyszczenie umysłu (+30 XP, +10 Złota)</div>
+                    <div class="quest-title">Blok 25 minut pracy (Pomodoro)</div>
+                    <div class="quest-meta">Czysty Focus (+50 XP, +50 Punktów)</div>
                 </div>
-                <button class="btn-sleek" style="width: auto; padding: 8px 12px;" onclick="completeDetox()">Wykonaj</button>
+                <button class="btn-sleek" style="width: auto; padding: 8px 12px;" onclick="completeDetox()">Zaliczone</button>
             </div>
         </div>
 
         <!-- TAB 4: SKLEP -->
         <div id="tab-shop" class="tab-view">
-            <div class="section-header"><span class="section-title">Sklep Alchemiczny</span></div>
+            <div class="section-header"><span class="section-title">Wydaj Punkty Dopaminowe</span></div>
             <div class="quest-card">
                 <div style="display: flex; align-items: center; gap: 12px;">
-                    <img src="image_generation_content/14885394587259587265" style="width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+                    <!-- ZASÓB .png -->
+                    <img src="./assets/icon_reward.png" style="width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border-subtle);" onerror="this.style.display='none';">
                     <div>
-                        <div class="quest-title">Łaska Kostuchy</div>
-                        <div class="quest-meta">Chroni serię streaku (50 Złota)</div>
+                        <div class="quest-title">5 minut scrollowania TikToka / YouTube</div>
+                        <div class="quest-meta">Szybki strzał dopaminy (Koszt: 100 pkt)</div>
                     </div>
                 </div>
-                <button class="btn-sleek" style="width: auto; padding: 8px 12px;" onclick="buyShield()">Kup</button>
+                <button class="btn-sleek" style="width: auto; padding: 8px 12px;" onclick="buyReward(100, '5m Scrollowania')">Kup</button>
             </div>
             <div class="quest-card">
                 <div style="display: flex; align-items: center; gap: 12px;">
-                    <img src="image_generation_content/5594749731608925098" style="width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+                    <!-- ZASÓB .png -->
+                    <img src="./assets/icon_reward.png" style="width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border-subtle);" onerror="this.style.display='none';">
                     <div>
-                        <div class="quest-title">Napar Jasnego Umysłu</div>
-                        <div class="quest-meta">Zwiększa skupienie (30 Złota)</div>
+                        <div class="quest-title">1h Grania w grę / Oglądania filmu</div>
+                        <div class="quest-meta">Nagroda za długi focus (Koszt: 500 pkt)</div>
                     </div>
                 </div>
-                <button class="btn-sleek" style="width: auto; padding: 8px 12px;" onclick="buyBuff()">Wypij</button>
+                <button class="btn-sleek" style="width: auto; padding: 8px 12px;" onclick="buyReward(500, '1h Rozrywki')">Kup</button>
             </div>
         </div>
     </div>
 
-    <!-- DOLNY DOCK NAWIGACYJNY (5 PRZYCISKÓW) -->
+    <!-- DOLNY DOCK -->
     <nav class="bottom-dock">
         <button class="dock-btn active" onclick="switchTab('home', this)">
             <span class="dock-icon">⚡</span>Start
         </button>
         <button class="dock-btn" onclick="switchTab('quests', this)">
-            <span class="dock-icon">⚔️</span>Questy
+            <span class="dock-icon">🎯</span>Cele
         </button>
         <button class="dock-btn" onclick="switchTab('map', this)">
-            <span class="dock-icon">🗺️</span>Wyprawy
+            <span class="dock-icon">🌌</span>Pałac
         </button>
         <button class="dock-btn" onclick="switchTab('social', this)">
-            <span class="dock-icon">🛡️</span>Detox
+            <span class="dock-icon">🛡️</span>Blokada
         </button>
         <button class="dock-btn" onclick="switchTab('shop', this)">
-            <span class="dock-icon">🪙</span>Alchemia
+            <span class="dock-icon">💎</span>Sklep
         </button>
     </nav>
 
     <!-- MODALE -->
     <div id="add-quest-modal" class="modal-backdrop">
         <div class="modal-window">
-            <h3 style="font-family: 'Cinzel', serif; color: var(--gold); margin-bottom: 16px;">Nowy Quest</h3>
-            <input type="text" id="new-quest-title" placeholder="Nazwa zadania...">
+            <h3 style="font-family: 'Bungee Spice', cursive; color: var(--neon-cyan); margin-bottom: 16px; font-size: 16px; letter-spacing: 1px;">Nowy Cel // Zadanie</h3>
+            <input type="text" id="new-quest-title" placeholder="np. Wyrzucić śmieci, Odpisać na maila...">
             <select id="new-quest-diff">
-                <option value="10">Łatwe (10 XP)</option>
-                <option value="25">Średnie (25 XP)</option>
-                <option value="50">Trudne (50 XP)</option>
+                <option value="15">Mikro (15 XP, +50 pkt)</option>
+                <option value="30">Średnie (30 XP, +150 pkt)</option>
+                <option value="60">Makro - Potrzebna medytacja (60 XP, +400 pkt)</option>
             </select>
-            <button class="btn-sleek" onclick="addQuest()" style="margin-bottom: 8px;">Dodaj do Harmonogramu</button>
+            <button class="btn-sleek" onclick="addQuest()" style="margin-bottom: 8px;">Dodaj Zadanie</button>
             <button class="btn-action" onclick="closeModal('add-quest-modal')" style="width: 100%;">Anuluj</button>
         </div>
     </div>
 
     <div id="loot-modal" class="modal-backdrop">
         <div class="modal-window">
-            <h3 style="font-family: 'Cinzel', serif; color: var(--gold); margin-bottom: 16px;">Skrzynia z Łupem</h3>
-            <p id="loot-result" style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Dotknij skrzyni, aby odkryć zawartość...</p>
-            <button class="btn-sleek" onclick="openLootBox()" style="margin-bottom: 8px;">Otwórz Skrzynię</button>
+            <h3 style="font-family: 'Bungee Spice', cursive; color: var(--neon-cyan); margin-bottom: 16px; font-size: 16px; letter-spacing: 1px;">Dopamine Drop Box</h3>
+            <p id="loot-result" style="font-size: 12px; color: var(--text-muted); margin-bottom: 20px;">Odbierz swoją nagrodę za aktywność...</p>
+            <button class="btn-sleek" onclick="openLootBox()" style="margin-bottom: 8px;">Odbierz Nagrodę</button>
             <button class="btn-action" onclick="closeModal('loot-modal')" style="width: 100%;">Zamknij</button>
         </div>
     </div>
 
     <script>
-        let player = JSON.parse(localStorage.getItem('nightbrand_player')) || {
-            level: 1, xp: 0, maxXp: 100, hp: 100, maxHp: 100,
-            gold: 50, streak: 3, shields: 1, water: 0
+        let agent = JSON.parse(localStorage.getItem('adhd_agent')) || {
+            level: 'Łowca', xp: 60, maxXp: 100, hp: 90, maxHp: 100,
+            gold: 750, streak: 3, shields: 5, water: 2, lastActionTime: Date.now()
         };
 
-        let quests = JSON.parse(localStorage.getItem('nightbrand_quests')) || [
-            { id: 1, title: 'Poranna rozgrzewka i woda', xp: 10, completed: false, category: 'Poranek' },
-            { id: 2, title: 'Praca nad kodem NightBrand (45 min)', xp: 50, completed: false, category: 'Popołudnie' }
-        ];
-
-        let bounties = [];
-        const bountyPool = [
-            { title: 'Porządek na biurku (Stajnia Augiasza)', xp: 30 },
-            { title: 'Odpisanie na 3 zaległe maile', xp: 25 },
-            { title: 'Wyniesienie śmieci i przewietrzenie pokoju', xp: 15 },
-            { title: 'Sesja głębokiego skupienia (30 min)', xp: 40 }
+        let quests = JSON.parse(localStorage.getItem('adhd_quests')) || [
+            { id: 1, title: 'Zrobić kawę i usiąść do biurka przed 9:00', xp: 30, reward: 150, completed: false },
+            { id: 2, title: '15 minutowy blok pracy nad głównym projektem', xp: 25, reward: 100, completed: false },
+            { id: 3, title: 'Wyłączyć powiadomienia w telefonie', xp: 15, reward: 50, completed: false }
         ];
 
         const eliteSpots = [
-            { title: "Zamek w Łańcucie", desc: "Magnacka rezydencja z parkiem.", lat: 50.067, lon: 22.233 },
-            { title: "Zamek w Krasiczynie", desc: "Renesansowy klejnot nad Sanem.", lat: 49.775, lon: 22.633 },
-            { title: "Rezerwat Skalny Prządki", desc: "Malownicze formacje koło Krosna.", lat: 49.716, lon: 21.800 },
-            { title: "Zapora Wodna w Solinie", desc: "Bieszczadzkie morze i turystyka.", lat: 49.383, lon: 22.450 }
+            { title: "Biblioteka Chaosu", desc: "Gdzie leżą wszystkie twoje książki.", lat: 51.5074, lon: -0.1278 },
+            { title: "Jaskinia Hyperfixacji", desc: "Tam, gdzie spędziłeś ostatnie 72h.", lat: 35.6895, lon: 139.6917 },
+            { title: "Ogród Kreatywności", desc: "Piękny, ale trochę zarośnięty.", lat: 40.7128, lon: -74.0060 },
+            { title: "Dolina Rozpraszaczy", desc: "Uważaj, jest tu dużo 'błyskotek'.", lat: -33.8688, lon: 151.2093 }
         ];
 
-        async function fetchLiveWeather() {
-            try {
-                const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=50.067&longitude=22.233&current=temperature_2m,weather_code,wind_speed_10m');
-                const data = await res.json();
-                const temp = Math.round(data.current.temperature_2m);
-                const wind = Math.round(data.current.wind_speed_10m);
-                let condition = "Czyste Niebo";
-                document.getElementById('live-temp').innerText = temp + "°C";
-                document.getElementById('live-condition').innerText = condition + " • Spokojna Aura";
-                document.getElementById('live-wind').innerText = `🌬️ Wiatr: ${wind} km/h`;
-            } catch (e) {
-                document.getElementById('live-temp').innerText = "9°C";
-                document.getElementById('live-condition').innerText = "Czyste Niebo • Dane lokalne";
-            }
+        function updateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+            const dateStr = now.toLocaleDateString('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' });
+            document.getElementById('live-time').innerText = timeStr;
+            document.getElementById('live-date').innerText = dateStr;
+            document.getElementById('live-state').innerText = "System Operacyjny Aktywny";
         }
-        fetchLiveWeather();
+        updateTime();
+        setInterval(updateTime, 10000);
 
-        function saveGame() {
-            localStorage.setItem('nightbrand_player', JSON.stringify(player));
-            localStorage.setItem('nightbrand_quests', JSON.stringify(quests));
+        setInterval(() => {
+            const hoursSinceLastAction = (Date.now() - agent.lastActionTime) / (1000 * 60 * 60);
+            const banner = document.getElementById('roast-banner');
+            if (hoursSinceLastAction >= (20/60)) {
+                banner.style.display = 'block';
+                agent.hp = Math.max(0, agent.hp - 10);
+                saveAgent();
+            } else {
+                banner.style.display = 'none';
+            }
+        }, 5000);
+
+        function saveAgent() {
+            localStorage.setItem('adhd_agent', JSON.stringify(agent));
+            localStorage.setItem('adhd_quests', JSON.stringify(quests));
             updateHUD();
         }
 
         function updateHUD() {
-            document.getElementById('hud-level').innerText = player.level;
-            document.getElementById('hud-gold').innerText = player.gold;
-            document.getElementById('hud-streak').innerText = player.streak + ' d.';
-            document.getElementById('hud-shields').innerText = player.shields;
+            document.getElementById('hud-level').innerText = agent.level;
+            document.getElementById('hud-gold').innerText = agent.gold;
+            document.getElementById('hud-streak').innerText = agent.streak + ' d.';
+            document.getElementById('hud-shields').innerText = agent.shields;
 
-            document.getElementById('hp-bar').style.width = (player.hp / player.maxHp * 100) + '%';
-            document.getElementById('hp-text').innerText = `${player.hp} / ${player.maxHp}`;
+            const hpPercent = (agent.hp / agent.maxHp * 100);
+            const hpBar = document.getElementById('hp-bar');
+            hpBar.style.width = hpPercent + '%';
+            hpBar.className = 'bar-fill fill-hp';
+            if(hpPercent > 50) hpBar.className = 'bar-fill fill-xp';
 
-            document.getElementById('xp-bar').style.width = (player.xp / player.maxXp * 100) + '%';
-            document.getElementById('xp-text').innerText = `${player.xp} / ${player.maxXp}`;
-
-            document.getElementById('water-bar').style.width = (player.water / 8 * 100) + '%';
-            document.getElementById('water-text').innerText = `${player.water} / 8`;
-        }
-
-        function drawBounties() {
-            const shuffled = [...bountyPool].sort(() => 0.5 - Math.random());
-            bounties = shuffled.slice(0, 3).map((b, idx) => ({ id: 100 + idx, ...b, completed: false }));
-            renderBounties();
-        }
-
-        function renderBounties() {
-            const container = document.getElementById('bounty-container');
-            container.innerHTML = '';
-            bounties.forEach(q => {
-                container.innerHTML += `
-                    <div class="quest-card ${q.completed ? 'completed' : ''}">
-                        <div>
-                            <div class="quest-title">${q.title}</div>
-                            <div class="quest-meta">Zlecenie • +${q.xp} XP</div>
-                        </div>
-                        <button class="btn-sleek" style="width: auto; padding: 6px 12px; font-size: 10px;" onclick="toggleBounty(${q.id})">${q.completed ? 'Cofnij' : 'Zrobione'}</button>
-                    </div>
-                `;
-            });
-        }
-
-        function toggleBounty(id) {
-            const q = bounties.find(item => item.id === id);
-            if (!q) return;
-            q.completed = !q.completed;
-            processXpReward(q.xp, q.completed);
-            renderBounties();
+            document.getElementById('hp-text').innerText = `${agent.hp} / ${agent.maxHp}`;
+            document.getElementById('xp-bar').style.width = (agent.xp / agent.maxXp * 100) + '%';
+            document.getElementById('xp-text').innerText = `${agent.xp} / ${agent.maxXp}`;
+            document.getElementById('water-bar').style.width = (agent.water / 6 * 100) + '%';
+            document.getElementById('water-text').innerText = `${agent.water} / 6`;
         }
 
         function renderQuests() {
@@ -634,9 +656,9 @@
                     <div class="quest-card ${q.completed ? 'completed' : ''}">
                         <div>
                             <div class="quest-title">${q.title}</div>
-                            <div class="quest-meta">${q.category} • +${q.xp} XP</div>
+                            <div class="quest-meta">+${q.xp} XP • +${q.reward} pkt</div>
                         </div>
-                        <button class="btn-sleek" style="width: auto; padding: 6px 12px; font-size: 10px;" onclick="toggleQuest(${q.id})">${q.completed ? 'Cofnij' : 'Zrobione'}</button>
+                        <button class="btn-sleek" style="width: auto; padding: 6px 12px; font-size: 9px;" onclick="toggleQuest(${q.id})">${q.completed ? 'Cofnij' : 'Zrobione'}</button>
                     </div>
                 `;
             });
@@ -646,91 +668,92 @@
             const q = quests.find(item => item.id === id);
             if (!q) return;
             q.completed = !q.completed;
-            processXpReward(q.xp, q.completed);
+            
+            agent.lastActionTime = Date.now();
+            document.getElementById('roast-banner').style.display = 'none';
+
+            if (q.completed) {
+                agent.xp += q.xp;
+                agent.gold += q.reward;
+                agent.hp = Math.min(agent.maxHp, agent.hp + 10);
+                if (agent.xp >= agent.maxXp) {
+                    agent.level = 'Mistrz Skupienia';
+                    agent.xp -= agent.maxXp;
+                    agent.maxXp = Math.floor(agent.maxXp * 1.5);
+                    alert(`SYSTEM // AWANS! Osiągnięto rangę: ${agent.level}!`);
+                }
+            } else {
+                agent.xp = Math.max(0, agent.xp - q.xp);
+                agent.gold = Math.max(0, agent.gold - q.reward);
+                agent.hp = Math.max(0, agent.hp - 10);
+            }
+            saveAgent();
             renderQuests();
         }
 
-        function processXpReward(baseXp, isCompleted) {
-            if (isCompleted) {
-                player.xp += baseXp;
-                player.gold += Math.floor(baseXp / 2);
-                if (player.xp >= player.maxXp) {
-                    player.level++;
-                    player.xp -= player.maxXp;
-                    player.maxXp = Math.floor(player.maxXp * 1.2);
-                    alert(`AWANS! Osiągnąłeś poziom ${player.level}!`);
-                }
-            } else {
-                player.xp = Math.max(0, player.xp - baseXp);
-            }
-            saveGame();
+        function logClientContact() {
+            agent.lastActionTime = Date.now();
+            document.getElementById('roast-banner').style.display = 'none';
+            agent.xp += 15;
+            agent.gold += 50;
+            saveAgent();
+            alert('SYNAPSE FIRED! Zarejestrowano mikrozadanie! +15 XP, +50 pkt.');
         }
 
         function drinkWater() {
-            if (player.water < 8) {
-                player.water++;
-                player.xp += 5;
-                player.gold += 2;
-                saveGame();
+            if (agent.water < 6) {
+                agent.water++;
+                agent.hp = Math.min(agent.maxHp, agent.hp + 5);
+                saveAgent();
             }
         }
 
         function failSocialMedia() {
-            player.hp = Math.max(0, player.hp - 15);
-            saveGame();
-            alert('Klątwa Dopaminy! Straciłeś 15 HP.');
+            agent.hp = Math.max(0, agent.hp - 20);
+            saveAgent();
+            alert('DOPAMINE ERROR! Spadek stabilności systemu. Wracaj do zadania!');
         }
 
         function completeDetox() {
-            player.xp += 30;
-            player.gold += 10;
-            saveGame();
-            alert('Sukces! Oczyszczenie umysłu (+30 XP).');
+            agent.xp += 50;
+            agent.gold += 100;
+            agent.lastActionTime = Date.now();
+            document.getElementById('roast-banner').style.display = 'none';
+            saveAgent();
+            alert('SYSTEM STABILNY! Sesja skupienia zakończona sukcesem.');
         }
 
-        function buyShield() {
-            if (player.gold >= 50) {
-                player.gold -= 50;
-                player.shields++;
-                saveGame();
-                alert('Zakupiono Łaskę Kostuchy!');
-            } else { alert('Za mało złota!'); }
-        }
-
-        function buyBuff() {
-            if (player.gold >= 30) {
-                player.gold -= 30;
-                saveGame();
-                alert('Wypito Napar Jasnego Umysłu!');
-            } else { alert('Za mało złota!'); }
+        function buyReward(cost, name) {
+            if (agent.gold >= cost) {
+                agent.gold -= cost;
+                saveAgent();
+                alert(`REWARD // Nagroda odebrana: ${name}. Czas na reset dopaminowy.`);
+            } else { alert('ERROR // Za mało punktów dopaminowych!'); }
         }
 
         function openLootBox() {
-            const win = Math.floor(Math.random() * 30) + 10;
-            player.gold += win;
-            saveGame();
-            document.getElementById('loot-result').innerText = `Odkryto ${win} sztuk złota w skrzyni!`;
-        }
-
-        function triggerPanicMode() {
-            alert('TRYB PARALIŻ: Wstań, zrób 3 głębokie oddechi i napij się wody. Skup się tylko na jednej minucie.');
+            const win = Math.floor(Math.random() * 150) + 50;
+            agent.gold += win;
+            saveAgent();
+            document.getElementById('loot-result').innerText = `SYSTEM // Wylosowano bonus: ${win} pkt!`;
         }
 
         function addQuest() {
             const title = document.getElementById('new-quest-title').value;
             const xp = parseInt(document.getElementById('new-quest-diff').value);
+            const reward = xp * 10;
             if (!title) return;
-            quests.push({ id: Date.now(), title, xp, completed: false, category: 'Własne' });
+            quests.push({ id: Date.now(), title, xp, reward, completed: false });
             closeModal('add-quest-modal');
             document.getElementById('new-quest-title').value = '';
-            saveGame();
+            saveAgent();
             renderQuests();
         }
 
         function resetApp() {
-            if (confirm("Czy na pewno chcesz zresetować aplikację i wyczyścić postępy?")) {
-                localStorage.removeItem('nightbrand_player');
-                localStorage.removeItem('nightbrand_quests');
+            if (confirm("Czy na pewno chcesz wykonać HARD RESET i wyczyścić wszystkie dane protokołu?")) {
+                localStorage.removeItem('adhd_agent');
+                localStorage.removeItem('adhd_quests');
                 location.reload();
             }
         }
@@ -751,7 +774,7 @@
         let map, mapInitialized = false, currentMarker = null;
 
         function initMap() {
-            map = L.map('map').setView([50.067, 22.233], 9);
+            map = L.map('map').setView([0, 0], 2);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(map);
             fetchElitePOI();
             mapInitialized = true;
@@ -763,19 +786,14 @@
             document.getElementById('poi-desc').innerText = spot.desc;
 
             if (map) {
-                map.setView([spot.lat, spot.lon], 12);
+                map.setView([spot.lat, spot.lon], 10);
                 if (currentMarker) map.removeLayer(currentMarker);
                 currentMarker = L.marker([spot.lat, spot.lon]).addTo(map).bindPopup(`<b>${spot.title}</b><br>${spot.desc}`).openPopup();
             }
         }
 
-        const now = new Date();
-        document.getElementById('datetime-display').innerText = `Łańcut | ${now.toLocaleDateString('pl-PL', { weekday: 'long', month: 'long', day: 'numeric' })}`;
-
-        drawBounties();
         updateHUD();
         renderQuests();
-        renderBounties();
     </script>
 </body>
 </html>
