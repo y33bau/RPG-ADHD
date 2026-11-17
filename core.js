@@ -134,3 +134,15 @@ export function migrate(oldAgent,oldTasks,now=Date.now()){
  }
  return s;
 }
+
+export const WATER_PORTION=200, WATER_GOAL=2000;
+export function hydration(state,now=Date.now()){
+ const count=state.water.day===dayKey(now)?state.water.count:0;
+ return {count,ml:count*WATER_PORTION,goal:WATER_GOAL,remaining:Math.max(0,WATER_GOAL-count*WATER_PORTION),percent:Math.min(100,count*WATER_PORTION/WATER_GOAL*100)};
+}
+export function logWater(state,delta=1,now=Date.now()){
+ if(![1,-1].includes(delta))throw Error('Nieprawidłowa porcja wody.');
+ if(state.water.day!==dayKey(now))state.water={day:dayKey(now),count:0};
+ state.water.count=Math.max(0,Math.min(10,state.water.count+delta));
+ return hydration(state,now);
+}
