@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>REVENUE & EMPIRE: Real Estate RPG</title>
+    <title>NightBrand: ADHD RPG Planner</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Real Estate RPG">
-    <link rel="apple-touch-icon" href="image_generation_content/13773131596121703961">
+    <meta name="apple-mobile-web-app-title" content="NightBrand RPG">
+    <link rel="apple-touch-icon" href="image_generation_content/6637477624654010166">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -18,12 +18,12 @@
 
         :root {
             --bg-obsidian: #050507;
-            --glass-panel: rgba(18, 18, 24, 0.8);
-            --glass-card: rgba(28, 28, 38, 0.7);
-            --border-subtle: rgba(212, 175, 55, 0.15);
-            --border-active: rgba(212, 175, 55, 0.4);
+            --glass-panel: rgba(18, 18, 24, 0.85);
+            --glass-card: rgba(28, 28, 38, 0.8);
+            --border-subtle: rgba(212, 175, 55, 0.2);
+            --border-active: rgba(212, 175, 55, 0.5);
             --gold: #d4af37;
-            --gold-glow: rgba(212, 175, 55, 0.25);
+            --gold-glow: rgba(212, 175, 55, 0.35);
             --text-main: #f3f0ea;
             --text-muted: #9490a0;
             --danger: #ef4444;
@@ -43,7 +43,7 @@
             color: var(--text-main);
             min-height: 100vh;
             padding-top: env(safe-area-inset-top);
-            padding-bottom: calc(100px + env(safe-area-inset-bottom));
+            padding-bottom: calc(110px + env(safe-area-inset-bottom));
             overflow-x: hidden;
             background-image: url('image_generation_content/8981768286863944199');
             background-size: cover;
@@ -51,23 +51,22 @@
         }
 
         header {
-            padding: 16px 20px;
+            padding: 14px 20px;
             text-align: center;
             position: sticky;
             top: 0;
             z-index: 1000;
-            background: rgba(5, 5, 7, 0.9);
-            backdrop-filter: blur(12px);
+            background: rgba(5, 5, 7, 0.92);
+            backdrop-filter: blur(14px);
             border-bottom: 1px solid var(--border-subtle);
         }
 
-        .logo-title {
-            font-family: 'Cinzel', serif;
-            font-size: 16px;
-            color: var(--gold);
-            font-weight: 700;
-            letter-spacing: 1px;
-            text-shadow: 0 2px 8px rgba(212,175,55,0.3);
+        .logo-img {
+            max-height: 28px;
+            width: auto;
+            margin: 0 auto 4px auto;
+            display: block;
+            filter: drop-shadow(0 2px 8px rgba(212,175,55,0.4));
         }
 
         .subtitle {
@@ -76,7 +75,6 @@
             letter-spacing: 2px;
             color: var(--text-muted);
             text-transform: uppercase;
-            margin-top: 2px;
         }
 
         .container {
@@ -89,21 +87,21 @@
         /* POGODA HERO TILE */
         .weather-hero-card {
             position: relative;
-            background: linear-gradient(135deg, rgba(20, 18, 26, 0.9), rgba(10, 8, 14, 0.95)), url('image_generation_content/47208ac9.jpeg');
+            background: linear-gradient(135deg, rgba(20, 18, 26, 0.95), rgba(10, 8, 14, 0.98)), url('image_generation_content/47208ac9.jpeg');
             background-size: cover;
             background-position: center;
             border: 1px solid var(--border-active);
             border-radius: 20px;
-            padding: 18px;
+            padding: 20px;
             margin-bottom: 16px;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7);
         }
 
         .weather-hero-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
         .location-badge {
@@ -113,7 +111,7 @@
             font-family: 'Cinzel', serif;
             font-size: 11px;
             font-weight: 700;
-            padding: 5px 12px;
+            padding: 6px 14px;
             border-radius: 20px;
             letter-spacing: 1px;
         }
@@ -126,7 +124,7 @@
 
         .temp-display {
             font-family: 'Cinzel', serif;
-            font-size: 34px;
+            font-size: 38px;
             font-weight: 700;
             color: var(--text-main);
         }
@@ -135,97 +133,65 @@
             font-size: 12px;
             color: var(--gold);
             font-family: 'Cinzel', serif;
-            margin-top: 2px;
+            margin-top: 4px;
         }
 
         .weather-graphic-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
+            width: 54px;
+            height: 54px;
+            border-radius: 14px;
             border: 1px solid var(--border-subtle);
             object-fit: cover;
         }
 
         .weather-footer-details {
             display: flex;
-            gap: 12px;
-            margin-top: 12px;
-            padding-top: 8px;
-            border-top: 1px solid rgba(255,255,255,0.06);
-            font-size: 10px;
+            justify-content: space-between;
+            margin-top: 14px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            font-size: 11px;
             color: var(--text-muted);
         }
 
-        /* OPIERDALACZ BANNER */
-        #roast-banner {
-            display: none;
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(139, 0, 0, 0.4));
-            border: 1px solid var(--danger);
-            border-radius: 14px;
-            padding: 14px;
-            margin-bottom: 16px;
-            animation: pulseAlert 1.5s infinite;
-        }
-
-        @keyframes pulseAlert {
-            0% { box-shadow: 0 0 10px rgba(239,68,68,0.2); }
-            50% { box-shadow: 0 0 25px rgba(239,68,68,0.5); }
-            100% { box-shadow: 0 0 10px rgba(239,68,68,0.2); }
-        }
-
-        .roast-title {
-            font-family: 'Cinzel', serif;
-            font-size: 12px;
-            color: #fca5a5;
-            font-weight: 700;
-            margin-bottom: 4px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .roast-text {
-            font-size: 11px;
-            color: var(--text-main);
-            line-height: 1.4;
-        }
-
-        /* Glass Cards & Grid */
-        .glass-card {
-            background: var(--glass-panel);
-            backdrop-filter: blur(16px);
-            border: 1px solid var(--border-subtle);
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 16px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-        }
-
+        /* DUŻE KAFELKI MENU GŁÓWNEGO */
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            gap: 14px;
             margin-bottom: 16px;
         }
 
         .tile-card {
             background: var(--glass-card);
             border: 1px solid var(--border-subtle);
-            border-radius: 14px;
-            padding: 16px;
+            border-radius: 18px;
+            padding: 20px 16px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.25s ease;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
         }
 
         .tile-card:active {
-            transform: scale(0.97);
-            background: rgba(212, 175, 55, 0.1);
+            transform: scale(0.96);
+            background: rgba(212, 175, 55, 0.12);
             border-color: var(--gold);
         }
 
-        .tile-icon { font-size: 22px; margin-bottom: 6px; display: block; }
-        .tile-title { font-family: 'Cinzel', serif; font-size: 11px; color: var(--gold); font-weight: 600; }
+        .tile-icon { font-size: 32px; margin-bottom: 10px; display: block; }
+        .tile-title { font-family: 'Cinzel', serif; font-size: 12px; color: var(--gold); font-weight: 700; letter-spacing: 0.5px; }
+
+        /* Glass Cards */
+        .glass-card {
+            background: var(--glass-panel);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 18px;
+            padding: 18px;
+            margin-bottom: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
 
         /* Stats HUD */
         .stats-grid {
@@ -236,43 +202,43 @@
         }
 
         .stat-item {
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 10px;
-            padding: 8px 4px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 10px 4px;
             text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
         }
 
         .stat-label { font-size: 8px; color: var(--text-muted); font-family: 'Cinzel', serif; text-transform: uppercase; }
-        .stat-val { font-size: 13px; font-weight: 700; color: var(--gold); margin-top: 2px; }
+        .stat-val { font-size: 13px; font-weight: 700; color: var(--gold); margin-top: 3px; }
 
-        .progress-group { margin-top: 10px; }
-        .progress-label { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-bottom: 4px; font-family: 'Cinzel', serif; }
-        .bar-track { background: rgba(255, 255, 255, 0.05); border-radius: 6px; height: 8px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.05); }
+        .progress-group { margin-top: 12px; }
+        .progress-label { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-bottom: 5px; font-family: 'Cinzel', serif; }
+        .bar-track { background: rgba(255, 255, 255, 0.06); border-radius: 6px; height: 9px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.06); }
         .bar-fill { height: 100%; border-radius: 6px; transition: width 0.5s ease; }
         .fill-hp { background: linear-gradient(90deg, #dc2626, #ef4444); }
         .fill-xp { background: linear-gradient(90deg, #d4af37, #fde047); }
         .fill-water { background: linear-gradient(90deg, #2563eb, #38bdf8); }
 
         .btn-sleek {
-            background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05));
+            background: linear-gradient(135deg, rgba(212,175,55,0.2), rgba(212,175,55,0.05));
             border: 1px solid var(--border-active);
             color: var(--gold);
-            padding: 12px 16px;
-            border-radius: 12px;
+            padding: 14px 18px;
+            border-radius: 14px;
             font-size: 12px;
             font-family: 'Cinzel', serif;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             text-align: center;
             width: 100%;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
         }
 
         .btn-row {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
+            gap: 10px;
             margin-bottom: 16px;
         }
 
@@ -280,324 +246,326 @@
             background: var(--glass-card);
             border: 1px solid var(--border-subtle);
             color: var(--text-main);
-            padding: 10px 6px;
-            border-radius: 10px;
+            padding: 12px 8px;
+            border-radius: 12px;
             font-size: 11px;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
             text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .section-title { font-family: 'Cinzel', serif; font-size: 13px; color: var(--gold); }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .section-title { font-family: 'Cinzel', serif; font-size: 14px; color: var(--gold); letter-spacing: 0.5px; }
 
         .quest-card {
             background: var(--glass-card);
             border: 1px solid var(--border-subtle);
-            border-radius: 12px;
-            padding: 12px 16px;
-            margin-bottom: 8px;
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
         .quest-card.completed { opacity: 0.4; border-color: rgba(16, 185, 129, 0.3); text-decoration: line-through; }
-        .quest-title { font-size: 12px; font-weight: 500; color: var(--text-main); margin-bottom: 2px; }
+        .quest-title { font-size: 12px; font-weight: 600; color: var(--text-main); margin-bottom: 3px; }
         .quest-meta { font-size: 10px; color: var(--text-muted); }
 
+        /* DOLNY PANEL NAWIGACYJNY (DOCK) - 5 PRZYCISKÓW */
         .bottom-dock {
             position: fixed;
             bottom: 16px;
             left: 50%;
             transform: translateX(-50%);
-            width: calc(100% - 32px);
-            max-width: 410px;
-            background: rgba(18, 18, 24, 0.9);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border-subtle);
-            border-radius: 20px;
+            width: calc(100% - 24px);
+            max-width: 420px;
+            background: rgba(15, 15, 20, 0.95);
+            backdrop-filter: blur(25px);
+            border: 1px solid var(--border-active);
+            border-radius: 22px;
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            padding: 8px;
+            padding: 10px 6px;
             z-index: 1000;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.8);
         }
 
         .dock-btn {
             background: none; border: none; color: var(--text-muted);
-            font-size: 9px; font-family: 'Cinzel', serif;
-            display: flex; flex-direction: column; align-items: center; gap: 4px;
-            cursor: pointer; padding: 6px 0; border-radius: 12px; transition: all 0.2s;
+            font-size: 10px; font-family: 'Cinzel', serif; font-weight: 600;
+            display: flex; flex-direction: column; align-items: center; gap: 5px;
+            cursor: pointer; padding: 8px 0; border-radius: 14px; transition: all 0.2s;
         }
-        .dock-btn.active { color: var(--gold); background: rgba(212, 175, 55, 0.08); border: 1px solid rgba(212, 175, 55, 0.2); }
-        .dock-icon { font-size: 16px; }
+        .dock-btn.active { color: var(--gold); background: rgba(212, 175, 55, 0.12); border: 1px solid rgba(212, 175, 55, 0.3); }
+        .dock-icon { font-size: 20px; }
 
         .tab-view { display: none; }
         .tab-view.active { display: block; }
 
         .modal-backdrop {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
             display: none; justify-content: center; align-items: center; z-index: 2000; padding: 20px;
         }
         .modal-window {
-            background: #14141c; border: 1px solid var(--border-active); border-radius: 20px; padding: 24px; width: 100%; max-width: 360px; text-align: center;
+            background: #14141c; border: 1px solid var(--border-active); border-radius: 22px; padding: 24px; width: 100%; max-width: 360px; text-align: center;
         }
         input, select {
-            width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border-subtle); color: var(--text-main); padding: 12px; border-radius: 10px; margin-bottom: 14px; font-size: 13px; outline: none;
+            width: 100%; background: rgba(0,0,0,0.5); border: 1px solid var(--border-subtle); color: var(--text-main); padding: 14px; border-radius: 12px; margin-bottom: 14px; font-size: 13px; outline: none;
         }
-        #map { height: 240px; border-radius: 12px; border: 1px solid var(--border-subtle); margin-bottom: 12px; }
+        #map { height: 240px; border-radius: 14px; border: 1px solid var(--border-subtle); margin-bottom: 12px; }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo-title">REVENUE & EMPIRE</div>
-        <div id="datetime-display" class="subtitle">Rynek Nieruchomości | Łańcut</div>
+        <img src="image_generation_content/5530a3e7.jpeg" alt="NightBrand" class="logo-img">
+        <div id="datetime-display" class="subtitle">Łańcut | System ADHD RPG</div>
     </header>
 
     <div class="container">
         
-        <!-- DYNAMICZNA POGODA NA ŻYWO (OPEN-METEO API) -->
+        <!-- POGODA HERO TILE -->
         <div class="weather-hero-card">
             <div class="weather-hero-header">
                 <div class="location-badge">📍 ŁAŃCUT / PODKARPACIE</div>
-                <div id="market-badge" style="background: rgba(212, 175, 55, 0.2); border: 1px solid rgba(212, 175, 55, 0.4); color: var(--gold); font-size: 9px; padding: 4px 10px; border-radius: 20px; font-weight: 600;">Popyt: Wysoki</div>
+                <div style="background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); color: var(--success); font-size: 9px; padding: 5px 12px; border-radius: 20px; font-weight: 700;">Biometr: Sprzyjający</div>
             </div>
             
             <div class="weather-main-info">
                 <div>
                     <div class="temp-display" id="live-temp">--°C</div>
-                    <div class="condition-text" id="live-condition">Pobieranie danych pogodowych...</div>
+                    <div class="condition-text" id="live-condition">Pobieranie aury regionu...</div>
                 </div>
                 <img src="image_generation_content/47208ac9.jpeg" alt="Faza Księżyca" class="weather-graphic-icon" onerror="this.style.display='none';">
             </div>
 
             <div class="weather-footer-details">
                 <span id="live-wind">🌬️ Wiatr: -- km/h</span>
-                <span>📞 Cele na dziś: 15 kontaktów</span>
+                <span>🧠 Stan: Skupienie</span>
             </div>
         </div>
 
-        <!-- OPIERDALACZ / ALARM -->
-        <div id="roast-banner">
-            <div class="roast-title">🚨 PROTOKÓŁ DYSCYPLINY SYNDYKATU</div>
-            <div id="roast-text" class="roast-text">Mija kolejna godzina, a brak wpisu o kontakcie z klientem! Prowizje same nie wskoczą na konto. Weź telefon do ręki i wykręć numer do nowego leada, dopóki konkurencja śpi! (-5 HP)</div>
-        </div>
-
-        <!-- HUD STATYSTYK -->
+        <!-- STATYSTYKI HUD -->
         <div class="glass-card">
             <div class="stats-grid">
                 <div class="stat-item">
-                    <div class="stat-label">Ranga</div>
-                    <div class="stat-val" id="hud-level">Agent</div>
+                    <div class="stat-label">Poziom</div>
+                    <div class="stat-val" id="hud-level">1</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-label">Prowizja</div>
-                    <div class="stat-val" id="hud-gold">1450 zł</div>
+                    <div class="stat-label">Złoto</div>
+                    <div class="stat-val" id="hud-gold">50</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-label">Seria Dni</div>
-                    <div class="stat-val" id="hud-streak">5 d.</div>
+                    <div class="stat-label">Streak</div>
+                    <div class="stat-val" id="hud-streak">3 d.</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-label">Tarcze</div>
-                    <div class="stat-val" id="hud-shields">2</div>
+                    <div class="stat-val" id="hud-shields">1</div>
                 </div>
             </div>
 
             <div class="progress-group">
-                <div class="progress-label"><span>ENERGIACJA / HP</span><span id="hp-text">85 / 100</span></div>
-                <div class="bar-track"><div class="bar-fill fill-hp" id="hp-bar" style="width: 85%;"></div></div>
+                <div class="progress-label"><span>PUNKTY ŻYCIA (HP)</span><span id="hp-text">100 / 100</span></div>
+                <div class="bar-track"><div class="bar-fill fill-hp" id="hp-bar" style="width: 100%;"></div></div>
             </div>
 
             <div class="progress-group">
-                <div class="progress-label"><span>AWANS NA DYREKTORA (XP)</span><span id="xp-text">40 / 100</span></div>
-                <div class="bar-track"><div class="bar-fill fill-xp" id="xp-bar" style="width: 40%;"></div></div>
+                <div class="progress-label"><span>DOŚWIADCZENIE (XP)</span><span id="xp-text">0 / 100</span></div>
+                <div class="bar-track"><div class="bar-fill fill-xp" id="xp-bar" style="width: 0%;"></div></div>
             </div>
 
             <div class="progress-group">
-                <div class="progress-label"><span>NAWODNIENIE (KAWA / WODA)</span><span id="water-text">3 / 6 Szklanek</span></div>
-                <div class="bar-track"><div class="bar-fill fill-water" id="water-bar" style="width: 50%;"></div></div>
+                <div class="progress-label"><span>ELIXIR NAWODNIENIA</span><span id="water-text">0 / 8 Szklanek</span></div>
+                <div class="bar-track"><div class="bar-fill fill-water" id="water-bar" style="width: 0%;"></div></div>
             </div>
         </div>
 
         <!-- SZYBKIE AKCJE -->
         <div class="btn-row">
-            <button class="btn-action" onclick="logClientContact()">📞 Kontakt (+15 XP)</button>
-            <button class="btn-action" onclick="drinkWater()">☕ Woda/Kawa</button>
-            <button class="btn-action" onclick="openModal('loot-modal')">🎁 Bonus Biura</button>
+            <button class="btn-action" onclick="drinkWater()">💧 Woda (+5 XP)</button>
+            <button class="btn-action" onclick="triggerPanicMode()">🚨 Paraliż</button>
+            <button class="btn-action" onclick="openModal('loot-modal')">🎁 Skrzynia</button>
         </div>
 
-        <!-- KAFELKOWE MENU GŁÓWNE -->
-        <div class="dashboard-grid">
-            <div class="tile-card" onclick="switchTab('quests', document.querySelectorAll('.dock-btn')[0])">
-                <span class="tile-icon">📞</span>
-                <div class="tile-title">Leady i Dzwonienie</div>
+        <!-- GŁÓWNE ZAKŁADKI (START / DASHBOARD) -->
+        <div id="tab-home" class="tab-view active">
+            <div class="section-header"><span class="section-title">Centrum Dowodzenia ADHD</span></div>
+            <div class="dashboard-grid">
+                <div class="tile-card" onclick="switchTab('quests', document.querySelectorAll('.dock-btn')[1])">
+                    <span class="tile-icon">⚔️</span>
+                    <div class="tile-title">Questy Dnia</div>
+                </div>
+                <div class="tile-card" onclick="switchTab('map', document.querySelectorAll('.dock-btn')[2])">
+                    <span class="tile-icon">🗺️</span>
+                    <div class="tile-title">Wyprawy POI</div>
+                </div>
+                <div class="tile-card" onclick="switchTab('social', document.querySelectorAll('.dock-btn')[3])">
+                    <span class="tile-icon">🛡️</span>
+                    <div class="tile-title">Anty-Social</div>
+                </div>
+                <div class="tile-card" onclick="switchTab('shop', document.querySelectorAll('.dock-btn')[4])">
+                    <span class="tile-icon">🪙</span>
+                    <div class="tile-title">Sklep / Alchemia</div>
+                </div>
             </div>
-            <div class="tile-card" onclick="switchTab('map', document.querySelectorAll('.dock-btn')[1])">
-                <span class="tile-icon">🗺️</span>
-                <div class="tile-title">Elitarne Rewiry</div>
-            </div>
-            <div class="tile-card" onclick="switchTab('social', document.querySelectorAll('.dock-btn')[2])">
-                <span class="tile-icon">🔥</span>
-                <div class="tile-title">Blokada Prokrastynacji</div>
-            </div>
-            <div class="tile-card" onclick="switchTab('shop', document.querySelectorAll('.dock-btn')[3])">
-                <span class="tile-icon">🏆</span>
-                <div class="tile-title">Sklep / Nagrody</div>
-            </div>
+            
+            <!-- PRZYCISK RESETU APLIKACJI -->
+            <button class="btn-action" style="width: 100%; background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.3); color: var(--danger); margin-top: 10px;" onclick="resetApp()">⚠️ Wyzeruj / Zresetuj Aplikację</button>
         </div>
-
-        <!-- ZAKŁADKI -->
 
         <!-- TAB 1: QUESTY -->
-        <div id="tab-quests" class="tab-view active">
+        <div id="tab-quests" class="tab-view">
             <div class="section-header">
-                <span class="section-title">Codzienne Zadania Akwizycyjne</span>
-                <button class="btn-sleek" style="width: auto; padding: 6px 12px; font-size: 10px;" onclick="openModal('add-quest-modal')">+ Nowy Cel</button>
+                <span class="section-title">Zlecenia Cechu</span>
+                <button class="btn-sleek" style="width: auto; padding: 6px 12px; font-size: 10px;" onclick="drawBounties()">Losuj</button>
+            </div>
+            <div class="quest-list" id="bounty-container"></div>
+
+            <div class="section-header" style="margin-top: 20px;">
+                <span class="section-title">Harmonogram Dnia</span>
+                <button class="btn-sleek" style="width: auto; padding: 6px 12px; font-size: 10px;" onclick="openModal('add-quest-modal')">+ Nowy</button>
             </div>
             <div class="quest-list" id="quests-container"></div>
         </div>
 
-        <!-- TAB 2: MAPA / WYSELEKCJONOWANE PEREŁKI PODKARPACIA -->
+        <!-- TAB 2: MAPA -->
         <div id="tab-map" class="tab-view">
-            <div class="section-header"><span class="section-title">Skaner Atrakcji i Okazji Terenowych</span></div>
+            <div class="section-header"><span class="section-title">Odkrywca Podkarpacia</span></div>
             <div id="map"></div>
             <div class="glass-card" style="margin-bottom: 0;">
                 <h4 id="poi-title" style="color: var(--gold); font-family: 'Cinzel', serif; font-size: 13px; margin-bottom: 4px;">Ładowanie atrakcji...</h4>
                 <p id="poi-desc" style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">Wyszukiwanie topowych miejsc regionu.</p>
-                <button class="btn-sleek" onclick="fetchElitePOI()">Wylosuj Inną Perełkę Podkarpacia</button>
+                <button class="btn-sleek" onclick="fetchElitePOI()">Wylosuj Nowy Cel Wyprawy</button>
             </div>
         </div>
 
-        <!-- TAB 3: BLOKADA -->
+        <!-- TAB 3: ANTY-SOCIAL -->
         <div id="tab-social" class="tab-view">
-            <div class="section-header"><span class="section-title">Strefa Bez Skrollowania (Cold Calling Mode)</span></div>
+            <div class="section-header"><span class="section-title">Walka z Klątwą Dopaminy</span></div>
             <div class="quest-card">
                 <div>
-                    <div class="quest-title">Przeglądanie portali społecznościowych w godzinach pracy</div>
-                    <div class="quest-meta">Uległeś rozpraszaczom? Tracisz energię (-20 HP)</div>
+                    <div class="quest-title">Bezużyteczne Scrollowanie</div>
+                    <div class="quest-meta">Uległeś pokusie? Straciłeś skupienie (-15 HP)</div>
                 </div>
-                <button class="btn-sleek" style="width: auto; padding: 8px 12px; background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.4); color: var(--danger);" onclick="failSocialMedia()">Przyznaj się</button>
+                <button class="btn-sleek" style="width: auto; padding: 8px 12px; background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.4); color: var(--danger);" onclick="failSocialMedia()">Skapituluj</button>
             </div>
             <div class="quest-card">
                 <div>
-                    <div class="quest-title">Blok 60 minut nieprzerwanych telefonów</div>
-                    <div class="quest-meta">Czysta akwizycja (+50 XP, +100 zł prowizji)</div>
+                    <div class="quest-title">1h Digital Detox</div>
+                    <div class="quest-meta">Oczyszczenie umysłu (+30 XP, +10 Złota)</div>
                 </div>
-                <button class="btn-sleek" style="width: auto; padding: 8px 12px;" onclick="completeDetox()">Zaliczone</button>
+                <button class="btn-sleek" style="width: auto; padding: 8px 12px;" onclick="completeDetox()">Wykonaj</button>
             </div>
         </div>
 
         <!-- TAB 4: SKLEP -->
         <div id="tab-shop" class="tab-view">
-            <div class="section-header"><span class="section-title">Wydaj Zarobioną Prowizję</span></div>
+            <div class="section-header"><span class="section-title">Sklep Alchemiczny</span></div>
             <div class="quest-card">
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <img src="image_generation_content/14885394587259587265" style="width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border-subtle);">
                     <div>
-                        <div class="quest-title">Wyjście na obiad / restaurację</div>
-                        <div class="quest-meta">Nagroda za domknięte cele (Koszt: 300 zł)</div>
+                        <div class="quest-title">Łaska Kostuchy</div>
+                        <div class="quest-meta">Chroni serię streaku (50 Złota)</div>
                     </div>
                 </div>
-                <button class="btn-sleek" style="width: auto; padding: 8px 12px;" onclick="buyReward(300, 'Obiad w restauracji')">Kup</button>
+                <button class="btn-sleek" style="width: auto; padding: 8px 12px;" onclick="buyShield()">Kup</button>
             </div>
             <div class="quest-card">
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <img src="image_generation_content/5594749731608925098" style="width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border-subtle);">
                     <div>
-                        <div class="quest-title">2 godziny wolnego / Gry / Netflix</div>
-                        <div class="quest-meta">Regeneracja sił (Koszt: 500 zł)</div>
+                        <div class="quest-title">Napar Jasnego Umysłu</div>
+                        <div class="quest-meta">Zwiększa skupienie (30 Złota)</div>
                     </div>
                 </div>
-                <button class="btn-sleek" style="width: auto; padding: 8px 12px;" onclick="buyReward(500, '2h Wolnego')">Kup</button>
-            </div>
-        </div>
-
-        <!-- TAB 5: STATYSTYKI -->
-        <div id="tab-stats" class="tab-view">
-            <div class="section-header"><span class="section-title">Skuteczność Działania</span></div>
-            <div class="glass-card">
-                <canvas id="statsChart" style="max-height: 180px;"></canvas>
+                <button class="btn-sleek" style="width: auto; padding: 8px 12px;" onclick="buyBuff()">Wypij</button>
             </div>
         </div>
     </div>
 
-    <!-- DOLNY DOCK -->
+    <!-- DOLNY DOCK NAWIGACYJNY (5 PRZYCISKÓW) -->
     <nav class="bottom-dock">
-        <button class="dock-btn active" onclick="switchTab('quests', this)">
-            <span class="dock-icon">📞</span>Leady
+        <button class="dock-btn active" onclick="switchTab('home', this)">
+            <span class="dock-icon">⚡</span>Start
+        </button>
+        <button class="dock-btn" onclick="switchTab('quests', this)">
+            <span class="dock-icon">⚔️</span>Questy
         </button>
         <button class="dock-btn" onclick="switchTab('map', this)">
-            <span class="dock-icon">🗺️</span>Rewiry
+            <span class="dock-icon">🗺️</span>Wyprawy
         </button>
         <button class="dock-btn" onclick="switchTab('social', this)">
-            <span class="dock-icon">🔥</span>Blokada
+            <span class="dock-icon">🛡️</span>Detox
         </button>
         <button class="dock-btn" onclick="switchTab('shop', this)">
-            <span class="dock-icon">🏆</span>Nagrody
-        </button>
-        <button class="dock-btn" onclick="switchTab('stats', this)">
-            <span class="dock-icon">📊</span>Staty
+            <span class="dock-icon">🪙</span>Alchemia
         </button>
     </nav>
 
     <!-- MODALE -->
     <div id="add-quest-modal" class="modal-backdrop">
         <div class="modal-window">
-            <h3 style="font-family: 'Cinzel', serif; color: var(--gold); margin-bottom: 16px;">Nowy Cel Akwizycyjny</h3>
-            <input type="text" id="new-quest-title" placeholder="np. Telefon do 5 nowych właścicieli...">
+            <h3 style="font-family: 'Cinzel', serif; color: var(--gold); margin-bottom: 16px;">Nowy Quest</h3>
+            <input type="text" id="new-quest-title" placeholder="Nazwa zadania...">
             <select id="new-quest-diff">
-                <option value="15">Łatwe (15 XP, +50 zł)</option>
-                <option value="30">Średnie (30 XP, +150 zł)</option>
-                <option value="60">Trudne - Umówione Spotkanie (60 XP, +400 zł)</option>
+                <option value="10">Łatwe (10 XP)</option>
+                <option value="25">Średnie (25 XP)</option>
+                <option value="50">Trudne (50 XP)</option>
             </select>
-            <button class="btn-sleek" onclick="addQuest()" style="margin-bottom: 8px;">Dodaj Zadanie</button>
+            <button class="btn-sleek" onclick="addQuest()" style="margin-bottom: 8px;">Dodaj do Harmonogramu</button>
             <button class="btn-action" onclick="closeModal('add-quest-modal')" style="width: 100%;">Anuluj</button>
         </div>
     </div>
 
     <div id="loot-modal" class="modal-backdrop">
         <div class="modal-window">
-            <h3 style="font-family: 'Cinzel', serif; color: var(--gold); margin-bottom: 16px;">Premia Biura Nieruchomości</h3>
-            <p id="loot-result" style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Otwórz kopertę z premią za aktywność...</p>
-            <button class="btn-sleek" onclick="openLootBox()" style="margin-bottom: 8px;">Otwórz Kopertę</button>
+            <h3 style="font-family: 'Cinzel', serif; color: var(--gold); margin-bottom: 16px;">Skrzynia z Łupem</h3>
+            <p id="loot-result" style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Dotknij skrzyni, aby odkryć zawartość...</p>
+            <button class="btn-sleek" onclick="openLootBox()" style="margin-bottom: 8px;">Otwórz Skrzynię</button>
             <button class="btn-action" onclick="closeModal('loot-modal')" style="width: 100%;">Zamknij</button>
         </div>
     </div>
 
     <script>
-        let agent = JSON.parse(localStorage.getItem('realestate_agent')) || {
-            level: 'Agent', xp: 40, maxXp: 100, hp: 85, maxHp: 100,
-            gold: 1450, streak: 5, shields: 2, water: 3, lastActionTime: Date.now()
+        let player = JSON.parse(localStorage.getItem('nightbrand_player')) || {
+            level: 1, xp: 0, maxXp: 100, hp: 100, maxHp: 100,
+            gold: 50, streak: 3, shields: 1, water: 0
         };
 
-        let quests = JSON.parse(localStorage.getItem('realestate_quests')) || [
-            { id: 1, title: 'Wykonaj 5 telefonów do nowych leadów z OLX/Otodom', xp: 25, reward: 100, completed: false },
-            { id: 2, title: 'Zrób follow-up z wczorajszymi klientami kupującymi', xp: 20, reward: 80, completed: false },
-            { id: 3, title: 'Wystaw 1 nowe ogłoszenie na portalach', xp: 35, reward: 150, completed: false }
+        let quests = JSON.parse(localStorage.getItem('nightbrand_quests')) || [
+            { id: 1, title: 'Poranna rozgrzewka i woda', xp: 10, completed: false, category: 'Poranek' },
+            { id: 2, title: 'Praca nad kodem NightBrand (45 min)', xp: 50, completed: false, category: 'Popołudnie' }
         ];
 
-        // POBIERANIE PRAWDZIWEJ POGODY NA ŻYWO (OPEN-METEO DLA ŁAŃCUTA: 50.067, 22.233)
+        let bounties = [];
+        const bountyPool = [
+            { title: 'Porządek na biurku (Stajnia Augiasza)', xp: 30 },
+            { title: 'Odpisanie na 3 zaległe maile', xp: 25 },
+            { title: 'Wyniesienie śmieci i przewietrzenie pokoju', xp: 15 },
+            { title: 'Sesja głębokiego skupienia (30 min)', xp: 40 }
+        ];
+
+        const eliteSpots = [
+            { title: "Zamek w Łańcucie", desc: "Magnacka rezydencja z parkiem.", lat: 50.067, lon: 22.233 },
+            { title: "Zamek w Krasiczynie", desc: "Renesansowy klejnot nad Sanem.", lat: 49.775, lon: 22.633 },
+            { title: "Rezerwat Skalny Prządki", desc: "Malownicze formacje koło Krosna.", lat: 49.716, lon: 21.800 },
+            { title: "Zapora Wodna w Solinie", desc: "Bieszczadzkie morze i turystyka.", lat: 49.383, lon: 22.450 }
+        ];
+
         async function fetchLiveWeather() {
             try {
                 const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=50.067&longitude=22.233&current=temperature_2m,weather_code,wind_speed_10m');
                 const data = await res.json();
                 const temp = Math.round(data.current.temperature_2m);
                 const wind = Math.round(data.current.wind_speed_10m);
-                const code = data.current.weather_code;
-
-                // Tłumaczenie kodów WMO na polski
-                let condition = "Umiarkowanie";
-                if (code === 0) condition = "Czyste Niebo";
-                else if (code >= 1 && code <= 3) condition = "Lekkie Zachmurzenie";
-                else if (code >= 51 && code <= 67) condition = "Opady Deszczu";
-                else if (code >= 71 && code <= 77) condition = "Śnieg";
-                else if (code >= 95) condition = "Burza";
-
+                let condition = "Czyste Niebo";
                 document.getElementById('live-temp').innerText = temp + "°C";
-                document.getElementById('live-condition').innerText = condition + " • Rynek Aktywny";
+                document.getElementById('live-condition').innerText = condition + " • Spokojna Aura";
                 document.getElementById('live-wind').innerText = `🌬️ Wiatr: ${wind} km/h`;
             } catch (e) {
                 document.getElementById('live-temp').innerText = "9°C";
@@ -606,50 +574,56 @@
         }
         fetchLiveWeather();
 
-        // BAZA PRAWDZIWYCH, CIEKAWYCH MIEJSC NA PODKARPACIU (BEZ WIOCH)
-        const eliteSpots = [
-            { title: "Zamek w Łańcucie", desc: "Magnacka rezydencja z parkiem i stajniami.", lat: 50.067, lon: 22.233 },
-            { title: "Zamek w Krasiczynie", desc: "Renesansowy klejnot architektoniczny nad Sanem.", lat: 49.775, lon: 22.633 },
-            { title: "Rezerwat Skalny Prządki", desc: "Malownicze formacje piaskowcowe koło Krosna.", lat: 49.716, lon: 21.800 },
-            { title: "Zapora Wodna w Solinie", desc: "Bieszczadzkie morze i potężna hydrotechnika.", lat: 49.383, lon: 22.450 },
-            { title: "Zamek Kamieniec w Odrzykoniu", desc: "Ruiny średniowiecznej warowni Fredry.", lat: 49.733, lon: 21.783 },
-            { title: "Rynek w Przemyślu", desc: "Historyczne zabytkowe kamienice i klimat pogranicza.", lat: 49.783, lon: 22.766 },
-            { title: "Skansen w Sanoku (Muzeum Budownictwa Ludowego)", desc: "Jedno z najlepszych muzeów etnograficznych w Europie.", lat: 49.566, lon: 22.216 }
-        ];
-
-        // OPIERDALACZ CO GODZINĘ
-        setInterval(() => {
-            const hoursSinceLastAction = (Date.now() - agent.lastActionTime) / (1000 * 60 * 60);
-            const banner = document.getElementById('roast-banner');
-            if (hoursSinceLastAction >= 1) {
-                banner.style.display = 'block';
-                agent.hp = Math.max(0, agent.hp - 5);
-                saveAgent();
-            } else {
-                banner.style.display = 'none';
-            }
-        }, 10000);
-
-        function saveAgent() {
-            localStorage.setItem('realestate_agent', JSON.stringify(agent));
-            localStorage.setItem('realestate_quests', JSON.stringify(quests));
+        function saveGame() {
+            localStorage.setItem('nightbrand_player', JSON.stringify(player));
+            localStorage.setItem('nightbrand_quests', JSON.stringify(quests));
             updateHUD();
         }
 
         function updateHUD() {
-            document.getElementById('hud-level').innerText = agent.level;
-            document.getElementById('hud-gold').innerText = agent.gold + ' zł';
-            document.getElementById('hud-streak').innerText = agent.streak + ' d.';
-            document.getElementById('hud-shields').innerText = agent.shields;
+            document.getElementById('hud-level').innerText = player.level;
+            document.getElementById('hud-gold').innerText = player.gold;
+            document.getElementById('hud-streak').innerText = player.streak + ' d.';
+            document.getElementById('hud-shields').innerText = player.shields;
 
-            document.getElementById('hp-bar').style.width = (agent.hp / agent.maxHp * 100) + '%';
-            document.getElementById('hp-text').innerText = `${agent.hp} / ${agent.maxHp}`;
+            document.getElementById('hp-bar').style.width = (player.hp / player.maxHp * 100) + '%';
+            document.getElementById('hp-text').innerText = `${player.hp} / ${player.maxHp}`;
 
-            document.getElementById('xp-bar').style.width = (agent.xp / agent.maxXp * 100) + '%';
-            document.getElementById('xp-text').innerText = `${agent.xp} / ${agent.maxXp}`;
+            document.getElementById('xp-bar').style.width = (player.xp / player.maxXp * 100) + '%';
+            document.getElementById('xp-text').innerText = `${player.xp} / ${player.maxXp}`;
 
-            document.getElementById('water-bar').style.width = (agent.water / 6 * 100) + '%';
-            document.getElementById('water-text').innerText = `${agent.water} / 6`;
+            document.getElementById('water-bar').style.width = (player.water / 8 * 100) + '%';
+            document.getElementById('water-text').innerText = `${player.water} / 8`;
+        }
+
+        function drawBounties() {
+            const shuffled = [...bountyPool].sort(() => 0.5 - Math.random());
+            bounties = shuffled.slice(0, 3).map((b, idx) => ({ id: 100 + idx, ...b, completed: false }));
+            renderBounties();
+        }
+
+        function renderBounties() {
+            const container = document.getElementById('bounty-container');
+            container.innerHTML = '';
+            bounties.forEach(q => {
+                container.innerHTML += `
+                    <div class="quest-card ${q.completed ? 'completed' : ''}">
+                        <div>
+                            <div class="quest-title">${q.title}</div>
+                            <div class="quest-meta">Zlecenie • +${q.xp} XP</div>
+                        </div>
+                        <button class="btn-sleek" style="width: auto; padding: 6px 12px; font-size: 10px;" onclick="toggleBounty(${q.id})">${q.completed ? 'Cofnij' : 'Zrobione'}</button>
+                    </div>
+                `;
+            });
+        }
+
+        function toggleBounty(id) {
+            const q = bounties.find(item => item.id === id);
+            if (!q) return;
+            q.completed = !q.completed;
+            processXpReward(q.xp, q.completed);
+            renderBounties();
         }
 
         function renderQuests() {
@@ -660,7 +634,7 @@
                     <div class="quest-card ${q.completed ? 'completed' : ''}">
                         <div>
                             <div class="quest-title">${q.title}</div>
-                            <div class="quest-meta">+${q.xp} XP • +${q.reward} zł prowizji</div>
+                            <div class="quest-meta">${q.category} • +${q.xp} XP</div>
                         </div>
                         <button class="btn-sleek" style="width: auto; padding: 6px 12px; font-size: 10px;" onclick="toggleQuest(${q.id})">${q.completed ? 'Cofnij' : 'Zrobione'}</button>
                     </div>
@@ -672,85 +646,93 @@
             const q = quests.find(item => item.id === id);
             if (!q) return;
             q.completed = !q.completed;
-            
-            agent.lastActionTime = Date.now();
-            document.getElementById('roast-banner').style.display = 'none';
-
-            if (q.completed) {
-                agent.xp += q.xp;
-                agent.gold += q.reward;
-                agent.hp = Math.min(agent.maxHp, agent.hp + 5);
-                if (agent.xp >= agent.maxXp) {
-                    agent.level = 'Starszy Agent';
-                    agent.xp -= agent.maxXp;
-                    agent.maxXp = Math.floor(agent.maxXp * 1.3);
-                    alert(`AWANS! Twoja pozycja w agencji wzrosła na: ${agent.level}!`);
-                }
-            } else {
-                agent.xp = Math.max(0, agent.xp - q.xp);
-                agent.gold = Math.max(0, agent.gold - q.reward);
-            }
-            saveAgent();
+            processXpReward(q.xp, q.completed);
             renderQuests();
         }
 
-        function logClientContact() {
-            agent.lastActionTime = Date.now();
-            document.getElementById('roast-banner').style.display = 'none';
-            agent.xp += 15;
-            agent.gold += 50;
-            saveAgent();
-            alert('Zarejestrowano kontakt z klientem! +15 XP, +50 zł prowizji.');
+        function processXpReward(baseXp, isCompleted) {
+            if (isCompleted) {
+                player.xp += baseXp;
+                player.gold += Math.floor(baseXp / 2);
+                if (player.xp >= player.maxXp) {
+                    player.level++;
+                    player.xp -= player.maxXp;
+                    player.maxXp = Math.floor(player.maxXp * 1.2);
+                    alert(`AWANS! Osiągnąłeś poziom ${player.level}!`);
+                }
+            } else {
+                player.xp = Math.max(0, player.xp - baseXp);
+            }
+            saveGame();
         }
 
         function drinkWater() {
-            if (agent.water < 6) {
-                agent.water++;
-                agent.hp = Math.min(agent.maxHp, agent.hp + 5);
-                saveAgent();
+            if (player.water < 8) {
+                player.water++;
+                player.xp += 5;
+                player.gold += 2;
+                saveGame();
             }
         }
 
         function failSocialMedia() {
-            agent.hp = Math.max(0, agent.hp - 20);
-            saveAgent();
-            alert('Stracone 20 HP na bezmyślne scrollowanie! Wracaj do dzwonienia.');
+            player.hp = Math.max(0, player.hp - 15);
+            saveGame();
+            alert('Klątwa Dopaminy! Straciłeś 15 HP.');
         }
 
         function completeDetox() {
-            agent.xp += 50;
-            agent.gold += 100;
-            agent.lastActionTime = Date.now();
-            document.getElementById('roast-banner').style.display = 'none';
-            saveAgent();
-            alert('Świetna robota! 60 minut bez rozpraszaczy zaliczone.');
+            player.xp += 30;
+            player.gold += 10;
+            saveGame();
+            alert('Sukces! Oczyszczenie umysłu (+30 XP).');
         }
 
-        function buyReward(cost, name) {
-            if (agent.gold >= cost) {
-                agent.gold -= cost;
-                saveAgent();
-                alert(`Odebrano nagrodę: ${name}! Zasłużyłeś.`);
-            } else { alert('Za mało środków z prowizji!'); }
+        function buyShield() {
+            if (player.gold >= 50) {
+                player.gold -= 50;
+                player.shields++;
+                saveGame();
+                alert('Zakupiono Łaskę Kostuchy!');
+            } else { alert('Za mało złota!'); }
+        }
+
+        function buyBuff() {
+            if (player.gold >= 30) {
+                player.gold -= 30;
+                saveGame();
+                alert('Wypito Napar Jasnego Umysłu!');
+            } else { alert('Za mało złota!'); }
         }
 
         function openLootBox() {
-            const win = Math.floor(Math.random() * 200) + 100;
-            agent.gold += win;
-            saveAgent();
-            document.getElementById('loot-result').innerText = `W kopercie znajdowała się premia biura: ${win} zł!`;
+            const win = Math.floor(Math.random() * 30) + 10;
+            player.gold += win;
+            saveGame();
+            document.getElementById('loot-result').innerText = `Odkryto ${win} sztuk złota w skrzyni!`;
+        }
+
+        function triggerPanicMode() {
+            alert('TRYB PARALIŻ: Wstań, zrób 3 głębokie oddechi i napij się wody. Skup się tylko na jednej minucie.');
         }
 
         function addQuest() {
             const title = document.getElementById('new-quest-title').value;
             const xp = parseInt(document.getElementById('new-quest-diff').value);
-            const reward = xp * 5;
             if (!title) return;
-            quests.push({ id: Date.now(), title, xp, reward, completed: false });
+            quests.push({ id: Date.now(), title, xp, completed: false, category: 'Własne' });
             closeModal('add-quest-modal');
             document.getElementById('new-quest-title').value = '';
-            saveAgent();
+            saveGame();
             renderQuests();
+        }
+
+        function resetApp() {
+            if (confirm("Czy na pewno chcesz zresetować aplikację i wyczyścić postępy?")) {
+                localStorage.removeItem('nightbrand_player');
+                localStorage.removeItem('nightbrand_quests');
+                location.reload();
+            }
         }
 
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
@@ -776,9 +758,7 @@
         }
 
         function fetchElitePOI() {
-            // Losuj z eleganckiej bazy perełek, a nie ze ślepych współrzędnych
             const spot = eliteSpots[Math.floor(Math.random() * eliteSpots.length)];
-            
             document.getElementById('poi-title').innerText = spot.title;
             document.getElementById('poi-desc').innerText = spot.desc;
 
@@ -792,18 +772,10 @@
         const now = new Date();
         document.getElementById('datetime-display').innerText = `Łańcut | ${now.toLocaleDateString('pl-PL', { weekday: 'long', month: 'long', day: 'numeric' })}`;
 
-        const ctx = document.getElementById('statsChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Pon', 'Wt', 'Śr', 'Czw', 'Pt', 'Sob', 'Ndz'],
-                datasets: [{ label: 'Wykonane telefony', data: [12, 18, 25, 10, 30, 15, 20], borderColor: '#d4af37', tension: 0.3 }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-        });
-
+        drawBounties();
         updateHUD();
         renderQuests();
+        renderBounties();
     </script>
 </body>
 </html>
