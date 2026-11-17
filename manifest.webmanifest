@@ -1,0 +1,26 @@
+{
+  "id": "./",
+  "name": "SYNAPSE — małe kroki, własny rytm",
+  "short_name": "SYNAPSE",
+  "description": "Twoje zadania, skupienie i małe zwycięstwa.",
+  "lang": "pl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#101322",
+  "theme_color": "#101322",
+  "icons": [
+    {
+      "src": "./assets/synapse.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/synapse-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
