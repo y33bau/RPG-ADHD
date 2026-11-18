@@ -81,10 +81,30 @@ Przy zmianie plików aplikacji zwiększ wersję CACHE w sw.js. Nowy worker aktyw
 - Sprawdź klawiaturę, zamykanie dialogów przez Escape i ograniczony ruch.
 
 
+## Układ i nowości (v2.4)
+
+Pięć zakładek, każda z podzakładkami zamiast jednej długiej strony:
+
+| Zakładka | Podzakładki |
+| --- | --- |
+| Dzisiaj | Plan · Skupienie (Iskra, body doubling) · Ja (nastrój, rytuały, woda) |
+| Zadania | Lista · Zrzut z głowy (z wieczornym przeglądem) · Rutyny |
+| Świat | Pogoda · Wyprawa · Kalendarz |
+| Baza | Przystań · Wyprawy (bossowie) · Nagrody |
+| Postęp | Przegląd (klasa i atrybuty) · Osiągnięcia · Rytm (wykresy) · Historia |
+
+- **Zrzut z głowy**: szybkie pole na ekranie Plan; wieczorny przegląd decyduje o każdej myśli i niedokończonym zadaniu (dziś, jutro, puszczam).
+- **Iskra**: towarzysz sesji skupienia z pierścieniem czasu, krótkimi komunikatami i opcjonalnym szumem w tle.
+- **Wyprawy**: większy cel jako boss z ciosami. Cios daje 10 XP, 6 monet, 1 materiał; pokonanie premię 60 XP, 30 monet, 4 materiały. Maks. 3 aktywne wyprawy, 10 ciosów.
+- **Niespodzianki** (Ustawienia, domyślnie włączone w nowej instalacji): ok. co ósmy krok może dać mały bonus. Wynik zależy od kroku, więc cofanie i powtarzanie niczego nie farmi.
+- **Odznaki** liczone z historii, w tym odznaka za powrót po przerwie. **Rytm**: nastrój i energia z 14 dni oraz najlepsze godziny działania.
+- Skróty PWA: dodawanie zadania, zrzut z głowy, skupienie (`?action=add|dump|focus`).
+- Nowe dane dodatków (zrzuty, nastrój, rytuały, rutyny, wyprawy) są w tym samym kluczu co dotychczasowe dodatki, więc podróżują z synchronizacją.
+
 ## Powiadomienia (v2.1)
 
 Ustawienia → Powiadomienia i przypomnienia. Zgoda systemowa jest pytana dopiero po naciśnięciu przycisku. Przypomnienia lokalne działają przy otwartej aplikacji, w wybranych godzinach; nie są push po jej zamknięciu. iPhone wymaga aplikacji dodanej do ekranu początkowego.
 
-Prawdziwy Web Push jest obsługiwany przez service worker i panel połączenia. Wymaga uruchomienia prywatnej usługi z katalogu push-server w repozytorium agent, kluczy VAPID i wpisania jej adresu oraz klucza dostępu. Bez tego aplikacja uczciwie pokazuje, że działa tylko tryb lokalny. Serwer otrzymuje subskrypcję urządzenia i harmonogram, bez treści zadań, kontaktów i prowizji.
+Prawdziwy Web Push jest obsługiwany przez service worker i panel połączenia. Usługa jest w katalogu push-worker (Cloudflare Workers, instrukcja w push-worker/README.md). Wystarczy ją wdrożyć i wpisać jej adres oraz klucz dostępu. Bez tego aplikacja uczciwie pokazuje, że działa tylko tryb lokalny. Serwer otrzymuje subskrypcję urządzenia i harmonogram, bez treści zadań, kontaktów i prowizji.
 
 Licznik wody na ekranie Dzisiaj: cel 2 l, 10 porcji po 200 ml, cofanie porcji i reset po lokalnej północy. Woda nie daje punktów ani monet.

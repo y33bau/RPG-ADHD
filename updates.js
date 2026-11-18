@@ -1,4 +1,4 @@
-const VERSION='2.3.0';
+const VERSION='2.4.0';
 let registration,changed=false,checking=false,notice;
 function offerUpdate(){
  changed=true;
@@ -15,8 +15,8 @@ function updateSettings(){
  const form=document.getElementById('settings-form');if(!form)return;
  let area=document.getElementById('app-update-settings');
  if(!area){
- area=document.createElement('section');area.id='app-update-settings';area.style.cssText='margin:20px 0;padding:16px 0;border-top:1px solid #ffffff25';
- const info=document.createElement('p');info.className='subtext subtitle';info.textContent='Wersja '+VERSION+' · Aktualizacje bez ponownej instalacji.';
+ area=document.createElement('section');area.id='app-update-settings';area.style.cssText='display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:space-between;margin:0 0 18px;padding:12px 14px;border:1px solid #ffffff1f;border-radius:14px;background:#ffffff06';
+ const info=document.createElement('p');info.className='subtext subtitle';info.style.margin='0';info.textContent='Wersja '+VERSION;
  const button=document.createElement('button');button.type='button';button.className='btn';button.id='app-update-check';
  button.addEventListener('click',async()=>{
  if(changed){location.reload();return;}
@@ -30,7 +30,7 @@ function updateSettings(){
  }catch{button.textContent='Brak połączenia · spróbuj ponownie';}
  finally{checking=false;button.disabled=false;if(changed)button.textContent='Wczytaj nową wersję';}
  });
- area.append(info,button);form.after(area);
+ area.append(info,button);form.before(area);
  }
  const button=area.querySelector('button');
  if(changed&&button.textContent!=='Wczytaj nową wersję')button.textContent='Wczytaj nową wersję';

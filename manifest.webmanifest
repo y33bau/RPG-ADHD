@@ -22,5 +22,22 @@
       "type": "image/svg+xml",
       "purpose": "maskable"
     }
+  ],
+  "shortcuts": [
+    {
+      "name": "Dodaj zadanie",
+      "short_name": "Zadanie",
+      "url": "./?action=add"
+    },
+    {
+      "name": "Zrzut z głowy",
+      "short_name": "Zrzut",
+      "url": "./?action=dump"
+    },
+    {
+      "name": "Skupienie z Iskrą",
+      "short_name": "Skupienie",
+      "url": "./?action=focus"
+    }
   ]
 }

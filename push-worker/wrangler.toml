@@ -1,0 +1,14 @@
+name = "synapse-push"
+main = "worker.js"
+compatibility_date = "2025-01-01"
+
+[triggers]
+crons = ["*/5 * * * *"]
+
+# Cloudflare creates this KV namespace on the first deploy.
+[[kv_namespaces]]
+binding = "KV"
+
+[vars]
+ALLOWED_ORIGINS = "https://y33bau.github.io"
+VAPID_SUBJECT = "mailto:TWOJ-EMAIL@example.com"
