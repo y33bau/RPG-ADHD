@@ -35,6 +35,17 @@ export function progress(state,task,day){
 }
 function share(total,count,index){return Math.floor(total/count)+(index<total%count?1:0);}
 function rewardFor(task,index){const t=TIERS[task.tier];const n=task.steps.length||1;return {xp:share(t.xp,n,index),coins:share(t.coins,n,index),materials:share(task.tier==='big'?6:task.tier==='normal'?3:1,n,index)};}
+export const BOSS={blow:{xp:10,coins:6,materials:1},defeat:{xp:60,coins:30,materials:4},maxBlows:10,maxActive:3};
+const FINDS=[{label:'Złota moneta',coins:10,materials:0},{label:'Rzadki materiał',coins:0,materials:2},{label:'Skrzynka z drobiazgami',coins:5,materials:1}];
+/* Deterministic "surprise": the same step always rolls the same result, so undo and redo cannot farm it. */
+export function bonusFor(taskId,occurrence,step){
+ let h=2166136261;for(const ch of taskId+'|'+occurrence+'|'+step){h^=ch.charCodeAt(0);h=Math.imul(h,16777619);}
+ h>>>=0;return h%8===0?FINDS[(h>>>3)%FINDS.length]:null;
+}
+export function awardBoss(state,title,reward,key,now=Date.now()){
+ if(state.ledger.some(e=>e.key===key))return false;
+ state.ledger.push({id:uid(),kind:'boss',key,title,day:dayKey(now),time:now,xp:reward.xp,coins:reward.coins,materials:reward.materials});return true;
+}
 export function completeTask(state,id,day=dayKey(),now=Date.now(),step=null){
  const task=state.tasks.find(t=>t.id===id);if(!task||!eligible(task,day)||completion(state,task,day))return null;
  const o=occurrence(task,day),done=progress(state,task,day);let earned={xp:0,coins:0,materials:0};
@@ -43,6 +54,8 @@ export function completeTask(state,id,day=dayKey(),now=Date.now(),step=null){
   if(!Number.isInteger(i)||i<0||i>=(task.steps.length||1)||done.includes(i))continue;
   const reward=rewardFor(task,i);Object.keys(earned).forEach(k=>earned[k]+=reward[k]);
   state.ledger.push({id:uid(),kind:'step',taskId:id,title:task.title,occurrence:o,step:i,day,time:now,...reward});
+  const find=state.settings.surprises?bonusFor(id,o,i):null,key='find|'+id+'|'+o+'|'+i;
+  if(find&&!state.ledger.some(e=>e.key===key))state.ledger.push({id:uid(),kind:'bonus',key,title:find.label,day,time:now,xp:0,coins:find.coins,materials:find.materials});
  }
  const finished=progress(state,task,day).length===(task.steps.length||1);
  if(finished)state.ledger.push({id:uid(),kind:'complete',taskId:id,title:task.title,occurrence:o,day,time:now,xp:0,coins:0,materials:0});
@@ -101,7 +114,7 @@ export function validate(data){
  }
  const entryIds=new Set(),unique=new Set();
  for(const e of data.ledger){
- if(!str(e.id,100)||entryIds.has(e.id)||!['step','complete','purchase','upgrade','focus','legacy'].includes(e.kind)||!str(e.title,200)||!date(e.day)||!Number.isFinite(e.time)||e.time<0)fail();
+ if(!str(e.id,100)||entryIds.has(e.id)||!['step','complete','purchase','upgrade','focus','legacy','bonus','boss'].includes(e.kind)||!str(e.title,200)||!date(e.day)||!Number.isFinite(e.time)||e.time<0)fail();
  entryIds.add(e.id);
  for(const k of ['xp','coins','materials'])if(!Number.isSafeInteger(e[k])||Math.abs(e[k])>10000000)fail();
  if(e.xp<0||(e.kind==='step'&&(e.coins<0||e.materials<0)))fail();
