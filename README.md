@@ -105,6 +105,6 @@ Pięć zakładek, każda z podzakładkami zamiast jednej długiej strony:
 
 Ustawienia → Powiadomienia i przypomnienia. Zgoda systemowa jest pytana dopiero po naciśnięciu przycisku. Przypomnienia lokalne działają przy otwartej aplikacji, w wybranych godzinach; nie są push po jej zamknięciu. iPhone wymaga aplikacji dodanej do ekranu początkowego.
 
-Prawdziwy Web Push jest obsługiwany przez service worker i panel połączenia. Wymaga uruchomienia prywatnej usługi z katalogu push-server w repozytorium agent, kluczy VAPID i wpisania jej adresu oraz klucza dostępu. Bez tego aplikacja uczciwie pokazuje, że działa tylko tryb lokalny. Serwer otrzymuje subskrypcję urządzenia i harmonogram, bez treści zadań, kontaktów i prowizji.
+Prawdziwy Web Push jest obsługiwany przez service worker i panel połączenia. Usługa jest w katalogu push-worker (Cloudflare Workers, instrukcja w push-worker/README.md). Wystarczy ją wdrożyć i wpisać jej adres oraz klucz dostępu. Bez tego aplikacja uczciwie pokazuje, że działa tylko tryb lokalny. Serwer otrzymuje subskrypcję urządzenia i harmonogram, bez treści zadań, kontaktów i prowizji.
 
 Licznik wody na ekranie Dzisiaj: cel 2 l, 10 porcji po 200 ml, cofanie porcji i reset po lokalnej północy. Woda nie daje punktów ani monet.
