@@ -16,7 +16,7 @@ const openNotes = () => extra.notes.filter(n => !n.archived);
 export const SUBS = {
   today: [['plan', 'Plan'], ['focus', 'Skupienie'], ['me', 'Ja']],
   tasks: [['list', 'Lista'], ['dump', 'Zrzut z głowy'], ['routines', 'Rutyny']],
-  world: [['weather', 'Pogoda'], ['trip', 'Wyprawa'], ['calendar', 'Kalendarz']],
+  world: [['trip', 'Wyprawy'], ['calendar', 'Kalendarz'], ['settings', 'Ustawienia']],
   base: [['base', 'Przystań'], ['bosses', 'Wyprawy'], ['rewards', 'Nagrody']],
   history: [['overview', 'Przegląd'], ['badges', 'Osiągnięcia'], ['rhythm', 'Rytm'], ['log', 'Historia']],
 };

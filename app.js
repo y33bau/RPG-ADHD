@@ -1,7 +1,7 @@
 import * as C from './core.js';
 import * as X from './extras-ui.js';
 const KEY='synapse_v2', $=s=>document.querySelector(s), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let storageFailed=false,loadFailed=false,notice='',state,tab='today',sub={today:'plan',tasks:'list',world:'weather',base:'base',history:'overview'},filter='today',selected=null,toastTimer,installPrompt=null,lastTrigger=null,ringed=null;
+let storageFailed=false,loadFailed=false,notice='',state,tab='today',sub={today:'plan',tasks:'list',world:'trip',base:'base',history:'overview'},filter='today',selected=null,toastTimer,installPrompt=null,lastTrigger=null,ringed=null;
 try{
  const raw=localStorage.getItem(KEY);
  if(raw)state=C.validate(JSON.parse(raw));
@@ -13,7 +13,7 @@ try{
   localStorage.setItem(KEY,JSON.stringify(state));
  }
 }catch(e){state=C.fresh();loadFailed=true;notice='Nie udało się odczytać zapisu. Nie nadpisujemy go. W ustawieniach możesz pobrać oryginalne dane lub wczytać kopię.';}
-const previousVisit=state.lastVisit, today=()=>C.dayKey();
+const today=()=>C.dayKey();
 function save(){
  if(loadFailed){toast('Zapis wstrzymany. Najpierw odzyskaj dane w ustawieniach.');return false;}
  try{const serialized=JSON.stringify(state);if(localStorage.getItem(KEY)!==serialized)localStorage.setItem(KEY,serialized);storageFailed=false;if(typeof document.dispatchEvent==='function')document.dispatchEvent(new Event('app-progress'));return true;}
@@ -72,17 +72,20 @@ function planBody(){
  const t=choose(),limit=state.minimum?1:3,list=ready().slice(0,limit),completeCount=state.ledger.filter(e=>e.kind==='complete'&&e.day===today()).length;
  const steps=t?C.progress(state,t,today()):[],first=t?.steps.find((_,i)=>!steps.includes(i));
  return '<div class="energy-row"><div class="row"><span class="tiny muted">Twoja energia</span><div class="segmented" aria-label="Poziom energii">'+[['low','Niska'],['medium','W sam raz'],['high','Mam moc']].map(([v,l])=>'<button data-energy="'+v+'" class="'+(state.energy===v?'selected':'')+'" aria-pressed="'+(state.energy===v)+'">'+l+'</button>').join('')+'</div></div><button class="minimum '+(state.minimum?'selected':'')+'" data-action="minimum" aria-pressed="'+state.minimum+'">☾ Dzisiaj minimum</button></div>'+
- '<div class="dashboard"><div class="stack"><section class="panel hero"><div class="hero-content"><div class="row between"><div class="eyebrow">◈ TERAZ TYLKO TEN KROK</div><span class="tiny muted">'+(t?C.TIERS[t.tier].label:'Czysta karta')+'</span></div><h2>'+esc(t?t.title:'Jeden mały krok wystarczy.')+'</h2><p class="first-step">'+esc(t?(first?'Pierwszy krok: '+first:'Zacznij od najprostszej części. Reszta może poczekać.'):'Dodaj coś, co chcesz dziś zrobić. Nawet jeśli zajmie tylko dwie minuty.')+'</p>'+(t?rewardLabel(t):'')+'<div class="hero-bottom"><button class="btn primary" data-action="'+(t?'focus-5':'add')+'" '+(t?'data-id="'+esc(t.id)+'"':'')+'>'+(t?'▷ Zacznij na 5 minut':'＋ Moje pierwsze zadanie')+'</button>'+(t?'<button class="btn link" data-action="focus" data-id="'+esc(t.id)+'">Inny czas</button><button class="btn link" data-action="help" data-id="'+esc(t.id)+'">Nie mogę ruszyć ↗</button>':'')+'</div></div></section>'+
+ '<div class="dashboard"><div class="stack">'+(t?'<section class="panel next-step"><div><h2>'+esc(t.title)+'</h2>'+(first?'<p class="subtext">'+esc(first)+'</p>':'')+'</div><div class="row wrap"><button class="btn primary" data-action="focus-5" data-id="'+esc(t.id)+'">▷ Skupienie 5 min</button><button class="btn link" data-action="focus" data-id="'+esc(t.id)+'">Inny czas</button><button class="btn link" data-action="help" data-id="'+esc(t.id)+'">Nie mogę ruszyć</button></div></section>':'')+
+ '<div class="quick-row"><button class="quick-card" data-action="already"><span class="quick-symbol">✓</span><span><strong>Już coś zrobiłem</strong><small>Dopisz małe zwycięstwo</small></span></button><button class="quick-card" data-action="water"><span class="quick-symbol">♧</span><span><strong>Chwila dla siebie</strong><small>Woda: '+(C.hydration(state).ml/1000).toLocaleString('pl-PL')+' / 2 l</small></span></button></div>'+
  '<section class="panel"><div class="section-line"><h2>'+(state.minimum?'Minimum na dziś':'Mały plan na dziś')+'</h2><span class="tiny muted">'+completeCount+' ukończone</span></div><div class="task-list">'+(list.length?list.map(t=>taskCard(t,true)).join(''):'<div class="empty"><div class="empty-symbol">✧</div><h3>Masz wolną przestrzeń.</h3><p>Możesz odpocząć albo wybrać kolejny mały cel.</p><button class="btn purple" data-action="add">Dodaj zadanie</button></div>')+'</div><button class="btn link" data-tab="tasks" style="margin-top:13px">Wszystkie zadania ('+ready().length+') →</button></section>'+
- '<div class="quick-row"><button class="quick-card" data-action="already"><span class="quick-symbol">✓</span><span><strong>Już coś zrobiłem</strong><small>Dopisz małe zwycięstwo</small></span></button><button class="quick-card" data-action="water"><span class="quick-symbol">♧</span><span><strong>Chwila dla siebie</strong><small>Woda: '+(C.hydration(state).ml/1000).toLocaleString('pl-PL')+' / 2 l</small></span></button></div></div>'+
+ '</div>'+
  '<div class="stack">'+profile()+X.captureCard()+'<section class="panel base-preview"><div class="section-line"><h3>Twoja mała przystań</h3><span class="tiny muted">'+Object.values(state.rooms).reduce((n,x)=>n+x,0)+'/9</span></div>'+scene()+'<p class="base-caption">Z codziennych kroków powstaje coś Twojego.</p><button class="btn purple" data-tab="base">Zajrzyj do swojej bazy ↗</button></section></div></div>';
 }
 function meBody(){return '<div class="dashboard"><div class="stack">'+X.moodCard()+X.habitsCard()+'</div><div class="stack">'+waterCard()+week()+'</div></div>';}
 function subBody(name,map){return (map[sub[name]]||Object.values(map)[0])();}
 function todayView(){
- const greeting=new Date().getHours()<12?'Dobrego poranka':new Date().getHours()<18?'Dobrze Cię widzieć':'Spokojnego wieczoru';
- return heading(greeting+', '+esc(state.settings.name||'odkrywco')+'.','Nie musisz ogarniać wszystkiego. Zacznij od jednej rzeczy.',true,'DZISIAJ')+
- (notice?'<p class="return-note">'+esc(notice)+'</p>':previousVisit!==today()?'<p class="return-note">Miło, że jesteś. Twój dorobek czeka — dziś wybierz jeden mały krok.</p>':'')+X.subnav('today',sub.today)+subBody('today',{plan:planBody,focus:()=>X.focusView(state),me:meBody});
+ return '<div class="page-heading"><h1>Dzisiaj</h1><button class="btn primary" data-action="add">＋ Dodaj zadanie</button></div>'+
+  '<div data-life-slot id="slot-weather"></div>'+
+  (notice?'<p class="return-note">'+esc(notice)+'</p>':'')+
+  X.subnav('today',sub.today)+subBody('today',{plan:planBody,focus:()=>X.focusView(state),me:meBody});
+
 }
 function taskList(){
  let tasks=state.tasks.filter(t=>filter==='archived'?t.archived:!t.archived);
@@ -100,8 +103,13 @@ function baseView(){
 }
 function rewardsView(){return heading('Coś miłego po drodze.','Twoje monety, Twoje nagrody. Zwykły odpoczynek zawsze jest za darmo.',false,'NAGRODY')+rewardsBody();}
 function worldView(){
- const slots={weather:'<div class="x-slots"><div data-life-slot id="slot-weather"></div></div>',trip:'<div class="x-slots"><div data-life-slot id="slot-place"></div><div data-co-slot id="slot-visits"></div></div>',calendar:'<div class="x-slots"><div data-life-slot id="slot-calendar"></div></div>'};
- return heading('Świat poza listą.','Pogoda, mała wyprawa i umówienie się ze sobą. Odpoczynek też jest planem.',false,'ŚWIAT')+X.subnav('world',sub.world)+(slots[sub.world]||slots.weather);
+ const slots={
+  trip:'<div class="x-slots"><div data-life-slot id="slot-place"></div><div data-co-slot id="slot-visits"></div></div>',
+  calendar:'<div class="x-slots"><div data-life-slot id="slot-calendar"></div></div>',
+  settings:'<section class="panel"><h2>Ustawienia</h2><p id="connection" class="subtext">● Zapis na urządzeniu</p><button class="btn primary" data-action="settings">Otwórz ustawienia i kopie danych</button></section>'
+ };
+ return '<div class="page-heading"><h1>Więcej</h1></div>'+X.subnav('world',sub.world)+(slots[sub.world]||slots.trip);
+
 }
 function rewardsBody(){return '<div class="row between" style="margin-bottom:23px"><span class="btn purple">◈ '+b().coins+' monet</span><button class="btn primary" data-action="reward-add">＋ Własna nagroda</button></div><div class="reward-grid">'+state.rewards.filter(r=>!r.archived).map((r,i)=>'<section class="panel reward-card"><button class="icon-button" data-action="reward-edit" data-id="'+esc(r.id)+'" aria-label="Edytuj nagrodę">⋯</button><div class="reward-art">'+['✧','☾','◇'][i%3]+'</div><h3>'+esc(r.title)+'</h3><div class="row between"><span class="tiny" style="color:var(--gold)">◈ '+r.cost+' monet</span><button class="btn small purple" data-action="redeem" data-id="'+esc(r.id)+'" '+(b().coins<r.cost?'disabled':'')+'>Odbierz ↗</button></div></section>').join('')+'</div>';}
 function historyView(){
@@ -112,10 +120,11 @@ function historyView(){
 }
 function render(){
  if(state.water.day!==today())state.water={day:today(),count:0};
- applySettings();$('#date-label').textContent=new Date().toLocaleDateString('pl-PL',{weekday:'long',day:'numeric',month:'long'});
- $('#connection').textContent=loadFailed?'● Zapis wstrzymany':storageFailed?'● Błąd zapisu':navigator.onLine?'● Zapis na urządzeniu':'● Działasz offline';
+ applySettings();
+
  if(tab==='rewards'){tab='base';sub.base='rewards';}
  $('#main').innerHTML=({today:todayView,tasks:tasksView,world:worldView,base:baseView,history:historyView}[tab]||todayView)();
+ if(tab==='world'&&sub.world==='settings'){$('#connection').textContent=loadFailed?'● Zapis wstrzymany':storageFailed?'● Błąd zapisu':navigator.onLine?'● Zapis na urządzeniu':'● Działasz offline';}
  document.querySelectorAll('[data-tab]').forEach(el=>{el.classList.toggle('active',el.dataset.tab===tab);if(el.closest('nav')){if(el.dataset.tab===tab)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current');}});
  renderFocus();state.lastVisit=today();save();
  const earnedNow=X.checkBadges(state);if(earnedNow.length)toast('Nowa odznaka: '+earnedNow.join(', ')+' ✦');
