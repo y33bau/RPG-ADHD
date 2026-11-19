@@ -1,4 +1,4 @@
-/* Swipe left/right to move between sub-tabs; past the last one you land in the next section.
+/* Swipe left/right to move between the sub-tabs of the current section. Sections never change by swiping.
    The page follows the finger, then the usual slide-in animation finishes the move. */
 (() => {
   const main = () => document.querySelector('main');
@@ -7,25 +7,13 @@
   let x0, y0, t0, lock = null, active = false;
 
   const subs = () => [...document.querySelectorAll('.x-subtab')];
-  const tabs = () => [...document.querySelectorAll('nav [data-tab]')].filter((b, i, all) => all.findIndex(o => o.dataset.tab === b.dataset.tab) === i);
-  const currentTab = () => document.querySelector('nav [data-tab].active')?.dataset.tab;
 
+  /** Moves within the current section only; at either end it bounces instead of jumping to another section. */
   function go(dir) {
     const list = subs(), i = list.findIndex(b => b.classList.contains('on'));
     const target = list[i + dir];
-    if (target) { target.click(); target.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' }); return true; }
-    const t = tabs(), ti = t.findIndex(b => b.dataset.tab === currentTab()), next = t[ti + dir];
-    if (!next) return false;
-    main()?.setAttribute('data-dir', dir > 0 ? 'r' : 'l');
-    next.click();
-    // Going backwards lands on the last sub-tab of the previous section, like flipping pages.
-    setTimeout(() => {
-      const fresh = subs();
-      const want = dir > 0 ? fresh[0] : fresh.at(-1);
-      if (want && !want.classList.contains('on')) want.click();
-      main()?.setAttribute('data-dir', dir > 0 ? 'r' : 'l');
-      window.scrollTo({ top: 0, behavior: 'instant' });
-    }, 0);
+    if (!target) return false;
+    target.click(); target.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
     return true;
   }
 
