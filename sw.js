@@ -1,4 +1,4 @@
-const CACHE='synapse-v2.5.3';
+const CACHE='synapse-v2.6.0';
 const CORE=['./sync-crypto.js','./polish.css','./polish.js','./extras-ui.js','./planner.js','./guard.js','./generator.js','./facts.js','./diy.js','./extra-store.js','./achievements.js','./insights.js','./extras.css','./companion.js','./companion-core.js','./app-bridge.js','./sync.js','./features.js','./updates.js','./','./index.html','./app.js','./notifications.js','./notification-core.js','./core.js','./styles.css','./manifest.webmanifest','./assets/synapse.svg','./assets/synapse-maskable.svg','./adhd.html'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE.map(url=>new Request(url,{cache:'reload'})))).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('synapse-')&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));

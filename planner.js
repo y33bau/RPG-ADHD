@@ -44,7 +44,7 @@ export function nextThing(state, { skip = 0, now = Date.now() } = {}) {
   const options = buildPlan(state, { minutes: 24 * 60, now, maxTasks: 50 }).blocks.filter(b => b.type === 'task').map(b => ({ kind: 'task', task: byId.get(b.taskId), title: b.title, tier: b.tier }));
   const seed = [...day].reduce((a, c) => a + c.charCodeAt(0), 0);
   const energy = state.minimum ? 'low' : state.energy || 'medium';
-  for (const area of ['life', 'self']) for (const idea of suggest({ area, minutes: 15, energy, count: 2, seed })) options.push({ kind: 'idea', idea, area, title: idea.t, tier: idea.tier });
+  for (const area of ['life', 'family', 'self']) for (const idea of suggest({ area, minutes: 15, energy, count: 2, seed })) options.push({ kind: 'idea', idea, area, title: idea.t, tier: idea.tier });
   if (!options.length) return null;
   const index = ((skip % options.length) + options.length) % options.length;
   return { ...options[index], index, total: options.length };

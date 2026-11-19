@@ -350,7 +350,7 @@ export function nowCard(state) {
   const n = P.nextThing(state, { skip: nowSkip });
   if (!n) return '';
   const done = n.kind === 'task' ? '<button class="btn" data-action="complete" data-id="' + esc(n.task.id) + '">Już zrobione ✓</button>' : '';
-  return '<section class="panel x-now"><div class="eyebrow">CO TERAZ?</div><p class="x-now-hint">Jedna rzecz. Reszta może poczekać.</p><h2 class="x-now-title">' + esc(n.title) + '</h2>' +
+  return '<section class="panel x-now"><div class="eyebrow">CO TERAZ?</div><p class="x-now-hint">Zrób dziś tylko jedną z tych rzeczy. Resztę możesz zostawić na później.</p><h2 class="x-now-title">' + esc(n.title) + '</h2>' +
     '<p class="x-now-meta">' + TIER_LABEL[n.tier] + ' · zaczynasz od 5 minut' + (n.kind === 'idea' ? ' · nowy pomysł' : '') + '</p>' +
     '<button class="btn primary x-now-go" data-action="x-now-start">▶ Zaczynam</button>' +
     '<div class="x-note-actions x-now-more"><button class="btn" data-action="x-now-next">Inna rzecz ↻</button>' + done + '</div></section>';
@@ -535,7 +535,7 @@ export function init(ctx, doc = globalThis.document) {
           const n = P.nextThing(s, { skip: nowSkip }); if (!n) break;
           let taskId = n.task?.id;
           if (n.kind === 'idea') {
-            const t = C.makeTask({ title: n.idea.t, tier: n.idea.tier, category: n.area, steps: n.idea.steps || [], date: today() });
+            const t = C.makeTask({ title: n.idea.t, tier: n.idea.tier, category: GEN.CATEGORY[n.area] || 'life', steps: n.idea.steps || [], date: today() });
             s.tasks.push(t); taskId = t.id;
           }
           C.startFocus(s, taskId, 5); nowSkip = 0; ctx.save(); ctx.render(); ctx.toast('Tylko 5 minut. Iskra siedzi obok.'); break;
@@ -550,7 +550,7 @@ export function init(ctx, doc = globalThis.document) {
         case 'x-gen-roll': genOpts = { ...genOpts, seed: genOpts.seed + 1 }; ctx.render(); break;
         case 'x-gen-add': {
           const x = GEN.suggest({ ...genOpts, count: 3 })[Number(b.dataset.i)]; if (!x) break;
-          const cat = genOpts.area;
+          const cat = GEN.CATEGORY[genOpts.area] || 'life';
           s.tasks.push(C.makeTask({ title: x.t, tier: x.tier, category: cat, steps: x.steps || [], date: today() }));
           ctx.save(); ctx.render(); ctx.toast('Dodane na dziś. Zacznij od dwóch minut.'); break;
         }
