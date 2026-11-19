@@ -268,3 +268,111 @@ main.bump{animation:bump .4s var(--ease)}
 @keyframes swipe-demo{0%,100%{transform:translateX(-10px)}50%{transform:translateX(10px)}}
 @keyframes bump{30%{transform:translateX(-10px)}60%{transform:translateX(6px)}}
 @media(min-width:851px){.swipe-hint{display:none}}
+
+/* ───────── Round 6: Iskra and her island ───────── */
+.isk{overflow:visible;display:block}
+.isk .i-body{transform-box:fill-box;transform-origin:50% 100%}
+.isk{animation:isk-bob 3.4s ease-in-out infinite}
+.isk .i-halo{animation:isk-halo 3.4s ease-in-out infinite;transform-origin:60px 68px}
+.isk .i-shape{filter:drop-shadow(0 0 6px var(--c2))}
+.isk .i-shine{fill:#fff;opacity:.45}
+.isk .i-eye{fill:#1d1934;transform-box:fill-box;transform-origin:center;animation:isk-blink 5.5s infinite}
+.isk .i-glint{fill:#fff}
+.isk .i-eye-c,.isk .i-mouth{fill:none;stroke:#1d1934;stroke-width:2.4;stroke-linecap:round}
+.isk .i-mouth-open{fill:#1d1934}
+.isk .i-mouth-o{fill:#1d1934}
+.isk .i-cheek{fill:#ff8fb1;opacity:.5}
+.isk .i-tuft{transform-box:fill-box;transform-origin:50% 100%;animation:isk-tuft 1.8s ease-in-out infinite}
+.isk .i-rays{stroke:var(--c3);stroke-width:2.2;stroke-linecap:round;opacity:.65;transform-origin:60px 66px;animation:spin-r 22s linear infinite}
+.isk .i-orbit{fill:var(--c1);filter:drop-shadow(0 0 3px var(--c2));transform-origin:60px 66px;animation:spin-r 6s linear infinite}
+.isk .i-aurora{fill:none;stroke:var(--c3);stroke-width:3;stroke-linecap:round;opacity:.35;animation:twinkle 4s ease-in-out infinite}
+.isk .i-zzz{fill:#cfc5ff;font:700 11px system-ui;animation:isk-z 2.6s ease-in-out infinite}
+.isk .i-hearts{fill:#ff9ab9;animation:isk-z 2.2s ease-in-out infinite}
+.isk.joy{animation:isk-hop 1.2s cubic-bezier(.34,1.56,.64,1) infinite}
+.isk.joy .i-halo{animation-duration:1.2s}
+.isk.sleepy{animation-duration:6s}.isk.sleepy .i-halo{opacity:.6}
+.isk.missed{animation:isk-wiggle 2.4s ease-in-out infinite}
+.x-iskra-says{display:flex;align-items:center;gap:12px;width:100%;margin:-6px 0 14px;padding:0;background:none;border:0;color:var(--text);text-align:left;cursor:pointer}
+.x-iskra-says .isk{flex:0 0 64px}
+.x-bubble{position:relative;display:block;padding:10px 14px;border-radius:16px 16px 16px 4px;background:#ffffff0d;border:1px solid #ffffff1c;font-size:13px;line-height:1.45;color:#ece9fb;animation:bubble-in .5s var(--ease) both .15s}
+.x-bubble.big{font-size:15px;margin:10px 0 16px;border-radius:18px 18px 18px 4px}
+.x-now .eyebrow{text-align:center}
+.x-now-links{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 14px;margin-top:10px}
+.x-now-links .btn{width:auto;font-size:13px}
+.x-back{width:auto;margin:0 0 12px;padding-left:0}
+.x-iskra-card{display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center;margin-bottom:18px;background:radial-gradient(ellipse at 15% 50%,#bbabff2e,transparent 60%),linear-gradient(150deg,#262a48,#1a1e33)}
+.x-iskra-stage{display:grid;place-items:center;width:170px;height:170px;border-radius:50%;background:radial-gradient(circle,#ffffff0d,transparent 70%)}
+.x-iskra-info h2{margin:2px 0 0}
+.x-stages{display:flex;gap:6px;margin-top:12px}
+.x-stages span{flex:1;height:6px;border-radius:4px;background:#ffffff14}
+.x-stages span.on{background:var(--c);box-shadow:0 0 10px var(--c)}
+.x-island{margin-bottom:18px}
+.x-island-art{margin:6px -6px 14px;border-radius:18px;overflow:hidden;box-shadow:inset 0 0 0 1px #ffffff14,0 20px 40px -24px #000}
+.island{display:block;width:100%;height:auto}
+.island .shore{filter:drop-shadow(0 0 10px #f3d49b33)}
+.island .cloud{fill:#ffffff24;animation:cloud 60s linear infinite}.island .cloud.c2{animation-duration:85s;animation-delay:-30s}
+.island .waves{fill:none;stroke:#a6e3f566;stroke-width:1.4;stroke-linecap:round;animation:waves 5s ease-in-out infinite}
+.island .sun{filter:drop-shadow(0 0 14px #ffd9a0);animation:breathe-sun 6s ease-in-out infinite}
+.island .moon{filter:drop-shadow(0 0 12px #f6efd2aa)}
+.island .star{fill:#fff;animation:twinkle 3s ease-in-out infinite}
+.island .win{fill:#5c6a8a}.island.night .win{fill:#ffd98a;filter:drop-shadow(0 0 3px #ffd98a)}
+.island .lamp{fill:#ffe9a8;filter:drop-shadow(0 0 4px #ffd98a)}
+.island .pl-path{fill:none;stroke:#d8c08f;stroke-linecap:round;stroke-dasharray:1 5;opacity:.9}
+.island .smoke circle{fill:#ffffff40;animation:smoke 3.4s ease-out infinite}.island .smoke circle+circle{animation-delay:-1.7s}
+.island .bloom{animation:bloom 3.2s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.island .swing{transform-box:fill-box;transform-origin:50% 0;animation:swing 2.6s ease-in-out infinite}
+.island .flame{transform-box:fill-box;transform-origin:50% 100%;animation:flame .9s ease-in-out infinite alternate}.island .flame.f2{animation-duration:.7s}
+.island .ember circle{fill:#ffcf7a;animation:isk-z 2s ease-in-out infinite}
+.island .ripple-w{animation:ripple-w 3s ease-out infinite;transform-box:fill-box;transform-origin:center}
+.island .duck{animation:duck 7s ease-in-out infinite}
+.island .critter{animation:critter 2.8s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.island .flag{transform-box:fill-box;transform-origin:0 50%;animation:flag 1.6s ease-in-out infinite}
+.island .gear{transform-box:fill-box;transform-origin:center;animation:spin-r 6s linear infinite}
+.island .heart{animation:isk-z 2.4s ease-in-out infinite}
+.island .tree{transform-box:fill-box;transform-origin:50% 100%;animation:sway 5s ease-in-out infinite}
+.island .pl{animation:pop-in .6s cubic-bezier(.34,1.56,.64,1) both}
+.island .pl-ghost circle{fill:#ffffff10;stroke:#ffffff55;stroke-dasharray:2 2}
+.island .pl-ghost text{fill:#ffffffaa;font:700 10px system-ui;text-anchor:middle}
+.island .isl-iskra{animation:float-isk 5s ease-in-out infinite}
+.x-places{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.x-place{display:grid;gap:3px;padding:11px 12px;border-radius:14px;background:#ffffff04;border:1px solid var(--line);opacity:.6}
+.x-place.on{opacity:1;background:#b4efd908;border-color:#b4efd926}
+.x-place strong{font-size:13px}.x-place small{font-size:11px;color:var(--muted);line-height:1.35}
+.x-place-dots{display:flex;gap:4px}.x-place-dots i{width:14px;height:4px;border-radius:3px;background:#ffffff18}.x-place-dots i.on{background:linear-gradient(90deg,var(--purple),var(--mint))}
+.x-rooms-head{margin-top:6px}
+.x-rename{margin-top:18px}.x-rename summary{cursor:pointer;font-size:13px;color:var(--muted)}.x-rename form{margin-top:12px}
+.x-own-routines{margin-top:22px}.x-own-routines>.eyebrow{margin:0 0 10px}
+.x-inbox{margin-bottom:16px}
+@keyframes isk-bob{50%{transform:translateY(-5px)}}
+@keyframes isk-hop{0%,100%{transform:translateY(0)}40%{transform:translateY(-10px) scale(1.03,.97)}60%{transform:translateY(0) scale(.97,1.03)}}
+@keyframes isk-wiggle{0%,100%{transform:rotate(0)}20%{transform:rotate(-5deg)}40%{transform:rotate(5deg)}60%{transform:rotate(0)}}
+@keyframes isk-halo{50%{transform:scale(1.08);opacity:.85}}
+@keyframes isk-blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+@keyframes isk-tuft{50%{transform:scaleY(1.12) skewX(4deg)}}
+@keyframes isk-z{0%{opacity:0;transform:translateY(4px)}40%{opacity:1}100%{opacity:0;transform:translateY(-8px)}}
+@keyframes spin-r{to{transform:rotate(360deg)}}
+@keyframes bubble-in{from{opacity:0;transform:translateY(6px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes cloud{from{transform:translateX(-120px)}to{transform:translateX(420px)}}
+@keyframes waves{50%{transform:translateX(6px);opacity:.5}}
+@keyframes breathe-sun{50%{opacity:.8}}
+@keyframes smoke{0%{transform:translateY(0) scale(.6);opacity:.8}100%{transform:translateY(-12px) scale(1.4);opacity:0}}
+@keyframes bloom{50%{transform:scale(1.18)}}
+@keyframes swing{0%,100%{transform:rotate(-14deg)}50%{transform:rotate(14deg)}}
+@keyframes flame{from{transform:scale(1,1)}to{transform:scale(.88,1.12)}}
+@keyframes ripple-w{0%{transform:scale(.5);opacity:1}100%{transform:scale(1.8);opacity:0}}
+@keyframes duck{50%{transform:translateX(14px)}}
+@keyframes critter{50%{transform:translateX(2px) scaleY(.92)}}
+@keyframes flag{50%{transform:skewY(8deg) scaleX(.9)}}
+@keyframes sway{50%{transform:rotate(2.5deg)}}
+@keyframes pop-in{from{opacity:0;transform:scale(.4)}}
+@keyframes float-isk{50%{transform:translateY(-4px)}}
+@media(max-width:620px){.x-iskra-card{grid-template-columns:1fr;text-align:center;justify-items:center}.x-stages{justify-content:center}.x-places{grid-template-columns:1fr 1fr}}
+body.calm .isk,body.calm .isk *,body.calm .island *{animation:none!important}
+@media(prefers-reduced-motion:reduce){.isk,.isk *,.island *{animation:none!important}}
+.x-island~.room-grid,.x-rooms-head+.room-grid{grid-template-columns:repeat(3,1fr);gap:10px}
+.x-rooms-head+.room-grid .room-card{padding:16px 12px;text-align:center}
+.x-rooms-head+.room-grid .room-card p{display:none}
+.x-rooms-head+.room-grid .room-card h2{font-size:15px;margin:6px 0}
+.x-rooms-head+.room-grid .room-symbol{font-size:26px;margin:6px auto}
+.x-rooms-head+.room-grid .btn{font-size:12px;padding:8px 6px;min-height:38px}
+.x-rooms-head+.room-grid .eyebrow{font-size:9px;letter-spacing:.12em}.x-rooms-head+.room-grid .eyebrow:before{display:none}

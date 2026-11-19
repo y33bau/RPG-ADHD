@@ -121,3 +121,28 @@ test('only a brand new user gets onboarding', () => {
   assert.equal(Dly.needsOnboarding(C.fresh(), { onboarded: true }), false);
   assert.equal(Dly.needsOnboarding(withTasks({ title: 'x' }), {}), false);
 });
+
+import * as ISK from '../iskra.js';
+import * as ISL from '../island.js';
+test('Iskra grows with XP, never shrinks when coins are spent, and is glad when you come back', () => {
+  const s = withTasks({ title: 'Duże', tier: 'big' });
+  assert.equal(ISK.growth(s).index, 0);
+  for (let i = 0; i < 3; i++) s.ledger.push({ id: 'x' + i, kind: 'complete', day: '2026-11-10', time: at('2026-11-10T10:00:00'), xp: 50, coins: 30, materials: 0, title: 'x' });
+  s.ledger.push({ id: 'p', kind: 'purchase', day: '2026-11-10', time: at('2026-11-10T11:00:00'), xp: 0, coins: -80, materials: 0, title: 'nagroda' });
+  assert.equal(ISK.growth(s).stage.name, 'Płomyczek');
+  assert.equal(ISK.mood(s, at('2026-11-10T11:30:00')), 'joy');
+  assert.equal(ISK.mood(s, at('2026-11-15T12:00:00')), 'missed');
+  assert.match(ISK.line(s, at('2026-11-15T12:00:00')).text, /./);
+  assert.match(ISK.svg(s), /^<svg[^>]+class="isk /);
+});
+
+test('island places grow from matching chores and use the names typed by the user', () => {
+  const s = C.fresh(at('2026-11-18T08:00:00'));
+  const done = title => { const t = C.makeTask({ title }); s.tasks.push(t); C.completeTask(s, t.id); };
+  done('Wstaw naczynia do zmywarki'); done('Pobaw się z Olafem'); done('Coś zupełnie innego'); done('Jeszcze coś');
+  const p = ISL.places(s, { kid: 'Olaf' }), by = Object.fromEntries(p.list.map(x => [x.id, x]));
+  assert.equal(by.house.level, 1); assert.equal(by.playground.level, 1); assert.equal(by.playground.title, 'Plac zabaw Olafa');
+  assert.ok(p.trees >= 1);
+  assert.equal(ISL.levelOf(6), 2); assert.equal(ISL.levelOf(20), 3);
+  assert.match(ISL.svg(s, {}), /class="island/);
+});

@@ -1,7 +1,7 @@
 import * as C from './core.js';
 import * as X from './extras-ui.js';
 const KEY='synapse_v2', $=s=>document.querySelector(s), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let storageFailed=false,loadFailed=false,notice='',state,tab='today',sub={today:'now',tasks:'list',world:'trip',base:'base',history:'overview'},filter='today',selected=null,toastTimer,installPrompt=null,lastTrigger=null,ringed=null;
+let storageFailed=false,loadFailed=false,notice='',state,tab='today',sub={today:'now',tasks:'list',world:'trip',base:'island',history:'overview'},filter='today',selected=null,toastTimer,installPrompt=null,lastTrigger=null,ringed=null;
 try{
  const raw=localStorage.getItem(KEY);
  if(raw)state=C.validate(JSON.parse(raw));
@@ -71,14 +71,14 @@ function week(){
 function planBody(){
  return '<div class="energy-row"><div class="row"><span class="tiny muted">Twoja energia</span><div class="segmented" aria-label="Poziom energii">'+[['low','Niska'],['medium','W sam raz'],['high','Mam moc']].map(([v,l])=>'<button data-energy="'+v+'" class="'+(state.energy===v?'selected':'')+'" aria-pressed="'+(state.energy===v)+'">'+l+'</button>').join('')+'</div></div><button class="minimum '+(state.minimum?'selected':'')+'" data-action="minimum" aria-pressed="'+state.minimum+'">☾ Dzisiaj minimum</button></div>'+X.guardCard(state)+X.plannerView(state);
 }
-function meBody(){return '<div class="dashboard"><div class="stack">'+X.moodCard()+X.habitsCard()+'</div><div class="stack">'+waterCard()+week()+'</div></div>';}
+function meBody(){return '<div class="dashboard"><div class="stack">'+X.moodCard()+X.habitsCard()+'</div><div class="stack">'+waterCard()+'</div></div>';}
 function subBody(name,map){const cur=X.currentSub(name,sub[name],!!state.settings.minimal);return (map[cur]||Object.values(map)[0])();}
 function todayView(){
  const ob=notice?'':X.onboarding(state);if(ob)return '<div class="x-ob-wrap">'+ob+'</div>';
  return '<div class="page-heading"><h1>Dzisiaj</h1><button class="btn primary" data-action="add">＋ Dodaj zadanie</button></div>'+
   '<div data-life-slot id="slot-weather"></div>'+
   (notice?'<p class="return-note">'+esc(notice)+'</p>':'')+
-  X.subnav('today',sub.today,!!state.settings.minimal)+subBody('today',{now:()=>X.nowView(state),plan:planBody,ritual:()=>X.ritualView(state),focus:()=>X.focusView(state),me:meBody});
+  X.subnav('today',sub.today,!!state.settings.minimal)+subBody('today',{now:()=>X.nowView(state),plan:planBody,ritual:()=>X.ritualView(state)});
 
 }
 function taskList(){
@@ -89,11 +89,11 @@ function taskList(){
  return '<div class="filter-row">'+[['today','Na dzisiaj'],['all','Wszystkie'],['upcoming','Później'],['done','Ukończone'],['archived','Archiwum']].map(([v,l])=>'<button class="filter '+(filter===v?'selected':'')+'" data-filter="'+v+'">'+l+'</button>').join('')+'</div><section class="panel"><div class="task-list">'+(tasks.length?tasks.map(t=>taskCard(t,true)).join(''):'<div class="empty"><div class="empty-symbol">☷</div><h3>Tutaj na razie jest spokojnie.</h3><p>Nowy cel możesz dodać jednym przyciskiem.</p></div>')+'</div></section>';
 }
 function tasksView(){
- return heading('Przestrzeń na Twoje sprawy.','Zapisz myśl. Wybierz pierwszy krok. Resztę zostaw na później.',true,'ZADANIA')+X.subnav('tasks',sub.tasks,!!state.settings.minimal)+subBody('tasks',{list:taskList,quick:()=>X.quickView(state),generator:()=>X.generatorView(state),dump:()=>X.dumpView(),routines:()=>X.routinesView()});
+ return heading('Przestrzeń na Twoje sprawy.','Zapisz myśl. Wybierz pierwszy krok. Resztę zostaw na później.',true,'ZADANIA')+X.subnav('tasks',sub.tasks,!!state.settings.minimal)+subBody('tasks',{list:()=>X.captureCard(true)+X.inboxCard()+taskList(),quick:()=>X.quickView(state),ideas:()=>X.ideasView(state)});
 }
-function baseBody(){return '<div class="row between panel" style="margin-bottom:22px"><div><div class="eyebrow">TWÓJ DOROBEK</div><h2>◇ '+b().materials+' materiałów</h2><p class="subtext">Trzy miejsca. Dziewięć małych przemian.</p></div><div style="width:220px;max-width:45%">'+scene()+'</div></div><div class="room-grid">'+C.ROOMS.map(r=>{const level=state.rooms[r.id],cost=C.roomCost(state,r.id);return '<section class="panel room-card" data-level="'+level+'"><div class="eyebrow">'+['DO ODKRYCIA','PIERWSZE ŚWIATŁO','CORAZ BLIŻEJ','TWOJE MIEJSCE'][level]+'</div><div class="room-symbol">'+r.symbol+'</div><h2>'+r.name+'</h2><div class="room-level" aria-label="Poziom '+level+' z 3">'+[1,2,3].map(i=>'<span class="'+(level>=i?'on':'')+'"></span>').join('')+'</div><p>'+r.description+'</p><button class="btn '+(level<3?'purple':'')+'" data-action="upgrade" data-id="'+r.id+'" '+(level===3||b().materials<cost?'disabled':'')+'>'+(level===3?'✓ W pełni rozbudowane':(level?'Ulepsz':'Odbuduj')+' · ◇ '+cost)+'</button></section>';}).join('')+'</div><div data-co-slot id="slot-garden"></div>';}
+function roomsGrid(){return '<div class="section-line x-rooms-head"><div><div class="eyebrow">BUDOWLE Z MATERIAŁÓW</div><h3>◇ '+b().materials+' materiałów</h3></div></div><div class="room-grid">'+C.ROOMS.map(r=>{const level=state.rooms[r.id],cost=C.roomCost(state,r.id);return '<section class="panel room-card" data-level="'+level+'"><div class="eyebrow">'+['DO ODKRYCIA','PIERWSZE ŚWIATŁO','CORAZ BLIŻEJ','TWOJE MIEJSCE'][level]+'</div><div class="room-symbol">'+r.symbol+'</div><h2>'+r.name+'</h2><div class="room-level" aria-label="Poziom '+level+' z 3">'+[1,2,3].map(i=>'<span class="'+(level>=i?'on':'')+'"></span>').join('')+'</div><p>'+r.description+'</p><button class="btn '+(level<3?'purple':'')+'" data-action="upgrade" data-id="'+r.id+'" '+(level===3||b().materials<cost?'disabled':'')+'>'+(level===3?'✓ W pełni rozbudowane':(level?'Ulepsz':'Odbuduj')+' · ◇ '+cost)+'</button></section>';}).join('')+'</div>';}
 function baseView(){
- return heading('Przystań, którą budujesz.','Każde wykonane zadanie daje materiały. Baza zostaje z Tobą.',false,'BAZA')+X.subnav('base',sub.base,!!state.settings.minimal)+subBody('base',{base:baseBody,bosses:()=>X.bossesView(state),rewards:()=>rewardsBody()+X.rewardIdeas(state)});
+ return heading('Wyspa '+X.iskraTitle()+'.','Wszystko, co robisz w prawdziwym życiu, buduje jej dom.',false,'WYSPA')+X.subnav('base',sub.base,!!state.settings.minimal)+subBody('base',{island:()=>X.islandView(state,roomsGrid()),bosses:()=>X.bossesView(state),rewards:()=>rewardsBody()+X.rewardIdeas(state)});
 }
 function rewardsView(){return heading('Coś miłego po drodze.','Twoje monety, Twoje nagrody. Zwykły odpoczynek zawsze jest za darmo.',false,'NAGRODY')+rewardsBody();}
 function worldView(){
@@ -101,7 +101,6 @@ function worldView(){
   trip:()=>'<div class="x-slots"><div data-life-slot id="slot-place"></div><div data-co-slot id="slot-visits"></div></div>',
   calendar:()=>'<div class="x-slots"><div data-life-slot id="slot-calendar"></div></div>',
   facts:()=>X.factsView(),
-  diy:()=>X.diyView(),
   settings:()=>'<section class="panel"><h2>Ustawienia</h2><div id="app-update-slot"></div><p id="connection" class="subtext">● Zapis na urządzeniu</p><div class="x-note-actions"><button class="btn primary" data-action="settings">Ustawienia i kopie danych</button><button class="btn" data-action="x-minimal" aria-pressed="'+!!state.settings.minimal+'">Tryb minimalny: '+(state.settings.minimal?'włączony':'wyłączony')+'</button></div><p class="subtext tiny">Tryb minimalny ukrywa dodatki i zostawia plan, skupienie, zadania, bazę i nagrody.</p></section>'+X.namesCard()
  };
  return '<div class="page-heading"><h1>Więcej</h1></div>'+X.subnav('world',sub.world,!!state.settings.minimal)+subBody('world',slots);
@@ -111,7 +110,7 @@ function historyView(){
  const history=state.ledger.filter(e=>e.kind!=='step'||!state.ledger.some(x=>x.kind==='complete'&&x.taskId===e.taskId&&x.occurrence===e.occurrence)).slice().reverse().slice(0,120);
  const log=()=>'<section class="panel"><div class="section-line"><h2>Twoje ostatnie zwycięstwa</h2><span class="tiny muted">Do 120 wpisów</span></div>'+
  (history.length?history.map(e=>'<div class="history-item"><span class="history-symbol">'+({complete:'✓',step:'↗',purchase:'✧',upgrade:'⌂',focus:'◷',legacy:'◇',bonus:'❖',boss:'♞'}[e.kind])+'</span><div style="min-width:0"><strong>'+esc(e.title)+'</strong><small>'+esc(new Date(e.time).toLocaleString('pl-PL',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}))+' · '+({complete:'Zadanie wykonane',step:'Mały krok',purchase:'Odebrana nagroda',upgrade:'Baza rośnie',focus:e.minutes+' min skupienia',legacy:'Poprzednia wersja',bonus:'Niespodzianka',boss:'Wyprawa'}[e.kind])+'</small></div><span class="history-points">'+(e.kind==='complete'?'✓':e.coins?((e.coins>0?'+':'')+e.coins+' ◈'):e.materials?e.materials+' ◇':'')+'</span></div>').join(''):'<div class="empty"><div class="empty-symbol">↗</div><h3>To dopiero początek Twojej historii.</h3><p>Wykonaj pierwszy krok, a pojawi się tutaj.</p></div>')+'</section>';
- return heading('Widać, ile już za Tobą.','Małe rzeczy też są osiągnięciami. Tutaj mają swoje miejsce.',false,'POSTĘP')+X.subnav('history',sub.history,!!state.settings.minimal)+subBody('history',{overview:()=>X.weekCard(state,{force:true})+'<div class="dashboard"><div class="stack">'+profile()+week()+'</div><div class="stack">'+X.attributesCard(state)+'</div></div>',badges:()=>X.badgesView(state),rhythm:()=>X.rhythmView(state),log});
+ return heading('Widać, ile już za Tobą.','Małe rzeczy też są osiągnięciami. Tutaj mają swoje miejsce.',false,'POSTĘP')+X.subnav('history',sub.history,!!state.settings.minimal)+subBody('history',{overview:()=>X.weekCard(state,{force:true})+'<div class="dashboard"><div class="stack">'+profile()+week()+'</div><div class="stack">'+X.attributesCard(state)+'</div></div>',me:()=>meBody()+X.rhythmView(state),badges:()=>X.badgesView(state)+log()});
 }
 function render(){
  if(state.water.day!==today())state.water={day:today(),count:0};
@@ -264,8 +263,8 @@ render();
 try{
  const q=new URLSearchParams(location.search||''),go=q.get('action');
  if(go==='add')taskForm();
- if(go==='dump'){tab='tasks';sub.tasks='dump';render();}
- if(go==='focus'){tab='today';sub.today='focus';render();}
+ if(go==='dump'){tab='tasks';sub.tasks='list';render();}
+ if(go==='focus'){tab='today';sub.today='now';X.openFocus();render();}
  if(go&&typeof history!=='undefined')history.replaceState(null,'',location.pathname);
 }catch{}
 if('serviceWorker' in navigator&&location.protocol!=='file:'){

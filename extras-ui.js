@@ -10,6 +10,8 @@ import { FACTS, factOfDay } from './facts.js';
 import { DIY } from './diy.js';
 import { FOCUS_TIPS, tipOfDay, thoughtOfDay } from './wisdom.js';
 import * as D from './daily.js';
+import * as ISK from './iskra.js';
+import * as ISL from './island.js';
 import { extra, saveExtra, reloadExtra } from './extra-store.js';
 
 export { extra };
@@ -21,15 +23,15 @@ const tomorrow = () => { const d = new Date(); d.setDate(d.getDate() + 1); retur
 const openNotes = () => extra.notes.filter(n => !n.archived);
 
 export const SUBS = {
-  today: [['now', 'Teraz'], ['plan', 'Plan'], ['ritual', 'Rytuał'], ['focus', 'Skupienie'], ['me', 'Ja']],
-  tasks: [['list', 'Lista'], ['quick', 'Szybkie punkty'], ['generator', 'Generator'], ['dump', 'Zrzut z głowy'], ['routines', 'Rutyny']],
-  world: [['trip', 'Wyprawy'], ['calendar', 'Kalendarz'], ['facts', 'Ciekawostki'], ['diy', 'Zrób to sam'], ['settings', 'Ustawienia']],
-  base: [['base', 'Przystań'], ['bosses', 'Wyprawy'], ['rewards', 'Nagrody']],
-  history: [['overview', 'Przegląd'], ['badges', 'Osiągnięcia'], ['rhythm', 'Rytm'], ['log', 'Historia']],
+  today: [['now', 'Teraz'], ['plan', 'Plan'], ['ritual', 'Rytuały']],
+  tasks: [['list', 'Lista'], ['quick', 'Szybkie punkty'], ['ideas', 'Pomysły']],
+  base: [['island', 'Wyspa'], ['bosses', 'Wyzwania'], ['rewards', 'Nagrody']],
+  history: [['overview', 'Przegląd'], ['me', 'Ja'], ['badges', 'Osiągnięcia']],
+  world: [['trip', 'Wyprawy'], ['calendar', 'Kalendarz'], ['facts', 'Ciekawostki'], ['settings', 'Ustawienia']],
 };
 
 /** Minimal mode keeps only what is needed to plan, focus and rest. */
-const MINIMAL_HIDDEN = new Set(['today:me', 'today:ritual', 'tasks:quick', 'tasks:generator', 'tasks:routines', 'world:trip', 'world:facts', 'world:diy', 'base:bosses', 'history:badges', 'history:rhythm']);
+const MINIMAL_HIDDEN = new Set(['today:ritual', 'tasks:quick', 'tasks:ideas', 'base:bosses', 'history:badges', 'world:trip', 'world:facts']);
 
 export function subs(tab, minimal = false) {
   return (SUBS[tab] || []).filter(([id]) => !(minimal && MINIMAL_HIDDEN.has(tab + ':' + id)));
@@ -45,7 +47,7 @@ export function subnav(tab, wanted, minimal = false) {
   const items = subs(tab, minimal), current = currentSub(tab, wanted, minimal);
   if (!items.length) return '';
   return '<div class="x-subtabs" role="tablist" aria-label="Sekcje">' + items.map(([id, label]) => {
-    const n = tab === 'tasks' && id === 'dump' ? openNotes().length : 0;
+    const n = tab === 'tasks' && id === 'list' ? openNotes().length : 0;
     return '<button role="tab" class="x-subtab' + (current === id ? ' on' : '') + '" data-sub="' + id + '" aria-selected="' + (current === id) + '" tabindex="' + (current === id ? 0 : -1) + '">' + label + (n ? '<b>' + n + '</b>' : '') + '</button>';
   }).join('') + '</div>';
 }
@@ -54,9 +56,18 @@ const empty = (symbol, title, text) => '<div class="empty"><div class="empty-sym
 
 /* ───────────── Brain dump ───────────── */
 
-export function captureCard() {
-  const n = openNotes().length;
-  return '<section class="panel x-capture"><div class="eyebrow">ZRZUT Z GŁOWY</div><form id="x-dump-form" class="x-inline"><label class="x-sr" for="x-dump-quick">Co chodzi Ci po głowie?</label><input id="x-dump-quick" name="text" maxlength="500" required placeholder="Zapisz myśl i wróć do działania" autocomplete="off"><button class="btn primary x-square" type="submit" aria-label="Zapisz myśl">＋</button></form><button class="btn link" data-go="tasks:dump">' + (n ? n + ' ' + plural(n, 'myśl czeka', 'myśli czekają', 'myśli czeka') + ' na przegląd →' : 'Otwórz parking myśli →') + '</button></section>';
+export function captureCard(inList = false) {
+  const n = inList ? 0 : openNotes().length;
+  return '<section class="panel x-capture"><div class="eyebrow">ZRZUT Z GŁOWY</div><form id="x-dump-form" class="x-inline"><label class="x-sr" for="x-dump-quick">Co chodzi Ci po głowie?</label><input id="x-dump-quick" name="text" maxlength="500" required placeholder="Zapisz myśl i wróć do działania" autocomplete="off"><button class="btn primary x-square" type="submit" aria-label="Zapisz myśl">＋</button></form>' + (inList ? '' : '<button class="btn link" data-go="tasks:list">' + (n ? n + ' ' + plural(n, 'myśl czeka', 'myśli czekają', 'myśli czeka') + ' na przegląd →' : 'Otwórz zadania →') + '</button>') + '</section>';
+}
+
+/** Notes waiting for a decision, shown on top of the task list only when there are any. */
+export function inboxCard() {
+  const notes = openNotes().slice().reverse();
+  if (!notes.length) return '';
+  return '<section class="panel x-inbox"><div class="section-line"><h3>Myśli czekają na decyzję · ' + notes.length + '</h3><button class="btn small purple" data-action="x-review">☾ Przejrzyj</button></div>' +
+    notes.slice(0, 5).map(n => '<article class="x-note"><p>' + esc(n.text) + '</p><div class="x-note-actions"><button class="btn small" data-action="x-note-today" data-id="' + esc(n.id) + '">Na dziś</button><button class="btn small" data-action="x-note-tomorrow" data-id="' + esc(n.id) + '">Na jutro</button><button class="btn small link" data-action="x-note-drop" data-id="' + esc(n.id) + '">Puść</button></div></article>').join('') +
+    (notes.length > 5 ? '<p class="subtext tiny">I jeszcze ' + (notes.length - 5) + '. Przejrzyj je po kolei przyciskiem wyżej.</p>' : '') + '</section>';
 }
 
 export function dumpView() {
@@ -190,7 +201,7 @@ export function focusView(state) {
     ? '<div class="x-buddy-timer"><svg viewBox="0 0 120 120" class="x-ring" aria-hidden="true"><circle cx="60" cy="60" r="52" class="x-ring-bg"/><circle cx="60" cy="60" r="52" class="x-ring-fg" id="x-ring" stroke-dasharray="' + RING.toFixed(1) + '" stroke-dashoffset="' + (RING * (1 - progress)).toFixed(1) + '"/></svg><div class="x-ring-text"><strong id="x-buddy-time" role="timer">' + clock(left) + '</strong><small>' + esc(task?.title || 'Chwila skupienia') + '</small></div></div><div class="x-buddy-actions">' +
       (left === 0 ? '<button class="btn primary" data-action="focus-finish">Zapisz sesję ✓</button>' : '<button class="btn" data-action="focus-pause">' + (f.paused ? 'Wznów' : 'Pauza') + '</button>') + '<button class="btn link" data-action="focus-stop">Zakończ bez zapisu</button></div>'
     : '<label class="field x-pick-field">Nad czym pracujemy?<select id="x-buddy-task"><option value="">Chwila skupienia, bez zadania</option>' + tasks.map(t => '<option value="' + esc(t.id) + '">' + esc(t.title) + '</option>').join('') + '</select></label><div class="x-durations" role="group" aria-label="Czas sesji">' + [2, 5, 15, 25].map(n => '<button class="x-duration" data-action="x-buddy-start" data-min="' + n + '"><strong>' + n + '</strong><small>min</small></button>').join('') + '</div>';
-  return tipCard() + '<div class="dashboard"><div class="stack"><section class="panel x-buddy"><div class="x-buddy-stage">' + spark(line.mode) + '</div><div class="x-buddy-body"><div class="eyebrow">POPRACUJMY RAZEM</div><h2>Iskra siedzi obok</h2><p class="x-buddy-msg" id="x-buddy-msg" aria-live="off">' + esc(line.text) + '</p>' + controls + '<button class="btn small x-ambient" data-action="x-ambient" aria-pressed="' + !!ambient + '">' + (ambient ? '♪ Szum włączony' : '♪ Włącz szum w tle') + '</button></div></section><div data-co-slot id="slot-pick"></div></div>' +
+  return tipCard() + '<div class="dashboard"><div class="stack"><section class="panel x-buddy"><div class="x-buddy-stage"><div id="x-spark" class="x-spark ' + line.mode + '">' + ISK.svg(state, { size: 150, moodOverride: line.mode === 'paused' ? 'sleepy' : line.mode === 'done' ? 'joy' : 'calm', label: iskraName() }) + '</div></div><div class="x-buddy-body"><div class="eyebrow">POPRACUJMY RAZEM</div><h2>' + esc(iskraName()) + ' siedzi obok</h2><p class="x-buddy-msg" id="x-buddy-msg" aria-live="off">' + esc(line.text) + '</p>' + controls + '<button class="btn small x-ambient" data-action="x-ambient" aria-pressed="' + !!ambient + '">' + (ambient ? '♪ Szum włączony' : '♪ Włącz szum w tle') + '</button></div></section><div data-co-slot id="slot-pick"></div></div>' +
     '<div class="stack"><section class="panel"><div class="section-line"><h3>Twoje skupienie</h3><span class="tiny muted">łącznie</span></div><div class="stats"><div class="stat"><strong>' + stats.sessions + '</strong><small>sesji</small></div><div class="stat"><strong>' + stats.minutes + '</strong><small>minut</small></div><div class="stat"><strong>' + stats.average + '</strong><small>śr. min</small></div></div><p class="subtext tiny">Sesja nie zalicza zadania. Punkty daje dopiero wykonany krok.</p></section></div></div>';
 }
 
@@ -348,14 +359,27 @@ export function plannerView(state) {
 
 let nowSkip = 0;
 
+const iskraName = () => (extra.iskraName || 'Iskra').slice(0, 20);
+/** Genitive for headings: "Wyspa Iskry". Custom names stay as typed. */
+export const iskraTitle = () => esc(extra.iskraName ? extra.iskraName : 'Iskry');
+
+/** Iskra's face and speech bubble, used on top of the "Now" card. */
+function iskraSays(state) {
+  const l = ISK.line(state, Date.now(), state.settings.name || '');
+  return '<button class="x-iskra-says" data-go="base:island" aria-label="' + esc(iskraName()) + ' mówi: ' + esc(l.text) + ' Otwórz wyspę.">' + ISK.svg(state, { size: 64, label: iskraName() }) + '<span class="x-bubble">' + esc(l.text) + '</span></button>';
+}
+
+let focusOpen = false;
+export const openFocus = () => { focusOpen = true; };
+
 export function nowCard(state) {
   const n = P.nextThing(state, { skip: nowSkip, names: extra.names });
   if (!n) return '';
   const done = n.kind === 'task' ? '<button class="btn" data-action="complete" data-id="' + esc(n.task.id) + '">Już zrobione ✓</button><button class="btn link" data-action="help" data-id="' + esc(n.task.id) + '">Nie mogę ruszyć</button>' : '';
-  return '<section class="panel x-now"><div class="eyebrow">CO TERAZ?</div><p class="x-now-hint">Zrób dziś tylko jedną z tych rzeczy. Resztę możesz zostawić na później.</p><h2 class="x-now-title">' + esc(n.title) + '</h2>' +
+  return '<section class="panel x-now">' + iskraSays(state) + '<div class="eyebrow">CO TERAZ?</div><h2 class="x-now-title">' + esc(n.title) + '</h2>' +
     '<p class="x-now-meta">' + TIER_LABEL[n.tier] + ' · zaczynasz od 5 minut' + (n.kind === 'idea' ? ' · nowy pomysł' : '') + '</p>' +
     '<button class="btn primary x-now-go" data-action="x-now-start">▶ Zaczynam</button>' +
-    '<div class="x-note-actions x-now-more"><button class="btn" data-action="x-now-next">Inna rzecz ↻</button>' + done + '</div><button class="btn link x-now-already" data-action="already">＋ Już coś zrobiłem, dopiszę</button></section>';
+    '<div class="x-note-actions x-now-more"><button class="btn" data-action="x-now-next">Inna rzecz ↻</button>' + done + '</div><div class="x-now-links"><button class="btn link" data-action="already">＋ Już coś zrobiłem</button><button class="btn link" data-action="x-focus-open">◷ Samo skupienie</button></div></section>';
 }
 
 /* ───────────── Procrastination guard ───────────── */
@@ -455,7 +479,7 @@ function ritualToggle(ctx, kind, item) {
 /** Both rituals on their own tab; the one that fits the hour goes first. */
 export function ritualView(state) {
   const order = D.ritualNow() === 'evening' || new Date().getHours() >= 12 ? ['evening', 'morning'] : ['morning', 'evening'];
-  return '<p class="subtext x-tab-lead">Krótkie rytuały domykają poranek i wieczór. Za każdy pełny dostajesz +' + D.RITUAL_REWARD.coins + ' monet.</p>' + order.map(k => ritualCard(state, k)).join('');
+  return '<p class="subtext x-tab-lead">Krótkie rytuały domykają poranek i wieczór. Za każdy pełny dostajesz +' + D.RITUAL_REWARD.coins + ' monet.</p>' + order.map(k => ritualCard(state, k)).join('') + '<div class="x-own-routines"><div class="eyebrow">TWOJE RUTYNY</div>' + routinesView() + '</div>';
 }
 
 /** A one-line link to the ritual that fits the hour, for the "Now" tab. */
@@ -473,8 +497,31 @@ function weekTeaser() {
 
 /** The "Now" tab: one thing to do, plus at most two small hints. */
 export function nowView(state) {
+  if (state.focus || focusOpen) return (state.focus ? '' : '<button class="btn link x-back" data-action="x-focus-close">← Wróć do „Co teraz?”</button>') + focusView(state);
   return weekTeaser() + nowCard(state) + ritualTeaser() + thoughtCard();
 }
+
+/* ───────────── Island ───────────── */
+
+export function islandView(state, roomsHtml = '') {
+  const gr = ISK.growth(state), l = ISK.line(state, Date.now(), state.settings.name || ''), names = extra.names || {};
+  const pl = ISL.places(state, names), found = pl.list.filter(p => p.level).length;
+  const iskra = '<section class="panel x-iskra-card"><div class="x-iskra-stage">' + ISK.svg(state, { size: 150, label: iskraName() }) + '</div><div class="x-iskra-info"><div class="eyebrow">TWOJA TOWARZYSZKA</div><h2>' + esc(iskraName()) + ' · ' + gr.stage.name + '</h2><p class="x-bubble big">' + esc(l.text) + '</p>' +
+    '<div class="progress-label"><span>' + (gr.next ? 'Do etapu „' + gr.next.name + '”' : 'Najwyższy etap') + '</span><span>' + (gr.next ? gr.toNext + ' XP' : '✦') + '</span></div><div class="track" role="progressbar" aria-label="Wzrost towarzyszki" aria-valuenow="' + Math.round(gr.progress * 100) + '" aria-valuemin="0" aria-valuemax="100"><div class="fill" style="width:' + (gr.progress * 100).toFixed(1) + '%"></div></div>' +
+    '<p class="subtext tiny">' + gr.stage.note + ' Rośnie od każdej zrobionej rzeczy. Nigdy nie znika i nie obraża się, gdy masz przerwę.</p>' +
+    '<div class="x-stages" aria-label="Etapy wzrostu">' + ISK.STAGES.map((st, i) => '<span class="' + (i <= gr.index ? 'on' : '') + '" title="' + st.name + '" style="--c:' + st.c2 + '"></span>').join('') + '</div></div></section>';
+  const island = '<section class="panel x-island"><div class="section-line"><div><div class="eyebrow">DOM TOWARZYSZKI</div><h2>Wyspa rośnie razem z Tobą</h2></div><span class="tiny muted">' + found + ' z ' + pl.list.length + ' miejsc</span></div><div class="x-island-art">' + ISL.svg(state, names) + '</div>' +
+    '<div class="x-places">' + pl.list.map(p => '<div class="x-place' + (p.level ? ' on' : '') + '"><div class="x-place-dots" aria-label="Poziom ' + p.level + ' z 3">' + [1, 2, 3].map(i => '<i class="' + (i <= p.level ? 'on' : '') + '"></i>').join('') + '</div><strong>' + esc(p.title) + '</strong><small>' + (p.level >= 3 ? 'W pełni rozkwitło' : 'Rośnie od ' + p.from + (p.toNext ? ' · jeszcze ' + p.toNext : '')) + '</small></div>').join('') + '</div>' +
+    '<p class="subtext tiny">Drzewa sadzi wszystko inne, co zrobisz. Domy poniżej budujesz z materiałów.</p></section>';
+  const rename = '<details class="panel x-rename"><summary>Zmień imię towarzyszki</summary><form id="x-iskra-name" class="x-inline"><label class="x-sr" for="x-iskra-name-input">Imię</label><input id="x-iskra-name-input" name="name" maxlength="20" value="' + esc(extra.iskraName || '') + '" placeholder="Iskra" autocomplete="off"><button class="btn" type="submit">Zapisz</button></form></details>';
+  return iskra + island + roomsHtml + rename;
+}
+
+/** Ideas: the task generator and the DIY hacks on one tab. */
+export function ideasView(state) {
+  return generatorView(state) + diyView();
+}
+
 
 /* ───────────── Weekly summary ───────────── */
 
@@ -610,6 +657,11 @@ export function init(ctx, doc = globalThis.document) {
         const title = String(data.get('title') || '').trim().slice(0, 120);
         if (title) finishOnboarding(ctx, title);
       }
+      if (id === 'x-iskra-name') {
+        const v = String(data.get('name') || '').trim().slice(0, 20);
+        if (v && v !== 'Iskra') extra.iskraName = v; else delete extra.iskraName;
+        saveExtra(); ctx.render(); ctx.toast('Miło mi, ' + iskraName() + '!');
+      }
       if (id === 'x-names-form') {
         extra.names = {};
         for (const [k] of GEN.NAME_FIELDS) { const v = String(data.get(k) || '').trim().slice(0, 150); if (v) extra.names[k] = v; }
@@ -681,6 +733,8 @@ export function init(ctx, doc = globalThis.document) {
         case 'x-routine-daily': { const r = extra.routines.find(r => r.id === id); if (r) launchRoutine(ctx, r, 'daily'); break; }
         case 'x-boss-new': bossForm(ctx); break;
         case 'x-blow': strike(ctx, id, Number(b.dataset.i)); break;
+        case 'x-focus-open': focusOpen = true; ctx.render(); break;
+        case 'x-focus-close': focusOpen = false; ctx.render(); break;
         case 'x-ritual': ritualToggle(ctx, b.dataset.kind, b.dataset.item); break;
         case 'x-ritual-close': { const day = D.ritualDay(); extra.rituals[day] ??= {}; extra.rituals[day][b.dataset.kind + 'Closed'] = true; saveExtra(); ctx.render(); break; }
         case 'x-week-close': extra.prefs.weekSeen = D.summaryWeek(); saveExtra(); ctx.render(); break;
