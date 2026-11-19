@@ -71,5 +71,17 @@
     }
     document.body.prepend(box);
   }
+  /* Glowing pill that glides behind the active menu item. */
+  const nav = document.querySelector('#navigation'), glider = nav?.querySelector('.nav-glider');
+  const place = () => {
+    const a = nav?.querySelector('.nav-item.active'); if (!a || !glider) return;
+    glider.style.width = a.offsetWidth + 'px'; glider.style.height = a.offsetHeight + 'px';
+    glider.style.transform = 'translate(' + a.offsetLeft + 'px,' + a.offsetTop + 'px)';
+    if (!glider.classList.contains('ready')) glider.classList.add('ready');
+  };
+  if (nav) {
+    new MutationObserver(ms => { if (ms.some(m => m.target !== glider)) place(); }).observe(nav, { attributes: true, subtree: true, attributeFilter: ['class'] });
+    addEventListener('resize', place); requestAnimationFrame(place); setTimeout(place, 300);
+  }
   play();
 })();

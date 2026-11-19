@@ -126,7 +126,11 @@ function mount() {
     '<button type="button" class="amb-chip" data-kind="" aria-pressed="false">Cisza</button></div>' +
     '<label class="amb-vol">Głośność<input type="range" min="0.05" max="1" step="0.05" value="' + prefs.vol + '" aria-label="Głośność dźwięków tła"></label>' +
     '<p class="amb-note">Dźwięk powstaje w telefonie i działa bez internetu.</p></div>';
-  document.body.append(root);
+  // Lives in the top bar on phones and in the sidebar on wider screens.
+  const small = matchMedia('(max-width: 850px)');
+  const host = () => document.querySelector('.amb-host[data-host="' + (small.matches ? 'top' : 'side') + '"]') || document.body;
+  host().append(root);
+  small.addEventListener?.('change', () => host().append(root));
   const btn = root.querySelector('.amb-btn'), pop = root.querySelector('.amb-pop'), range = root.querySelector('input');
   const paint = () => {
     root.classList.toggle('on', !!current);

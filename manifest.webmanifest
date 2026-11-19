@@ -7,8 +7,8 @@
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#101322",
-  "theme_color": "#101322",
+  "background_color": "#0d0a1f",
+  "theme_color": "#0d0a1f",
   "icons": [
     {
       "src": "./assets/synapse.svg",
