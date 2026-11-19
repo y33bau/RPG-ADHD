@@ -1,0 +1,92 @@
+/* SYNAPSE 2.5 — premium finish: depth, glow, typography and motion.
+   Everything here is cosmetic and switched off by calm mode / reduced motion. */
+:root{--ease:cubic-bezier(.22,1,.36,1);--glow-mint:0 0 0 1px #b4efd93d,0 10px 34px -8px #8deac055;--shadow-lg:0 24px 60px -24px #02030a,0 2px 0 #ffffff08 inset}
+body{background:
+ radial-gradient(900px 520px at 85% -8%,#7d68b224,transparent 60%),
+ radial-gradient(760px 480px at -10% 8%,#4ab8a11c,transparent 60%),
+ radial-gradient(900px 700px at 50% 120%,#bbabff12,transparent 60%),var(--bg);
+ background-attachment:fixed;font-feature-settings:"ss01","cv11";-webkit-font-smoothing:antialiased}
+h1{background:linear-gradient(120deg,#fff 30%,#cfc5ff 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.eyebrow{letter-spacing:.22em}
+.eyebrow:before{content:"";display:inline-block;width:14px;height:1px;background:currentColor;vertical-align:middle;margin-right:9px;opacity:.7}
+
+/* Surfaces */
+.panel{position:relative;border:1px solid #ffffff14;background:linear-gradient(150deg,#222640f2,#171b2dfa);box-shadow:var(--shadow-lg);transition:transform .35s var(--ease),border-color .3s,box-shadow .35s var(--ease)}
+.panel:before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;background:linear-gradient(160deg,#ffffff2b,transparent 38%,transparent 70%,#b4efd91f);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;opacity:.8}
+.panel:hover{border-color:#ffffff22}
+.hero{background:radial-gradient(ellipse at 95% 0,#8a73c944,transparent 58%),radial-gradient(ellipse at 0 100%,#4fd1b222,transparent 55%),linear-gradient(115deg,#2a2946,#1e2439)}
+.hero:after{animation:orbit 18s linear infinite}
+.hero h2{background:linear-gradient(120deg,#fff,#d8cfff);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* Controls */
+.btn{transition:transform .2s var(--ease),background .2s,box-shadow .25s,border-color .2s}
+.btn:not(:disabled):hover{transform:translateY(-1px)}
+.btn.primary{background:linear-gradient(135deg,#c6f6e4,#9fe6cb);box-shadow:0 8px 24px -8px #8deac088,inset 0 1px 0 #ffffff66;position:relative;overflow:hidden}
+.btn.primary:not(:disabled):hover{box-shadow:0 12px 30px -8px #8deac0aa,inset 0 1px 0 #ffffff77}
+.btn.primary:after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,#ffffff55 50%,transparent 70%);transform:translateX(-120%);transition:transform .7s var(--ease)}
+.btn.primary:not(:disabled):hover:after{transform:translateX(120%)}
+.btn.purple{background:linear-gradient(135deg,#bdacff26,#bdacff10)}
+.mobile-add{background:linear-gradient(135deg,#c6f6e4,#9fe6cb);box-shadow:0 14px 34px -8px #8deac099,inset 0 1px 0 #fff8;animation:float 4s ease-in-out infinite}
+
+/* Navigation */
+.nav-ico{display:grid;place-items:center;width:23px;height:23px;transition:transform .35s var(--ease),filter .3s}
+.nav-ico svg{width:22px;height:22px}
+.nav-item{position:relative;transition:background .25s,color .25s}
+.nav-item.active .nav-ico{transform:translateY(-1px) scale(1.08);filter:drop-shadow(0 0 8px #bbabff88)}
+.nav-item.active{background:linear-gradient(145deg,#c0b0ff1f,#b4efd90c)}
+.sidebar .nav-item.active:before{content:"";position:absolute;left:-24px;top:22%;bottom:22%;width:3px;border-radius:0 3px 3px 0;background:linear-gradient(var(--purple),var(--mint));box-shadow:0 0 14px #bbabff88}
+.brand-symbol{box-shadow:0 8px 26px -6px #bbabff88,inset 0 1px 0 #fff7}
+@media(max-width:850px){
+ .sidebar{background:#12162af0;box-shadow:0 -14px 40px -10px #000a}
+ .nav-item.active:after{content:"";position:absolute;top:2px;left:30%;right:30%;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--purple),var(--mint))}
+}
+.x-subtabs{background:#ffffff06;box-shadow:inset 0 1px 0 #ffffff0a}
+.x-subtab{transition:background .3s var(--ease),color .25s,transform .2s}
+.x-subtab.on{box-shadow:0 6px 20px -10px #8deac099}
+
+/* Tasks, progress, stats */
+.task{position:relative;transition:transform .3s var(--ease),background .25s,border-color .25s;border-left:3px solid #ffffff1a}
+.task:hover{transform:translateY(-2px);background:#ffffff07}
+.task:not(.done){border-left-color:#bbabff80}
+.check{transition:background .25s,border-color .25s,transform .25s var(--ease)}
+.check:hover{background:#b4efd91a;border-color:#b4efd966}
+.task.done .check{animation:pop .45s var(--ease)}
+.fill{background:linear-gradient(90deg,#9f8bf0,#d4c8fa,#b4efd9);background-size:200% 100%;animation:shimmer 3.2s linear infinite;box-shadow:0 0 14px #bbabff66}
+.track{height:8px;background:#ffffff0c;box-shadow:inset 0 1px 2px #0005}
+.stat strong{font-size:24px;text-shadow:0 0 22px currentColor}
+.level-emblem{box-shadow:0 0 30px -4px #bbabff66,inset 0 1px 0 #ffffff22;animation:breathe 4s ease-in-out infinite}
+.week-dot.on{box-shadow:0 0 14px -2px #b4efd988}
+.water-portion.filled{animation:rise .5s var(--ease) both}
+.x-block,.x-q,.x-note,.x-diy{transition:transform .3s var(--ease),background .25s,border-color .25s}
+.x-block:hover,.x-note:hover,.x-diy:hover{transform:translateY(-2px)}
+.x-fact{box-shadow:var(--shadow-lg),0 0 80px -30px #bbabff88}
+.x-fact-text{background:linear-gradient(120deg,#fff,#d8cfff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.x-guard{animation:glow 3.5s ease-in-out infinite}
+.toast{background:linear-gradient(135deg,#e3f9ef,#c4f0de);box-shadow:0 18px 50px -12px #000c,0 0 0 1px #ffffff55 inset;transition:opacity .3s,transform .5s cubic-bezier(.34,1.56,.64,1)}
+dialog{background:linear-gradient(150deg,#222640,#181c2f);box-shadow:0 50px 120px -20px #000e}
+dialog[open]{animation:dialog-in .4s var(--ease)}
+
+/* Readability: nothing under 11px */
+.stat small,.week-day,.task-meta,.tag,.progress-label,.history-item small,.profile-top .eyebrow,.water-goal,.water-footnote,.quick-card small,.page-footer{font-size:11px}
+.tag{padding:3px 8px}
+
+/* Motion */
+main.enter>*,main.enter .dashboard>*,main.enter .x-slots>*{animation:rise-in .55s var(--ease) both}
+main.enter>*:nth-child(2){animation-delay:.04s}main.enter>*:nth-child(3){animation-delay:.08s}main.enter>*:nth-child(4){animation-delay:.12s}main.enter>*:nth-child(5){animation-delay:.16s}main.enter>*:nth-child(n+6){animation-delay:.2s}
+main.enter .x-timeline>*,main.enter .task-list>*,main.enter .x-quick>*,main.enter .x-grid>*{animation:rise-in .5s var(--ease) both}
+main.enter .x-timeline>*:nth-child(2),main.enter .task-list>*:nth-child(2),main.enter .x-quick>*:nth-child(2),main.enter .x-grid>*:nth-child(2){animation-delay:.05s}
+main.enter .x-timeline>*:nth-child(3),main.enter .task-list>*:nth-child(3),main.enter .x-quick>*:nth-child(3),main.enter .x-grid>*:nth-child(3){animation-delay:.1s}
+main.enter .x-timeline>*:nth-child(n+4),main.enter .task-list>*:nth-child(n+4),main.enter .x-quick>*:nth-child(n+4),main.enter .x-grid>*:nth-child(n+4){animation-delay:.15s}
+.pop{animation:pop .4s var(--ease)}
+@keyframes rise-in{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.12)}100%{transform:scale(1)}}
+@keyframes shimmer{to{background-position:-200% 0}}
+@keyframes float{50%{transform:translateY(-4px)}}
+@keyframes breathe{50%{box-shadow:0 0 40px -2px #bbabff99,inset 0 1px 0 #ffffff22}}
+@keyframes orbit{to{transform:rotate(360deg)}}
+@keyframes glow{50%{box-shadow:var(--shadow-lg),0 0 44px -14px #f3d49b66}}
+@keyframes rise{from{transform:scaleY(.2);opacity:0}to{transform:none;opacity:1}}
+@keyframes dialog-in{from{opacity:0;transform:translateY(24px) scale(.97)}to{opacity:1;transform:none}}
+body.calm .panel:before,body.calm .mobile-add,body.calm .fill,body.calm .level-emblem,body.calm .x-guard,body.calm .hero:after{animation:none!important}
+body.calm h1,body.calm .hero h2,body.calm .x-fact-text{background:none;color:var(--text)}
+@media(prefers-reduced-motion:reduce){main.enter>*,main.enter *{animation:none!important}.fill,.mobile-add,.level-emblem,.x-guard,.hero:after{animation:none!important}}
