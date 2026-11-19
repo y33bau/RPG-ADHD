@@ -29,8 +29,14 @@
   };
 
   document.addEventListener('click', e => {
+    const sub = e.target.closest?.('[data-sub]');
+    if (sub) {
+      const tabs = [...document.querySelectorAll('.x-subtab')];
+      const from = tabs.findIndex(t => t.classList.contains('on')), to = tabs.indexOf(sub);
+      main()?.setAttribute('data-dir', from < 0 || to === from ? 't' : to > from ? 'r' : 'l');
+    } else if (e.target.closest?.('[data-tab],[data-go]')) main()?.setAttribute('data-dir', 't');
     if (e.target.closest?.('[data-tab],[data-sub],[data-go]')) setTimeout(play, 0);
-  });
+  }, true);
 
   document.addEventListener('pointerdown', e => {
     const b = e.target.closest?.('.check,.btn,.x-q,.x-chip,.x-subtab,.nav-item');
@@ -55,6 +61,15 @@
     document.addEventListener('pointerout', e => {
       const p = e.target.closest?.('.x-now,.hero'); if (p && !p.contains(e.relatedTarget)) p.style.transform = '';
     });
+  }
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const box = document.createElement('div'); box.className = 'fireflies'; box.setAttribute('aria-hidden', 'true');
+    for (let i = 0; i < 14; i++) {
+      const f = document.createElement('i'), r = (a, b) => (a + Math.random() * (b - a)).toFixed(1);
+      f.style.cssText = 'left:' + r(3, 97) + '%;top:' + r(8, 95) + '%;--d:' + r(14, 28) + 's;--w:-' + r(0, 20) + 's;--x:' + r(-70, 70) + 'px;--y:' + r(-110, -30) + 'px';
+      box.append(f);
+    }
+    document.body.prepend(box);
   }
   play();
 })();

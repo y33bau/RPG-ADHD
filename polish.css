@@ -158,3 +158,45 @@ body.calm .scene,body.calm .x-fact,body.calm .x-fact:before,body.calm .x-fact:af
 @media(prefers-reduced-motion:reduce){main:before,main:after,.scene,.x-fact,.x-fact:before,.x-fact:after,.x-now:before,.x-now .x-now-go,.focus-bar,.level-emblem:before,.task-list>.task,.x-note,.x-subtab.on:after{animation:none!important}}
 
 .x-quick-form .field:first-of-type{margin-top:6px}.x-quick-form .subtext{margin:2px 0 4px}
+
+/* ───────── Round 3: ambience dock, thought, tips, transitions, fireflies ───────── */
+.amb{position:fixed;z-index:90;right:22px;bottom:22px}
+.amb-btn{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(145deg,#2a2c4a,#1b1f35);border:1px solid #ffffff22;color:var(--text);box-shadow:0 12px 30px -10px #000c,inset 0 1px 0 #ffffff1c;transition:transform .3s var(--ease),box-shadow .3s}
+.amb-btn:hover{transform:scale(1.07)}
+.amb.on .amb-btn{box-shadow:0 12px 30px -10px #000c,0 0 0 1px #b4efd966,0 0 28px -4px #8deac099}
+.amb-bars{display:flex;align-items:flex-end;gap:3px;height:16px}
+.amb-bars i{display:block;width:3px;height:5px;border-radius:2px;background:#cfc5ff;transition:background .3s}
+.amb.on .amb-bars i{background:#b4efd9;animation:eq 1.1s ease-in-out infinite}
+.amb.on .amb-bars i:nth-child(2){animation-delay:-.3s}.amb.on .amb-bars i:nth-child(3){animation-delay:-.6s}.amb.on .amb-bars i:nth-child(4){animation-delay:-.9s}
+.amb-pop{position:absolute;right:0;bottom:58px;width:min(300px,calc(100vw - 32px));padding:16px;border-radius:20px;background:linear-gradient(150deg,#262a48f5,#181c30f8);border:1px solid #ffffff1f;box-shadow:0 30px 70px -20px #000e;backdrop-filter:blur(14px);animation:dialog-in .35s var(--ease)}
+.amb-pop[hidden]{display:none}
+.amb-title{font-size:13px;font-weight:650;margin-bottom:10px}
+.amb-chips{display:flex;flex-wrap:wrap;gap:7px}
+.amb-chip{padding:8px 13px;border-radius:999px;background:#ffffff08;border:1px solid #ffffff1a;color:var(--text);font-size:12px;min-height:36px;transition:background .25s,transform .2s var(--ease)}
+.amb-chip:hover{transform:translateY(-1px);background:#ffffff0f}
+.amb-chip[aria-pressed="true"]{background:#b4efd91f;border-color:#b4efd966;color:#b4efd9}
+.amb-vol{display:grid;gap:6px;margin-top:14px;font-size:12px;color:var(--muted)}
+.amb-vol input{width:100%;accent-color:#b4efd9}
+.amb-note{font-size:11px;color:var(--muted);margin:10px 0 0}
+@media(max-width:850px){.amb{right:auto;left:14px;bottom:98px}.amb-pop{right:auto;left:0}}
+.x-thought{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;margin:0 0 18px;padding:14px 18px;border-radius:18px;background:linear-gradient(120deg,#bbabff14,#b4efd90d);border:1px solid #ffffff14}
+.x-thought-mark{font-size:22px;color:#d8cfff;animation:twinkle 3s ease-in-out infinite}
+.x-thought .eyebrow{font-size:10px;margin-bottom:3px}
+.x-thought p{margin:0;font-size:14px;line-height:1.5;color:#e8e6f6}
+.x-thought-next{width:38px;height:38px;border-radius:50%;background:#ffffff08;border:1px solid #ffffff18;color:var(--text);transition:transform .4s var(--ease)}
+.x-thought-next:hover{transform:rotate(180deg)}
+.x-tip{margin-bottom:18px;border-color:#b4efd92e;background:radial-gradient(ellipse at 0 0,#b4efd91c,transparent 60%),linear-gradient(150deg,#222640f2,#171b2dfa)}
+.x-tip-text{font-size:17px;line-height:1.5;margin:8px 0 14px}
+/* directional page transitions */
+main[data-dir="r"].enter>*{animation-name:slide-r}
+main[data-dir="l"].enter>*{animation-name:slide-l}
+main[data-dir="t"].enter>*{animation-name:tab-in}
+.fireflies{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.fireflies i{position:absolute;width:4px;height:4px;border-radius:50%;background:#f3d49b;box-shadow:0 0 12px 3px #f3d49b88;opacity:0;animation:firefly var(--d,16s) ease-in-out infinite;animation-delay:var(--w,0s)}
+body.calm .fireflies,body.calm .amb-bars i{display:none}
+@keyframes eq{0%,100%{height:4px}50%{height:15px}}
+@keyframes slide-r{from{opacity:0;transform:translateX(36px)}to{opacity:1;transform:none}}
+@keyframes slide-l{from{opacity:0;transform:translateX(-36px)}to{opacity:1;transform:none}}
+@keyframes tab-in{from{opacity:0;transform:translateY(18px) scale(.97);filter:blur(4px)}to{opacity:1;transform:none;filter:none}}
+@keyframes firefly{0%{opacity:0;transform:translate(0,0)}15%{opacity:.9}50%{opacity:.35;transform:translate(var(--x,40px),var(--y,-60px))}85%{opacity:.9}100%{opacity:0;transform:translate(calc(var(--x,40px)*-.6),calc(var(--y,-60px)*1.4))}}
+@media(prefers-reduced-motion:reduce){.fireflies,.amb-bars i,.x-thought-mark{animation:none!important}.fireflies{display:none}}

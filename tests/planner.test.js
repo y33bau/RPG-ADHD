@@ -87,3 +87,11 @@ test('names are declined or overridden, and neutral wording is the fallback', ()
   assert.equal(parseNames('  '), null);
   assert.deepEqual(declineName('Marek'), ['Marek', 'Marka', 'Markowi', 'Marka', 'Markiem']);
 });
+
+import { FOCUS_TIPS, THOUGHTS, tipOfDay, thoughtOfDay } from '../wisdom.js';
+test('tips and thoughts are stable within a day and cycle with an offset', () => {
+  assert.equal(tipOfDay('2026-11-19'), tipOfDay('2026-11-19'));
+  assert.notEqual(tipOfDay('2026-11-19'), tipOfDay('2026-11-19', 1));
+  assert.ok(FOCUS_TIPS.length >= 20 && THOUGHTS.length >= 25);
+  assert.ok(thoughtOfDay('2026-11-19', 999).length > 10);
+});

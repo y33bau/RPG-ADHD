@@ -8,6 +8,7 @@ import * as G from './guard.js';
 import * as GEN from './generator.js';
 import { FACTS, factOfDay } from './facts.js';
 import { DIY } from './diy.js';
+import { FOCUS_TIPS, tipOfDay, thoughtOfDay } from './wisdom.js';
 import { extra, saveExtra, reloadExtra } from './extra-store.js';
 
 export { extra };
@@ -188,7 +189,7 @@ export function focusView(state) {
     ? '<div class="x-buddy-timer"><svg viewBox="0 0 120 120" class="x-ring" aria-hidden="true"><circle cx="60" cy="60" r="52" class="x-ring-bg"/><circle cx="60" cy="60" r="52" class="x-ring-fg" id="x-ring" stroke-dasharray="' + RING.toFixed(1) + '" stroke-dashoffset="' + (RING * (1 - progress)).toFixed(1) + '"/></svg><div class="x-ring-text"><strong id="x-buddy-time" role="timer">' + clock(left) + '</strong><small>' + esc(task?.title || 'Chwila skupienia') + '</small></div></div><div class="x-buddy-actions">' +
       (left === 0 ? '<button class="btn primary" data-action="focus-finish">Zapisz sesję ✓</button>' : '<button class="btn" data-action="focus-pause">' + (f.paused ? 'Wznów' : 'Pauza') + '</button>') + '<button class="btn link" data-action="focus-stop">Zakończ bez zapisu</button></div>'
     : '<label class="field x-pick-field">Nad czym pracujemy?<select id="x-buddy-task"><option value="">Chwila skupienia, bez zadania</option>' + tasks.map(t => '<option value="' + esc(t.id) + '">' + esc(t.title) + '</option>').join('') + '</select></label><div class="x-durations" role="group" aria-label="Czas sesji">' + [2, 5, 15, 25].map(n => '<button class="x-duration" data-action="x-buddy-start" data-min="' + n + '"><strong>' + n + '</strong><small>min</small></button>').join('') + '</div>';
-  return '<div class="dashboard"><div class="stack"><section class="panel x-buddy"><div class="x-buddy-stage">' + spark(line.mode) + '</div><div class="x-buddy-body"><div class="eyebrow">POPRACUJMY RAZEM</div><h2>Iskra siedzi obok</h2><p class="x-buddy-msg" id="x-buddy-msg" aria-live="off">' + esc(line.text) + '</p>' + controls + '<button class="btn small x-ambient" data-action="x-ambient" aria-pressed="' + !!ambient + '">' + (ambient ? '♪ Szum włączony' : '♪ Włącz szum w tle') + '</button></div></section><div data-co-slot id="slot-pick"></div></div>' +
+  return tipCard() + '<div class="dashboard"><div class="stack"><section class="panel x-buddy"><div class="x-buddy-stage">' + spark(line.mode) + '</div><div class="x-buddy-body"><div class="eyebrow">POPRACUJMY RAZEM</div><h2>Iskra siedzi obok</h2><p class="x-buddy-msg" id="x-buddy-msg" aria-live="off">' + esc(line.text) + '</p>' + controls + '<button class="btn small x-ambient" data-action="x-ambient" aria-pressed="' + !!ambient + '">' + (ambient ? '♪ Szum włączony' : '♪ Włącz szum w tle') + '</button></div></section><div data-co-slot id="slot-pick"></div></div>' +
     '<div class="stack"><section class="panel"><div class="section-line"><h3>Twoje skupienie</h3><span class="tiny muted">łącznie</span></div><div class="stats"><div class="stat"><strong>' + stats.sessions + '</strong><small>sesji</small></div><div class="stat"><strong>' + stats.minutes + '</strong><small>minut</small></div><div class="stat"><strong>' + stats.average + '</strong><small>śr. min</small></div></div><p class="subtext tiny">Sesja nie zalicza zadania. Punkty daje dopiero wykonany krok.</p></section></div></div>';
 }
 
@@ -415,13 +416,25 @@ export function namesCard() {
     '<p class="subtext tiny">Podgląd: ' + esc(sample) + '</p><button class="btn primary" type="submit">Zapisz imiona</button></form></section>';
 }
 
+/* ───────────── Tips and thought of the day ───────────── */
+
+let tipOffset = 0, thoughtOffset = 0;
+
+export function tipCard() {
+  return '<section class="panel x-tip"><div class="eyebrow">WSKAZÓWKA NA SKUPIENIE</div><p class="x-tip-text">' + esc(tipOfDay(today(), tipOffset)) + '</p><div class="x-note-actions"><button class="btn small" data-action="x-tip-next">Inna wskazówka ↻</button></div></section>';
+}
+
+export function thoughtCard() {
+  return '<section class="x-thought" aria-label="Myśl dnia"><span class="x-thought-mark" aria-hidden="true">✦</span><div><div class="eyebrow">MYŚL DNIA</div><p>' + esc(thoughtOfDay(today(), thoughtOffset)) + '</p></div><button class="x-thought-next" data-action="x-thought-next" aria-label="Inna myśl">↻</button></section>';
+}
+
 /* ───────────── Facts and DIY ───────────── */
 
 let factOffset = 0;
 
 export function factsView() {
   const f = factOfDay(today(), factOffset);
-  return '<section class="panel x-fact"><div class="eyebrow">' + esc(f.tag).toUpperCase() + ' · CIEKAWOSTKA' + (factOffset ? '' : ' DNIA') + '</div><p class="x-fact-text">' + esc(f.t) + '</p><div class="x-note-actions"><button class="btn purple" data-action="x-fact-next">Kolejna ciekawostka →</button>' + (factOffset ? '<button class="btn link" data-action="x-fact-reset">Wróć do dzisiejszej</button>' : '') + '</div></section><p class="subtext tiny" style="text-align:center">Mała dawka ciekawości na dobry początek. Zebrane: ' + FACTS.length + '.</p>';
+  return thoughtCard() + '<section class="panel x-fact"><div class="eyebrow">' + esc(f.tag).toUpperCase() + ' · CIEKAWOSTKA' + (factOffset ? '' : ' DNIA') + '</div><p class="x-fact-text">' + esc(f.t) + '</p><div class="x-note-actions"><button class="btn purple" data-action="x-fact-next">Kolejna ciekawostka →</button>' + (factOffset ? '<button class="btn link" data-action="x-fact-reset">Wróć do dzisiejszej</button>' : '') + '</div></section><p class="subtext tiny" style="text-align:center">Mała dawka ciekawości na dobry początek. Zebrane: ' + FACTS.length + '.</p>';
 }
 
 export function diyView() {
@@ -545,6 +558,8 @@ export function init(ctx, doc = globalThis.document) {
         case 'x-routine-daily': { const r = extra.routines.find(r => r.id === id); if (r) launchRoutine(ctx, r, 'daily'); break; }
         case 'x-boss-new': bossForm(ctx); break;
         case 'x-blow': strike(ctx, id, Number(b.dataset.i)); break;
+        case 'x-tip-next': tipOffset++; ctx.render(); break;
+        case 'x-thought-next': thoughtOffset++; ctx.render(); break;
         case 'x-now-next': nowSkip++; ctx.render(); break;
         case 'x-now-start': {
           const n = P.nextThing(s, { skip: nowSkip, names: extra.names }); if (!n) break;
