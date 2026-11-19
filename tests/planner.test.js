@@ -63,3 +63,16 @@ test('fact of the day is stable within a day and cycles', () => {
   assert.notEqual(factOfDay('2026-11-18'), factOfDay('2026-11-18', 1));
   assert.ok(FACTS.every(f => f.t.length > 20 && f.tag));
 });
+
+import { nextThing } from '../planner.js';
+test('"what now" gives one open task first, then ideas, and cycles', () => {
+  const s = withTasks({ title: 'Jedyne zadanie', tier: 'micro' });
+  const a = nextThing(s, { now: at('2026-11-18T10:00:00') });
+  assert.equal(a.kind, 'task'); assert.equal(a.title, 'Jedyne zadanie');
+  const b = nextThing(s, { skip: 1, now: at('2026-11-18T10:00:00') });
+  assert.equal(b.kind, 'idea');
+  const wrap = nextThing(s, { skip: a.total, now: at('2026-11-18T10:00:00') });
+  assert.equal(wrap.title, 'Jedyne zadanie');
+  const empty = nextThing(C.fresh(at('2026-11-18T08:00:00')), { now: at('2026-11-18T10:00:00') });
+  assert.equal(empty.kind, 'idea');
+});

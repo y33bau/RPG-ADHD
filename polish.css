@@ -90,3 +90,4 @@ main.enter .x-timeline>*:nth-child(n+4),main.enter .task-list>*:nth-child(n+4),m
 body.calm .panel:before,body.calm .mobile-add,body.calm .fill,body.calm .level-emblem,body.calm .x-guard,body.calm .hero:after{animation:none!important}
 body.calm h1,body.calm .hero h2,body.calm .x-fact-text{background:none;color:var(--text)}
 @media(prefers-reduced-motion:reduce){main.enter>*,main.enter *{animation:none!important}.fill,.mobile-add,.level-emblem,.x-guard,.hero:after{animation:none!important}}
+.skip:not(:focus){clip-path:inset(50%);width:1px;height:1px;overflow:hidden;white-space:nowrap}

@@ -342,6 +342,20 @@ export function plannerView(state) {
       : empty('☷', plan.total ? 'Nic się nie mieści w tym oknie.' : 'Nie ma nic do zaplanowania.', plan.total ? 'Wybierz dłuższe okno albo zmniejsz zadania.' : 'Dodaj zadanie albo wylosuj pomysł w generatorze.')) + '</section>';
 }
 
+/* ───────────── "What now?" — one thing at a time ───────────── */
+
+let nowSkip = 0;
+
+export function nowCard(state) {
+  const n = P.nextThing(state, { skip: nowSkip });
+  if (!n) return '';
+  const done = n.kind === 'task' ? '<button class="btn" data-action="complete" data-id="' + esc(n.task.id) + '">Już zrobione ✓</button>' : '';
+  return '<section class="panel x-now"><div class="eyebrow">CO TERAZ?</div><p class="x-now-hint">Jedna rzecz. Reszta może poczekać.</p><h2 class="x-now-title">' + esc(n.title) + '</h2>' +
+    '<p class="x-now-meta">' + TIER_LABEL[n.tier] + ' · zaczynasz od 5 minut' + (n.kind === 'idea' ? ' · nowy pomysł' : '') + '</p>' +
+    '<button class="btn primary x-now-go" data-action="x-now-start">▶ Zaczynam</button>' +
+    '<div class="x-note-actions x-now-more"><button class="btn" data-action="x-now-next">Inna rzecz ↻</button>' + done + '</div></section>';
+}
+
 /* ───────────── Procrastination guard ───────────── */
 
 export function guardCard(state) {
@@ -516,6 +530,16 @@ export function init(ctx, doc = globalThis.document) {
         case 'x-routine-daily': { const r = extra.routines.find(r => r.id === id); if (r) launchRoutine(ctx, r, 'daily'); break; }
         case 'x-boss-new': bossForm(ctx); break;
         case 'x-blow': strike(ctx, id, Number(b.dataset.i)); break;
+        case 'x-now-next': nowSkip++; ctx.render(); break;
+        case 'x-now-start': {
+          const n = P.nextThing(s, { skip: nowSkip }); if (!n) break;
+          let taskId = n.task?.id;
+          if (n.kind === 'idea') {
+            const t = C.makeTask({ title: n.idea.t, tier: n.idea.tier, category: n.area, steps: n.idea.steps || [], date: today() });
+            s.tasks.push(t); taskId = t.id;
+          }
+          C.startFocus(s, taskId, 5); nowSkip = 0; ctx.save(); ctx.render(); ctx.toast('Tylko 5 minut. Iskra siedzi obok.'); break;
+        }
         case 'x-plan-window': planWindow = Number(b.dataset.min) || 120; ctx.render(); break;
         case 'x-plan-start': { C.startFocus(s, id, Number(b.dataset.min) || 15); ctx.save(); ctx.render(); ctx.toast('Start. Iskra siedzi obok.'); break; }
         case 'x-guard-two': { C.startFocus(s, id, 2); ctx.save(); ctx.render(); ctx.toast('Tylko 2 minuty. Potem możesz przestać.'); break; }

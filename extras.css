@@ -195,3 +195,13 @@ main>.dashboard>.stack>.panel{margin:0}
  .x-block{grid-template-columns:48px 1fr}.x-block-actions{grid-column:1/-1;justify-content:flex-end}
  .x-fact-text{font-size:18px}.x-quick{grid-template-columns:1fr 1fr}
 }
+
+/* "What now?" hero */
+.x-now{margin-bottom:22px;padding:30px 28px;text-align:center;border-color:#b4efd93a;background:radial-gradient(ellipse at 50% 0,#b4efd926,transparent 62%),radial-gradient(ellipse at 100% 100%,#bbabff2b,transparent 60%),linear-gradient(150deg,#26294a,#1a1f35);box-shadow:var(--shadow-lg,0 20px 50px -20px #000),0 0 90px -34px #8deac0cc}
+.x-now .eyebrow{justify-content:center;margin-bottom:6px}
+.x-now-hint{font-size:12px;color:var(--muted);margin:0 0 18px}
+.x-now-title{font-size:clamp(24px,5vw,32px);line-height:1.25;letter-spacing:-.035em;font-weight:650;max-width:22ch;margin:0 auto 10px;overflow-wrap:anywhere}
+.x-now-meta{font-size:12px;color:#c5c6da;margin:0 0 22px}
+.x-now-go{width:100%;max-width:340px;min-height:62px;font-size:17px;border-radius:18px;margin:0 auto;display:flex}
+.x-now-more{justify-content:center;margin-top:14px}
+@media(max-width:620px){.x-now{padding:26px 20px}}
