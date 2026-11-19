@@ -5,10 +5,11 @@ import vm from 'node:vm';
 import * as C from '../core.js';
 import * as X from '../extras-ui.js';
 const source=readFileSync(new URL('../app.js',import.meta.url),'utf8').replace(/^import .*$/gm,'');
+const shell=readFileSync(new URL('../index.html',import.meta.url),'utf8');
 function boot(initial={}){
  const items=new Map(Object.entries(initial)),nodes=new Map();
  const node=()=>({innerHTML:'',textContent:'',hidden:false,open:false,dataset:{},classList:{toggle(){},add(){},remove(){}},addEventListener(){},querySelector(){return null;},showModal(){this.open=true;},close(){this.open=false;},focus(){}});
- const document={querySelector:s=>{if(!nodes.has(s))nodes.set(s,node());return nodes.get(s);},querySelectorAll:()=>[],addEventListener(){},body:node(),activeElement:null,title:''};
+ const document={querySelector:s=>{if(s==='.avatar'&&!/class="[^"]*\bavatar\b/.test(shell))return null;if(!nodes.has(s))nodes.set(s,node());return nodes.get(s);},querySelectorAll:()=>[],addEventListener(){},body:node(),activeElement:null,title:''};
  const localStorage={getItem:k=>items.get(k)??null,setItem:(k,v)=>items.set(k,v)};
  const context=vm.createContext({C,X,document,localStorage,navigator:{onLine:true},location:{protocol:'https:'},window:{addEventListener(){}},setInterval(){},setTimeout(){},clearTimeout(){},matchMedia:()=>({matches:false})});
  vm.runInContext(source+'\n;globalThis.api={getState:()=>state,todayView,tasksView,baseView,rewardsView,historyView,worldView,meBody,subBody,planBody,taskForm,rewardForm,settings,help,renderFocus};',context);

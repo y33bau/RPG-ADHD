@@ -20,7 +20,7 @@ function save(){
  catch(e){storageFailed=true;toast('Brak zapisu na urządzeniu. Pobierz kopię danych w ustawieniach.');return false;}
 }
 function toast(message){$('#toast').textContent=message;$('#toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('show'),4500);}
-function applySettings(){document.body.classList.toggle('calm',state.settings.calm);$('.avatar').textContent=state.settings.name.trim().slice(0,1).toUpperCase()||'S';}
+function applySettings(){document.body.classList.toggle('calm',state.settings.calm);}
 function celebrate(earned,finds=[]){
  if(state.settings.haptics)navigator.vibrate?.(30);
  if(state.settings.sound)try{
