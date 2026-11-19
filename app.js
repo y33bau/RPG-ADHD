@@ -1,7 +1,7 @@
 import * as C from './core.js';
 import * as X from './extras-ui.js';
 const KEY='synapse_v2', $=s=>document.querySelector(s), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let storageFailed=false,loadFailed=false,notice='',state,tab='today',sub={today:'plan',tasks:'list',world:'trip',base:'base',history:'overview'},filter='today',selected=null,toastTimer,installPrompt=null,lastTrigger=null,ringed=null;
+let storageFailed=false,loadFailed=false,notice='',state,tab='today',sub={today:'now',tasks:'list',world:'trip',base:'base',history:'overview'},filter='today',selected=null,toastTimer,installPrompt=null,lastTrigger=null,ringed=null;
 try{
  const raw=localStorage.getItem(KEY);
  if(raw)state=C.validate(JSON.parse(raw));
@@ -69,22 +69,15 @@ function week(){
  return '<section class="panel"><div class="section-line"><h3>W Twoim rytmie</h3><span class="tiny muted">Ostatnie 7 dni</span></div><div class="week">'+dates.map(d=>'<div class="week-day"><span>'+esc(d.toLocaleDateString('pl-PL',{weekday:'short'}).replace('.',''))+'</span><span class="week-dot '+(active.has(C.dayKey(d))?'on':'')+'" aria-label="'+C.dayKey(d)+(active.has(C.dayKey(d))?': aktywny':': odpoczynek')+'">'+(active.has(C.dayKey(d))?'✓':'·')+'</span></div>').join('')+'</div><p class="subtext tiny">Przerwa nie kasuje Twojego postępu.</p></section>';
 }
 function planBody(){
- const t=choose(),limit=state.minimum?1:3,list=ready().slice(0,limit),completeCount=state.ledger.filter(e=>e.kind==='complete'&&e.day===today()).length;
- const steps=t?C.progress(state,t,today()):[],first=t?.steps.find((_,i)=>!steps.includes(i));
- return X.nowCard(state)+X.thoughtCard()+X.guardCard(state)+'<div class="energy-row"><div class="row"><span class="tiny muted">Twoja energia</span><div class="segmented" aria-label="Poziom energii">'+[['low','Niska'],['medium','W sam raz'],['high','Mam moc']].map(([v,l])=>'<button data-energy="'+v+'" class="'+(state.energy===v?'selected':'')+'" aria-pressed="'+(state.energy===v)+'">'+l+'</button>').join('')+'</div></div><button class="minimum '+(state.minimum?'selected':'')+'" data-action="minimum" aria-pressed="'+state.minimum+'">☾ Dzisiaj minimum</button></div>'+
- '<div class="dashboard"><div class="stack">'+(t?'<section class="panel next-step"><div><h2>'+esc(t.title)+'</h2>'+(first?'<p class="subtext">'+esc(first)+'</p>':'')+'</div><div class="row wrap"><button class="btn primary" data-action="focus-5" data-id="'+esc(t.id)+'">▷ Skupienie 5 min</button><button class="btn link" data-action="focus" data-id="'+esc(t.id)+'">Inny czas</button><button class="btn link" data-action="help" data-id="'+esc(t.id)+'">Nie mogę ruszyć</button></div></section>':'')+
- '<div class="quick-row"><button class="quick-card" data-action="already"><span class="quick-symbol">✓</span><span><strong>Już coś zrobiłem</strong><small>Dopisz małe zwycięstwo</small></span></button><button class="quick-card" data-action="water"><span class="quick-symbol">♧</span><span><strong>Chwila dla siebie</strong><small>Woda: '+(C.hydration(state).ml/1000).toLocaleString('pl-PL')+' / 2 l</small></span></button></div>'+
- '<section class="panel"><div class="section-line"><h2>'+(state.minimum?'Minimum na dziś':'Mały plan na dziś')+'</h2><span class="tiny muted">'+completeCount+' ukończone</span></div><div class="task-list">'+(list.length?list.map(t=>taskCard(t,true)).join(''):'<div class="empty"><div class="empty-symbol">✧</div><h3>Masz wolną przestrzeń.</h3><p>Możesz odpocząć albo wybrać kolejny mały cel.</p><button class="btn purple" data-action="add">Dodaj zadanie</button></div>')+'</div><button class="btn link" data-tab="tasks" style="margin-top:13px">Wszystkie zadania ('+ready().length+') →</button></section>'+
- '</div>'+
- '<div class="stack">'+profile()+X.captureCard()+'<section class="panel base-preview"><div class="section-line"><h3>Twoja mała przystań</h3><span class="tiny muted">'+Object.values(state.rooms).reduce((n,x)=>n+x,0)+'/9</span></div>'+scene()+'<p class="base-caption">Z codziennych kroków powstaje coś Twojego.</p><button class="btn purple" data-tab="base">Zajrzyj do swojej bazy ↗</button></section></div></div>';
+ return '<div class="energy-row"><div class="row"><span class="tiny muted">Twoja energia</span><div class="segmented" aria-label="Poziom energii">'+[['low','Niska'],['medium','W sam raz'],['high','Mam moc']].map(([v,l])=>'<button data-energy="'+v+'" class="'+(state.energy===v?'selected':'')+'" aria-pressed="'+(state.energy===v)+'">'+l+'</button>').join('')+'</div></div><button class="minimum '+(state.minimum?'selected':'')+'" data-action="minimum" aria-pressed="'+state.minimum+'">☾ Dzisiaj minimum</button></div>'+X.guardCard(state)+X.plannerView(state);
 }
 function meBody(){return '<div class="dashboard"><div class="stack">'+X.moodCard()+X.habitsCard()+'</div><div class="stack">'+waterCard()+week()+'</div></div>';}
 function subBody(name,map){const cur=X.currentSub(name,sub[name],!!state.settings.minimal);return (map[cur]||Object.values(map)[0])();}
 function todayView(){
+ const ob=notice?'':X.onboarding(state);if(ob)return '<div class="x-ob-wrap">'+ob+'</div>';
  return '<div class="page-heading"><h1>Dzisiaj</h1><button class="btn primary" data-action="add">＋ Dodaj zadanie</button></div>'+
-  '<div data-life-slot id="slot-weather"></div>'+
   (notice?'<p class="return-note">'+esc(notice)+'</p>':'')+
-  X.subnav('today',sub.today,!!state.settings.minimal)+subBody('today',{plan:planBody,planner:()=>X.plannerView(state),focus:()=>X.focusView(state),me:meBody});
+  X.subnav('today',sub.today,!!state.settings.minimal)+subBody('today',{now:()=>X.nowView(state)+'<div data-life-slot id="slot-weather"></div>',plan:planBody,ritual:()=>X.ritualView(state),focus:()=>X.focusView(state),me:meBody});
 
 }
 function taskList(){
@@ -117,7 +110,7 @@ function historyView(){
  const history=state.ledger.filter(e=>e.kind!=='step'||!state.ledger.some(x=>x.kind==='complete'&&x.taskId===e.taskId&&x.occurrence===e.occurrence)).slice().reverse().slice(0,120);
  const log=()=>'<section class="panel"><div class="section-line"><h2>Twoje ostatnie zwycięstwa</h2><span class="tiny muted">Do 120 wpisów</span></div>'+
  (history.length?history.map(e=>'<div class="history-item"><span class="history-symbol">'+({complete:'✓',step:'↗',purchase:'✧',upgrade:'⌂',focus:'◷',legacy:'◇',bonus:'❖',boss:'♞'}[e.kind])+'</span><div style="min-width:0"><strong>'+esc(e.title)+'</strong><small>'+esc(new Date(e.time).toLocaleString('pl-PL',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}))+' · '+({complete:'Zadanie wykonane',step:'Mały krok',purchase:'Odebrana nagroda',upgrade:'Baza rośnie',focus:e.minutes+' min skupienia',legacy:'Poprzednia wersja',bonus:'Niespodzianka',boss:'Wyprawa'}[e.kind])+'</small></div><span class="history-points">'+(e.kind==='complete'?'✓':e.coins?((e.coins>0?'+':'')+e.coins+' ◈'):e.materials?e.materials+' ◇':'')+'</span></div>').join(''):'<div class="empty"><div class="empty-symbol">↗</div><h3>To dopiero początek Twojej historii.</h3><p>Wykonaj pierwszy krok, a pojawi się tutaj.</p></div>')+'</section>';
- return heading('Widać, ile już za Tobą.','Małe rzeczy też są osiągnięciami. Tutaj mają swoje miejsce.',false,'POSTĘP')+X.subnav('history',sub.history,!!state.settings.minimal)+subBody('history',{overview:()=>'<div class="dashboard"><div class="stack">'+profile()+week()+'</div><div class="stack">'+X.attributesCard(state)+'</div></div>',badges:()=>X.badgesView(state),rhythm:()=>X.rhythmView(state),log});
+ return heading('Widać, ile już za Tobą.','Małe rzeczy też są osiągnięciami. Tutaj mają swoje miejsce.',false,'POSTĘP')+X.subnav('history',sub.history,!!state.settings.minimal)+subBody('history',{overview:()=>X.weekCard(state,{force:true})+'<div class="dashboard"><div class="stack">'+profile()+week()+'</div><div class="stack">'+X.attributesCard(state)+'</div></div>',badges:()=>X.badgesView(state),rhythm:()=>X.rhythmView(state),log});
 }
 function render(){
  if(state.water.day!==today())state.water={day:today(),count:0};

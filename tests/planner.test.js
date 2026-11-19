@@ -95,3 +95,29 @@ test('tips and thoughts are stable within a day and cycle with an offset', () =>
   assert.ok(FOCUS_TIPS.length >= 20 && THOUGHTS.length >= 25);
   assert.ok(thoughtOfDay('2026-11-19', 999).length > 10);
 });
+
+import * as Dly from '../daily.js';
+test('rituals follow the clock and late evening belongs to the previous day', () => {
+  assert.equal(Dly.ritualNow(at('2026-11-19T08:00:00')), 'morning');
+  assert.equal(Dly.ritualNow(at('2026-11-19T14:00:00')), null);
+  assert.equal(Dly.ritualNow(at('2026-11-20T01:00:00')), 'evening');
+  assert.equal(Dly.ritualDay(at('2026-11-20T01:00:00')), '2026-11-19');
+});
+
+test('week summary counts the last seven days and shows on Sunday and Monday only', () => {
+  const s = withTasks({ title: 'Duże', tier: 'big' }, { title: 'Małe', tier: 'micro' });
+  C.completeTask(s, s.tasks[0].id, '2026-11-18', at('2026-11-18T10:00:00'));
+  C.completeTask(s, s.tasks[1].id, '2026-11-18', at('2026-11-18T11:00:00'));
+  const w = Dly.weekSummary(s, at('2026-11-22T12:00:00'));
+  assert.equal(w.completed, 2); assert.equal(w.best.name, 'środa'); assert.equal(w.proud, 'Duże');
+  assert.equal(Dly.summaryDue(undefined, at('2026-11-19T12:00:00')), false);
+  assert.equal(Dly.summaryDue(undefined, at('2026-11-22T12:00:00')), true);
+  assert.equal(Dly.summaryWeek(at('2026-11-22T12:00:00')), Dly.summaryWeek(at('2026-11-23T12:00:00')));
+  assert.equal(Dly.summaryDue(Dly.summaryWeek(at('2026-11-22T12:00:00')), at('2026-11-23T12:00:00')), false);
+});
+
+test('only a brand new user gets onboarding', () => {
+  assert.equal(Dly.needsOnboarding(C.fresh(), {}), true);
+  assert.equal(Dly.needsOnboarding(C.fresh(), { onboarded: true }), false);
+  assert.equal(Dly.needsOnboarding(withTasks({ title: 'x' }), {}), false);
+});

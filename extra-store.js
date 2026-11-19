@@ -20,6 +20,8 @@ function fill() {
   extra.routines ??= defaultRoutines();
   extra.prefs ??= { ambient: false };
   extra.names ??= {};
+  extra.rituals ??= {};
+  extra.wins ??= {};
 }
 
 export function reloadExtra(raw) {

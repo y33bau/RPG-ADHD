@@ -9,6 +9,7 @@ import * as GEN from './generator.js';
 import { FACTS, factOfDay } from './facts.js';
 import { DIY } from './diy.js';
 import { FOCUS_TIPS, tipOfDay, thoughtOfDay } from './wisdom.js';
+import * as D from './daily.js';
 import { extra, saveExtra, reloadExtra } from './extra-store.js';
 
 export { extra };
@@ -20,7 +21,7 @@ const tomorrow = () => { const d = new Date(); d.setDate(d.getDate() + 1); retur
 const openNotes = () => extra.notes.filter(n => !n.archived);
 
 export const SUBS = {
-  today: [['plan', 'Plan'], ['planner', 'Planer'], ['focus', 'Skupienie'], ['me', 'Ja']],
+  today: [['now', 'Teraz'], ['plan', 'Plan'], ['ritual', 'Rytuał'], ['focus', 'Skupienie'], ['me', 'Ja']],
   tasks: [['list', 'Lista'], ['quick', 'Szybkie punkty'], ['generator', 'Generator'], ['dump', 'Zrzut z głowy'], ['routines', 'Rutyny']],
   world: [['trip', 'Wyprawy'], ['calendar', 'Kalendarz'], ['facts', 'Ciekawostki'], ['diy', 'Zrób to sam'], ['settings', 'Ustawienia']],
   base: [['base', 'Przystań'], ['bosses', 'Wyprawy'], ['rewards', 'Nagrody']],
@@ -28,7 +29,7 @@ export const SUBS = {
 };
 
 /** Minimal mode keeps only what is needed to plan, focus and rest. */
-const MINIMAL_HIDDEN = new Set(['today:me', 'today:planner', 'tasks:quick', 'tasks:generator', 'tasks:routines', 'world:trip', 'world:facts', 'world:diy', 'base:bosses', 'history:badges', 'history:rhythm']);
+const MINIMAL_HIDDEN = new Set(['today:me', 'today:ritual', 'tasks:quick', 'tasks:generator', 'tasks:routines', 'world:trip', 'world:facts', 'world:diy', 'base:bosses', 'history:badges', 'history:rhythm']);
 
 export function subs(tab, minimal = false) {
   return (SUBS[tab] || []).filter(([id]) => !(minimal && MINIMAL_HIDDEN.has(tab + ':' + id)));
@@ -350,11 +351,11 @@ let nowSkip = 0;
 export function nowCard(state) {
   const n = P.nextThing(state, { skip: nowSkip, names: extra.names });
   if (!n) return '';
-  const done = n.kind === 'task' ? '<button class="btn" data-action="complete" data-id="' + esc(n.task.id) + '">Już zrobione ✓</button>' : '';
+  const done = n.kind === 'task' ? '<button class="btn" data-action="complete" data-id="' + esc(n.task.id) + '">Już zrobione ✓</button><button class="btn link" data-action="help" data-id="' + esc(n.task.id) + '">Nie mogę ruszyć</button>' : '';
   return '<section class="panel x-now"><div class="eyebrow">CO TERAZ?</div><p class="x-now-hint">Zrób dziś tylko jedną z tych rzeczy. Resztę możesz zostawić na później.</p><h2 class="x-now-title">' + esc(n.title) + '</h2>' +
     '<p class="x-now-meta">' + TIER_LABEL[n.tier] + ' · zaczynasz od 5 minut' + (n.kind === 'idea' ? ' · nowy pomysł' : '') + '</p>' +
     '<button class="btn primary x-now-go" data-action="x-now-start">▶ Zaczynam</button>' +
-    '<div class="x-note-actions x-now-more"><button class="btn" data-action="x-now-next">Inna rzecz ↻</button>' + done + '</div></section>';
+    '<div class="x-note-actions x-now-more"><button class="btn" data-action="x-now-next">Inna rzecz ↻</button>' + done + '</div><button class="btn link x-now-already" data-action="already">＋ Już coś zrobiłem, dopiszę</button></section>';
 }
 
 /* ───────────── Procrastination guard ───────────── */
@@ -416,9 +417,109 @@ export function namesCard() {
     '<p class="subtext tiny">Podgląd: ' + esc(sample) + '</p><button class="btn primary" type="submit">Zapisz imiona</button></form></section>';
 }
 
+/* ───────────── Morning and evening rituals ───────────── */
+
+export function ritualCard(state, forced = null) {
+  const kind = forced || D.ritualNow();
+  if (!kind) return '';
+  const r = D.RITUALS[kind], day = D.ritualDay(), done = extra.rituals?.[day]?.[kind] || [];
+  const finished = r.items.every(([id]) => done.includes(id));
+  if (!forced && finished && extra.rituals[day]?.[kind + 'Closed']) return '';
+  const win = kind === 'evening' ? extra.wins?.[day] : '';
+  return '<section class="panel x-ritual ' + kind + (finished ? ' finished' : '') + '"><div class="section-line"><div><div class="eyebrow">' + (kind === 'morning' ? '☀ RANO' : '☾ WIECZÓR') + '</div><h3>' + r.title + '</h3></div><span class="x-ritual-count">' + done.length + '/' + r.items.length + '</span></div>' +
+    (finished ? '<p class="subtext">' + (kind === 'morning' ? 'Dobry start. Reszta dnia może być zwyczajna.' : 'Dzień domknięty. Dobrej nocy.') + ' +' + D.RITUAL_REWARD.coins + ' monet</p><button class="btn small" data-action="x-ritual-close" data-kind="' + kind + '">Schowaj</button>'
+      : '<p class="subtext tiny">' + r.hint + '</p><div class="x-ritual-list">' + r.items.map(([id, label]) => {
+        const on = done.includes(id);
+        return '<button class="x-ritual-item' + (on ? ' on' : '') + '" data-action="x-ritual" data-kind="' + kind + '" data-item="' + id + '" aria-pressed="' + on + '"><span class="x-ritual-box" aria-hidden="true">' + (on ? '✓' : '') + '</span>' + label + '</button>';
+      }).join('') + '</div>' +
+      (kind === 'evening' ? '<form id="x-win-form" class="x-inline x-win"><label class="x-sr" for="x-win-input">Co się dziś udało?</label><input id="x-win-input" name="win" maxlength="140" placeholder="Co się dziś udało? (opcjonalnie)" value="' + esc(win || '') + '" autocomplete="off"><button class="btn small" type="submit">Zapisz</button></form>' : '')) +
+    '</section>';
+}
+
+function ritualToggle(ctx, kind, item) {
+  const r = D.RITUALS[kind]; if (!r || !r.items.some(([id]) => id === item)) return;
+  const day = D.ritualDay(), s = ctx.state();
+  extra.rituals[day] ??= {};
+  const list = extra.rituals[day][kind] ??= [];
+  const i = list.indexOf(item);
+  if (i >= 0) list.splice(i, 1); else list.push(item);
+  // Keep only the last two weeks of ritual history.
+  for (const k of Object.keys(extra.rituals).sort().slice(0, -14)) delete extra.rituals[k];
+  saveExtra();
+  if (r.items.every(([id]) => list.includes(id)) && C.awardBoss(s, r.title, D.RITUAL_REWARD, 'ritual-' + kind + '-' + day)) {
+    ctx.save(); ctx.render(); ctx.celebrate(D.RITUAL_REWARD, []); return;
+  }
+  ctx.render();
+}
+
+/** Both rituals on their own tab; the one that fits the hour goes first. */
+export function ritualView(state) {
+  const order = D.ritualNow() === 'evening' || new Date().getHours() >= 12 ? ['evening', 'morning'] : ['morning', 'evening'];
+  return '<p class="subtext x-tab-lead">Krótkie rytuały domykają poranek i wieczór. Za każdy pełny dostajesz +' + D.RITUAL_REWARD.coins + ' monet.</p>' + order.map(k => ritualCard(state, k)).join('');
+}
+
+/** A one-line link to the ritual that fits the hour, for the "Now" tab. */
+function ritualTeaser() {
+  const kind = D.ritualNow(); if (!kind) return '';
+  const r = D.RITUALS[kind], done = extra.rituals?.[D.ritualDay()]?.[kind] || [];
+  if (done.length >= r.items.length) return '';
+  return '<button class="x-teaser ' + kind + '" data-go="today:ritual"><span class="x-teaser-ico" aria-hidden="true">' + (kind === 'morning' ? '☀' : '☾') + '</span><span><strong>' + r.title + '</strong><small>' + done.length + ' z ' + r.items.length + ' · dotknij, by zacząć</small></span><span aria-hidden="true">→</span></button>';
+}
+
+function weekTeaser() {
+  if (!D.summaryDue(extra.prefs?.weekSeen)) return '';
+  return '<div class="x-teaser-row"><button class="x-teaser week" data-go="history:overview"><span class="x-teaser-ico" aria-hidden="true">✦</span><span><strong>Podsumowanie tygodnia jest gotowe</strong><small>Zobacz, ile się udało</small></span><span aria-hidden="true">→</span></button><button class="x-thought-next" data-action="x-week-close" aria-label="Schowaj podsumowanie">×</button></div>';
+}
+
+/** The "Now" tab: one thing to do, plus at most two small hints. */
+export function nowView(state) {
+  return weekTeaser() + nowCard(state) + ritualTeaser() + thoughtCard();
+}
+
+/* ───────────── Weekly summary ───────────── */
+
+export function weekCard(state, { force = false } = {}) {
+  if (!force && !D.summaryDue(extra.prefs?.weekSeen)) return '';
+  const w = D.weekSummary(state), max = Math.max(1, ...w.days.map(d => w.perDay[d]));
+  const short = ['nd', 'pn', 'wt', 'śr', 'cz', 'pt', 'sb'];
+  return '<section class="panel x-week"><div class="section-line"><div><div class="eyebrow">TWÓJ TYDZIEŃ</div><h2>' + (w.activeDays ? 'Zobacz, ile się udało' : 'Nowy tydzień, czysta karta') + '</h2></div>' + (force ? '' : '<button class="x-thought-next" data-action="x-week-close" aria-label="Zamknij podsumowanie">×</button>') + '</div>' +
+    '<div class="x-week-bars" aria-hidden="true">' + w.days.map(d => '<div class="x-week-bar"><i style="--h:' + Math.round(100 * w.perDay[d] / max) + '%"></i><small>' + short[new Date(d + 'T12:00:00').getDay()] + '</small></div>').join('') + '</div>' +
+    '<div class="stats x-week-stats"><div class="stat"><strong>' + w.completed + '</strong><small>ukończone</small></div><div class="stat"><strong>' + w.focusMinutes + '</strong><small>min skupienia</small></div><div class="stat"><strong>' + w.activeDays + '/7</strong><small>aktywne dni</small></div></div>' +
+    (w.best ? '<p class="subtext">Najlepszy dzień: <strong>' + w.best.name + '</strong> (' + w.best.count + ' ' + plural(w.best.count, 'krok', 'kroki', 'kroków') + ').</p>' : '<p class="subtext">W tym tygodniu było spokojnie. To też jest w porządku.</p>') +
+    (w.proud ? '<p class="x-week-proud">✦ Możesz być dumny z: <strong>' + esc(w.proud) + '</strong></p>' : '') + '</section>';
+}
+
+/* ───────────── First run ───────────── */
+
+let onboardStep = 0;
+
+export function onboarding(state) {
+  if (!D.needsOnboarding(state, extra)) return '';
+  const dots = '<div class="x-ob-dots" aria-hidden="true">' + [0, 1, 2].map(i => '<i class="' + (i === onboardStep ? 'on' : i < onboardStep ? 'done' : '') + '"></i>').join('') + '</div>';
+  const skip = '<button class="btn link" data-action="x-ob-skip">Pomiń</button>';
+  let body;
+  if (onboardStep === 0) body = '<div class="x-ob-icon" aria-hidden="true">✳</div><h1 class="x-ob-title">Cześć! To SYNAPSE.</h1><p class="subtext">Aplikacja dla głowy, która łatwo się rozprasza. Zawsze pokaże Ci <strong>jedną</strong> rzecz do zrobienia teraz, a za każdy krok dostaniesz punkty.</p><form id="x-ob-name" class="x-ob-form"><label class="field">Jak masz na imię?<input name="name" maxlength="40" autocomplete="given-name" placeholder="Twoje imię" required></label><button class="btn primary" type="submit">Dalej →</button></form>';
+  else if (onboardStep === 1) body = '<div class="x-ob-icon" aria-hidden="true">♡</div><h1 class="x-ob-title">Kto jest z Tobą w domu?</h1><p class="subtext">Wpisz imiona, a zadania będą brzmiały po ludzku, np. „Pobaw się z Olafem”. Możesz to pominąć. Imiona zostają tylko w tym telefonie.</p><form id="x-ob-names" class="x-ob-form">' + GEN.NAME_FIELDS.map(([k, label]) => '<label class="field">' + label + '<input name="' + k + '" maxlength="60" autocomplete="off" placeholder="' + esc(GEN.NAME_FIELDS.find(f => f[0] === k)[2][0]) + '"></label>').join('') + '<button class="btn primary" type="submit">Dalej →</button></form>';
+  else {
+    const ideas = GEN.suggest({ area: 'life', minutes: 5, energy: 'low', count: 3, seed: 3, names: extra.names });
+    body = '<div class="x-ob-icon" aria-hidden="true">▶</div><h1 class="x-ob-title">Wybierz pierwszą rzecz</h1><p class="subtext">Coś małego, na 5 minut. Dotknij, a od razu dodam to na dziś.</p><div class="x-ob-ideas">' + ideas.map((x, i) => '<button class="x-q" data-action="x-ob-pick" data-i="' + i + '"><span class="x-q-title">' + esc(x.t) + '</span><small>mały krok · 5 min</small></button>').join('') + '</div><form id="x-ob-own" class="x-inline" style="margin-top:12px"><label class="x-sr" for="x-ob-own-input">Własne zadanie</label><input id="x-ob-own-input" name="title" maxlength="120" required placeholder="Albo wpisz własne" autocomplete="off"><button class="btn" type="submit">Dodaj</button></form>';
+  }
+  return '<section class="panel x-ob">' + dots + body + '<div class="x-ob-foot">' + skip + '</div></section>';
+}
+
+function finishOnboarding(ctx, title, idea) {
+  const s = ctx.state();
+  if (title) s.tasks.push(C.makeTask({ title, tier: idea?.tier || 'micro', category: 'life', steps: idea?.steps || [], date: today() }));
+  extra.onboarded = true; onboardStep = 0; saveExtra(); ctx.save(); ctx.render();
+  if (title) ctx.toast('Gotowe. Na górze czeka „Co teraz?”. Dotknij „Zaczynam”.');
+}
+
 /* ───────────── Tips and thought of the day ───────────── */
 
 let tipOffset = 0, thoughtOffset = 0;
+
+/** Whether the rest of the Plan screen is unfolded. */
+export const planMore = () => !!extra.prefs?.planMore;
 
 export function tipCard() {
   return '<section class="panel x-tip"><div class="eyebrow">WSKAZÓWKA NA SKUPIENIE</div><p class="x-tip-text">' + esc(tipOfDay(today(), tipOffset)) + '</p><div class="x-note-actions"><button class="btn small" data-action="x-tip-next">Inna wskazówka ↻</button></div></section>';
@@ -486,6 +587,28 @@ export function init(ctx, doc = globalThis.document) {
         const tier = Object.hasOwn(C.TIERS, data.get('tier')) ? data.get('tier') : 'normal';
         extra.quick.push({ id: 'u-' + C.uid(), title, category, tier });
         saveExtra(); ctx.render(); ctx.toast('Dodane do szybkich punktów.');
+      }
+      if (id === 'x-win-form') {
+        const day = D.ritualDay(), v = String(data.get('win') || '').trim().slice(0, 140);
+        if (v) extra.wins[day] = v; else delete extra.wins[day];
+        for (const k of Object.keys(extra.wins).sort().slice(0, -60)) delete extra.wins[k];
+        saveExtra();
+        if (v && !(extra.rituals[day]?.evening || []).includes('win')) { ritualToggle(ctx, 'evening', 'win'); ctx.toast('Zapisane. Dobra robota.'); }
+        else { ctx.render(); ctx.toast('Zapisane.'); }
+      }
+      if (id === 'x-ob-name') {
+        const name = String(data.get('name') || '').trim().slice(0, 40);
+        if (name) { ctx.state().settings.name = name; ctx.save(); }
+        onboardStep = 1; ctx.render();
+      }
+      if (id === 'x-ob-names') {
+        extra.names = {};
+        for (const [k] of GEN.NAME_FIELDS) { const v = String(data.get(k) || '').trim().slice(0, 150); if (v) extra.names[k] = v; }
+        saveExtra(); onboardStep = 2; ctx.render();
+      }
+      if (id === 'x-ob-own') {
+        const title = String(data.get('title') || '').trim().slice(0, 120);
+        if (title) finishOnboarding(ctx, title);
       }
       if (id === 'x-names-form') {
         extra.names = {};
@@ -558,6 +681,12 @@ export function init(ctx, doc = globalThis.document) {
         case 'x-routine-daily': { const r = extra.routines.find(r => r.id === id); if (r) launchRoutine(ctx, r, 'daily'); break; }
         case 'x-boss-new': bossForm(ctx); break;
         case 'x-blow': strike(ctx, id, Number(b.dataset.i)); break;
+        case 'x-ritual': ritualToggle(ctx, b.dataset.kind, b.dataset.item); break;
+        case 'x-ritual-close': { const day = D.ritualDay(); extra.rituals[day] ??= {}; extra.rituals[day][b.dataset.kind + 'Closed'] = true; saveExtra(); ctx.render(); break; }
+        case 'x-week-close': extra.prefs.weekSeen = D.summaryWeek(); saveExtra(); ctx.render(); break;
+        case 'x-more': extra.prefs.planMore = !extra.prefs.planMore; saveExtra(); ctx.render(); break;
+        case 'x-ob-skip': extra.onboarded = true; onboardStep = 0; saveExtra(); ctx.render(); break;
+        case 'x-ob-pick': { const x = GEN.suggest({ area: 'life', minutes: 5, energy: 'low', count: 3, seed: 3, names: extra.names })[Number(b.dataset.i)]; if (x) finishOnboarding(ctx, x.t, x); break; }
         case 'x-tip-next': tipOffset++; ctx.render(); break;
         case 'x-thought-next': thoughtOffset++; ctx.render(); break;
         case 'x-now-next': nowSkip++; ctx.render(); break;
