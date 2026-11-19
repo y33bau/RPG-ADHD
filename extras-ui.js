@@ -3,6 +3,11 @@
 import * as C from './core.js';
 import * as A from './achievements.js';
 import * as I from './insights.js';
+import * as P from './planner.js';
+import * as G from './guard.js';
+import * as GEN from './generator.js';
+import { FACTS, factOfDay } from './facts.js';
+import { DIY } from './diy.js';
 import { extra, saveExtra, reloadExtra } from './extra-store.js';
 
 export { extra };
@@ -14,19 +19,32 @@ const tomorrow = () => { const d = new Date(); d.setDate(d.getDate() + 1); retur
 const openNotes = () => extra.notes.filter(n => !n.archived);
 
 export const SUBS = {
-  today: [['plan', 'Plan'], ['focus', 'Skupienie'], ['me', 'Ja']],
-  tasks: [['list', 'Lista'], ['dump', 'Zrzut z głowy'], ['routines', 'Rutyny']],
-  world: [['trip', 'Wyprawy'], ['calendar', 'Kalendarz'], ['settings', 'Ustawienia']],
+  today: [['plan', 'Plan'], ['planner', 'Planer'], ['focus', 'Skupienie'], ['me', 'Ja']],
+  tasks: [['list', 'Lista'], ['quick', 'Szybkie punkty'], ['generator', 'Generator'], ['dump', 'Zrzut z głowy'], ['routines', 'Rutyny']],
+  world: [['trip', 'Wyprawy'], ['calendar', 'Kalendarz'], ['facts', 'Ciekawostki'], ['diy', 'Zrób to sam'], ['settings', 'Ustawienia']],
   base: [['base', 'Przystań'], ['bosses', 'Wyprawy'], ['rewards', 'Nagrody']],
   history: [['overview', 'Przegląd'], ['badges', 'Osiągnięcia'], ['rhythm', 'Rytm'], ['log', 'Historia']],
 };
 
-export function subnav(tab, current) {
-  const items = SUBS[tab];
-  if (!items) return '';
+/** Minimal mode keeps only what is needed to plan, focus and rest. */
+const MINIMAL_HIDDEN = new Set(['today:me', 'today:planner', 'tasks:quick', 'tasks:generator', 'tasks:routines', 'world:trip', 'world:facts', 'world:diy', 'base:bosses', 'history:badges', 'history:rhythm']);
+
+export function subs(tab, minimal = false) {
+  return (SUBS[tab] || []).filter(([id]) => !(minimal && MINIMAL_HIDDEN.has(tab + ':' + id)));
+}
+
+/** The sub-tab that is really shown: the chosen one, or the first available. */
+export function currentSub(tab, wanted, minimal = false) {
+  const list = subs(tab, minimal);
+  return list.some(([id]) => id === wanted) ? wanted : list[0]?.[0];
+}
+
+export function subnav(tab, wanted, minimal = false) {
+  const items = subs(tab, minimal), current = currentSub(tab, wanted, minimal);
+  if (!items.length) return '';
   return '<div class="x-subtabs" role="tablist" aria-label="Sekcje">' + items.map(([id, label]) => {
     const n = tab === 'tasks' && id === 'dump' ? openNotes().length : 0;
-    return '<button role="tab" class="x-subtab' + (current === id ? ' on' : '') + '" data-sub="' + id + '" aria-selected="' + (current === id) + '">' + label + (n ? '<b>' + n + '</b>' : '') + '</button>';
+    return '<button role="tab" class="x-subtab' + (current === id ? ' on' : '') + '" data-sub="' + id + '" aria-selected="' + (current === id) + '" tabindex="' + (current === id ? 0 : -1) + '">' + label + (n ? '<b>' + n + '</b>' : '') + '</button>';
   }).join('') + '</div>';
 }
 
@@ -303,6 +321,90 @@ export function rhythmView(state) {
     '<section class="panel"><div class="section-line"><h3>Sesje skupienia</h3></div><div class="stats"><div class="stat"><strong>' + fs.sessions + '</strong><small>sesji</small></div><div class="stat"><strong>' + fs.average + '</strong><small>śr. minut</small></div><div class="stat"><strong>' + fs.longest + '</strong><small>najdłuższa</small></div></div></section>';
 }
 
+
+/* ───────────── Planner ───────────── */
+
+let planWindow = 120;
+const hm = t => new Date(t).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+const TIER_LABEL = { micro: 'mały krok', normal: 'zadanie', big: 'wyzwanie' };
+
+export function plannerView(state) {
+  const plan = P.buildPlan(state, { minutes: planWindow });
+  const energy = { low: 'Niska energia: zaczynasz od małych rzeczy.', medium: 'Energia w sam raz: rzeczy średniej wielkości na początek.', high: 'Masz moc: najcięższe rzeczy idą pierwsze.' }[plan.energy];
+  return '<section class="panel x-intro"><div class="section-line"><div><div class="eyebrow">PLANER DNIA</div><h2>Ile masz czasu?</h2></div></div><div class="x-durations x-windows" role="group" aria-label="Okno czasu">' +
+    [[60, '1 godz.'], [120, '2 godz.'], [240, '4 godz.'], [480, 'Cały dzień']].map(([m, l]) => '<button class="x-duration' + (planWindow === m ? ' on' : '') + '" data-action="x-plan-window" data-min="' + m + '" aria-pressed="' + (planWindow === m) + '"><strong>' + l + '</strong></button>').join('') +
+    '</div><p class="subtext tiny">' + energy + ' Co 25 minut pracy wpisuję 5 minut przerwy.</p></section>' +
+    '<section class="panel">' + (plan.blocks.length ? '<div class="section-line"><h3>Plan: ' + plan.planned + ' z ' + plan.total + '</h3><span class="tiny muted">do ' + hm(plan.blocks.at(-1).end) + '</span></div><div class="x-timeline">' +
+      plan.blocks.map(b => b.type === 'break'
+        ? '<div class="x-block break"><time>' + hm(b.start) + '</time><span>Przerwa ' + b.minutes + ' min. Woda, ruch, oddech.</span></div>'
+        : '<div class="x-block"><time>' + hm(b.start) + '</time><div class="x-block-main"><strong>' + esc(b.title) + '</strong><small>' + TIER_LABEL[b.tier] + ' · ' + b.minutes + ' min</small></div><div class="x-block-actions"><button class="btn small primary" data-action="x-plan-start" data-id="' + esc(b.taskId) + '" data-min="' + b.minutes + '">Start</button><button class="btn small" data-action="complete" data-id="' + esc(b.taskId) + '" aria-label="Oznacz jako zrobione: ' + esc(b.title) + '">✓</button></div></div>').join('') +
+      '</div>' + (plan.left ? '<p class="subtext tiny">' + plan.left + ' ' + plural(plan.left, 'rzecz nie mieści', 'rzeczy nie mieszczą', 'rzeczy nie mieści') + ' się w tym czasie. To dobra okazja, by coś puścić albo przenieść na jutro.</p>' : '')
+      : empty('☷', plan.total ? 'Nic się nie mieści w tym oknie.' : 'Nie ma nic do zaplanowania.', plan.total ? 'Wybierz dłuższe okno albo zmniejsz zadania.' : 'Dodaj zadanie albo wylosuj pomysł w generatorze.')) + '</section>';
+}
+
+/* ───────────── Procrastination guard ───────────── */
+
+export function guardCard(state) {
+  const stale = G.postponed(state).slice(0, 3), nudge = G.idleNudge(state);
+  if (!stale.length && !nudge) return '';
+  const first = stale[0]?.task || P.candidates(state)[0];
+  const startBtn = t => '<button class="btn small primary" data-action="x-guard-two" data-id="' + esc(t.id) + '">2 minuty</button>';
+  return '<section class="panel x-guard"><div class="section-line"><div><div class="eyebrow">STRAŻNIK ODKŁADANIA</div><h2>' + (stale.length ? 'Te sprawy czekają najdłużej' : 'Dzień się rozkręca') + '</h2></div></div>' +
+    (nudge && first ? '<p class="subtext">Jeszcze nic dziś nie zrobiłeś. To w porządku. Wystarczą dwie minuty z jedną rzeczą.' + (stale.length ? '' : ' ' + esc(first.title) + '?') + '</p>' + (stale.length ? '' : '<div class="x-note-actions">' + startBtn(first) + '</div>') : '') +
+    stale.map(({ task: t, days, touched }) => '<article class="x-note"><p><strong>' + esc(t.title) + '</strong><br><small class="muted">odkładane od ' + days + ' ' + plural(days, 'dnia', 'dni', 'dni') + '</small></p><div class="x-note-actions">' + startBtn(t) +
+      (!touched && !t.steps.length ? '<button class="btn small" data-action="x-guard-split" data-id="' + esc(t.id) + '">Rozbij</button>' : '') +
+      (!touched ? '<button class="btn small" data-action="x-guard-tomorrow" data-id="' + esc(t.id) + '">Jutro</button>' : '') +
+      '<button class="btn small link" data-action="x-guard-drop" data-id="' + esc(t.id) + '">Puść</button></div></article>').join('') + '</section>';
+}
+
+/* ───────────── Generator and quick points ───────────── */
+
+let genOpts = { area: 'life', minutes: 15, energy: 'medium', seed: 1 };
+
+export function generatorView(state) {
+  const ideas = GEN.suggest({ ...genOpts, count: 3 });
+  const seg = (key, items) => '<div class="x-chips" role="group">' + items.map(([v, l]) => '<button class="x-chip' + (genOpts[key] === v ? ' on' : '') + '" data-action="x-gen-opt" data-key="' + key + '" data-v="' + v + '" aria-pressed="' + (genOpts[key] === v) + '">' + l + '</button>').join('') + '</div>';
+  return '<section class="panel x-intro"><div class="section-line"><div><div class="eyebrow">NIE WIESZ, OD CZEGO ZACZĄĆ?</div><h2>Generator zadań</h2></div></div><label class="x-sr">Obszar</label>' + seg('area', GEN.AREAS) + '<label class="x-sr">Czas</label>' + seg('minutes', [[5, '5 min'], [15, '15 min'], [30, '30 min']]) + '<label class="x-sr">Energia</label>' + seg('energy', [['low', 'Niska'], ['medium', 'W sam raz'], ['high', 'Mam moc']]) +
+    '<div class="x-note-actions" style="margin-top:14px"><button class="btn purple" data-action="x-gen-roll">✧ Wylosuj inne</button></div></section>' +
+    '<section class="panel"><div class="section-line"><h3>Propozycje</h3></div>' + (ideas.length ? ideas.map((x, i) => '<article class="x-note"><p><strong>' + esc(x.t) + '</strong><br><small class="muted">' + TIER_LABEL[x.tier] + ' · ok. ' + x.min + ' min</small></p><div class="x-note-actions"><button class="btn small primary" data-action="x-gen-add" data-i="' + i + '">Dodaj na dziś</button></div></article>').join('') : empty('✧', 'Brak pomysłów dla tych ustawień.', 'Zwiększ czas albo energię.')) + '</section>' +
+    '<section class="panel"><div class="section-line"><h3>Rozbij własne zadanie</h3></div><p class="subtext tiny">Wpisz coś dużego, a podzielę to na małe kroki.</p><form id="x-split-form" class="x-inline"><label class="x-sr" for="x-split-input">Zadanie</label><input id="x-split-input" name="title" maxlength="120" required placeholder="Np. Zrobić operat dla klienta" autocomplete="off"><button class="btn primary" type="submit">Rozbij</button></form></section>';
+}
+
+const quickItems = () => GEN.QUICK.concat(extra.quick || []);
+
+export function quickView(state) {
+  const day = today(), done = q => state.tasks.some(t => t.title === q.title && t.date === day && C.completion(state, t, day));
+  const groups = [['life', 'Dom'], ['work', 'Praca'], ['self', 'Dla siebie']];
+  return '<section class="panel x-intro"><div class="section-line"><div><div class="eyebrow">JEDNO DOTKNIĘCIE</div><h2>Szybkie punkty</h2></div></div><p class="subtext">Zrobiłeś coś w domu albo w pracy? Zapisz to i odbierz punkty. Każdą czynność możesz zapisać raz dziennie.</p></section>' +
+    groups.map(([cat, label]) => '<section class="panel"><div class="section-line"><h3>' + label + '</h3></div><div class="x-quick">' + quickItems().filter(q => q.category === cat).map(q => {
+      const t = C.TIERS[q.tier], d = done(q);
+      return '<button class="x-q' + (d ? ' done' : '') + '" data-action="x-quick" data-id="' + esc(q.id) + '" ' + (d ? 'disabled' : '') + '><span class="x-q-title">' + (d ? '✓ ' : '') + esc(q.title) + '</span><small>+' + t.xp + ' XP · +' + t.coins + ' monet</small></button>';
+    }).join('') + '</div></section>').join('') +
+    '<section class="panel"><div class="section-line"><h3>Własna czynność</h3></div><form id="x-quick-form" class="x-quick-form"><label class="field">Nazwa<input name="title" maxlength="60" required placeholder="Np. Podlanie kwiatów"></label><div class="x-quick-row"><label class="field">Obszar<select name="category"><option value="life">Dom</option><option value="work">Praca</option><option value="self">Dla siebie</option></select></label><label class="field">Wielkość<select name="tier"><option value="micro">Mały krok</option><option value="normal" selected>Zadanie</option><option value="big">Wyzwanie</option></select></label></div><button class="btn primary" type="submit">＋ Dodaj do listy</button></form>' +
+    ((extra.quick || []).length ? '<div class="x-chips" style="margin-top:12px">' + extra.quick.map(q => '<button class="x-chip" data-action="x-quick-del" data-id="' + esc(q.id) + '" aria-label="Usuń czynność ' + esc(q.title) + '">' + esc(q.title) + ' ×</button>').join('') + '</div>' : '') + '</section>';
+}
+
+export function rewardIdeas(state) {
+  const have = new Set(state.rewards.filter(r => !r.archived).map(r => r.title));
+  const ideas = GEN.REWARD_IDEAS.map((r, i) => [r, i]).filter(([r]) => !have.has(r[0]));
+  if (!ideas.length) return '';
+  return '<section class="panel"><div class="section-line"><h3>Pomysły na nagrody</h3><span class="tiny muted">dotknij, by dodać</span></div><div class="x-chips">' + ideas.map(([r, i]) => '<button class="x-chip" data-action="x-reward-idea" data-i="' + i + '">＋ ' + esc(r[0]) + ' · ' + r[1] + '</button>').join('') + '</div></section>';
+}
+
+/* ───────────── Facts and DIY ───────────── */
+
+let factOffset = 0;
+
+export function factsView() {
+  const f = factOfDay(today(), factOffset);
+  return '<section class="panel x-fact"><div class="eyebrow">' + esc(f.tag).toUpperCase() + ' · CIEKAWOSTKA' + (factOffset ? '' : ' DNIA') + '</div><p class="x-fact-text">' + esc(f.t) + '</p><div class="x-note-actions"><button class="btn purple" data-action="x-fact-next">Kolejna ciekawostka →</button>' + (factOffset ? '<button class="btn link" data-action="x-fact-reset">Wróć do dzisiejszej</button>' : '') + '</div></section><p class="subtext tiny" style="text-align:center">Mała dawka ciekawości na dobry początek. Zebrane: ' + FACTS.length + '.</p>';
+}
+
+export function diyView() {
+  return '<section class="panel x-intro"><div class="section-line"><div><div class="eyebrow">ZRÓB TO SAM</div><h2>Domowe sposoby na produktywność</h2></div></div><p class="subtext">Proste rzeczy z kartki, pudełka i minutnika. Dotknij, by zamienić pomysł w zadanie z krokami.</p></section><div class="x-grid">' +
+    DIY.map(d => '<article class="panel x-diy"><h3>' + esc(d.title) + '</h3><p class="subtext tiny">' + esc(d.why) + '</p><ol>' + d.steps.map(x => '<li>' + esc(x) + '</li>').join('') + '</ol><button class="btn small primary" data-action="x-diy-task" data-id="' + d.id + '">Zrób z tego zadanie</button></article>').join('') + '</div>';
+}
+
 /* ───────────── Badges, shortcuts and events ───────────── */
 
 /** Records newly earned badges and returns their names for a toast. */
@@ -331,6 +433,22 @@ export function init(ctx, doc = globalThis.document) {
         extra.notes.push({ id: C.uid(), text, createdAt: Date.now(), archived: false });
         saveExtra(); ctx.render(); ctx.toast('Zapisane. Możesz wrócić do działania.');
         doc.querySelector('#x-dump-input')?.focus?.();
+      }
+      if (id === 'x-split-form') {
+        const title = String(data.get('title') || '').trim();
+        if (!title) return;
+        ctx.state().tasks.push(C.makeTask({ title, tier: 'big', category: 'work', steps: GEN.breakdown(title) }));
+        ctx.save(); ctx.render(); ctx.toast('Gotowe. Zadanie czeka w planie z małymi krokami.');
+      }
+      if (id === 'x-quick-form') {
+        const title = String(data.get('title') || '').trim().slice(0, 60);
+        if (!title) return;
+        extra.quick ??= [];
+        if (extra.quick.length >= 20) throw Error('Możesz mieć maksymalnie 20 własnych czynności.');
+        const category = ['life', 'work', 'self'].includes(data.get('category')) ? data.get('category') : 'life';
+        const tier = Object.hasOwn(C.TIERS, data.get('tier')) ? data.get('tier') : 'normal';
+        extra.quick.push({ id: 'u-' + C.uid(), title, category, tier });
+        saveExtra(); ctx.render(); ctx.toast('Dodane do szybkich punktów.');
       }
       if (id === 'x-habit-form') {
         const name = String(data.get('name') || '').trim().slice(0, 50);
@@ -398,6 +516,40 @@ export function init(ctx, doc = globalThis.document) {
         case 'x-routine-daily': { const r = extra.routines.find(r => r.id === id); if (r) launchRoutine(ctx, r, 'daily'); break; }
         case 'x-boss-new': bossForm(ctx); break;
         case 'x-blow': strike(ctx, id, Number(b.dataset.i)); break;
+        case 'x-plan-window': planWindow = Number(b.dataset.min) || 120; ctx.render(); break;
+        case 'x-plan-start': { C.startFocus(s, id, Number(b.dataset.min) || 15); ctx.save(); ctx.render(); ctx.toast('Start. Iskra siedzi obok.'); break; }
+        case 'x-guard-two': { C.startFocus(s, id, 2); ctx.save(); ctx.render(); ctx.toast('Tylko 2 minuty. Potem możesz przestać.'); break; }
+        case 'x-guard-split': { const t = s.tasks.find(t => t.id === id); if (t && !t.steps.length) { t.steps = GEN.breakdown(t.title); ctx.save(); ctx.render(); ctx.toast('Podzielone na małe kroki.'); } break; }
+        case 'x-guard-tomorrow': { const t = s.tasks.find(t => t.id === id); if (t && !locked(s, id)) { t.date = tomorrow(); ctx.save(); ctx.render(); ctx.toast('Przeniesione na jutro.'); } break; }
+        case 'x-guard-drop': { const t = s.tasks.find(t => t.id === id); if (t) { t.archived = true; ctx.save(); ctx.render(); ctx.toast('Puszczone. To też jest decyzja.'); } break; }
+        case 'x-gen-opt': { const v = b.dataset.key === 'minutes' ? Number(b.dataset.v) : b.dataset.v; genOpts = { ...genOpts, [b.dataset.key]: v, seed: genOpts.seed }; ctx.render(); break; }
+        case 'x-gen-roll': genOpts = { ...genOpts, seed: genOpts.seed + 1 }; ctx.render(); break;
+        case 'x-gen-add': {
+          const x = GEN.suggest({ ...genOpts, count: 3 })[Number(b.dataset.i)]; if (!x) break;
+          const cat = genOpts.area;
+          s.tasks.push(C.makeTask({ title: x.t, tier: x.tier, category: cat, steps: x.steps || [], date: today() }));
+          ctx.save(); ctx.render(); ctx.toast('Dodane na dziś. Zacznij od dwóch minut.'); break;
+        }
+        case 'x-quick': {
+          const q = quickItems().find(q => q.id === id); if (!q) break;
+          const day = today();
+          if (s.tasks.some(t => t.title === q.title && t.date === day && C.completion(s, t, day))) { ctx.toast('To już dziś zapisane.'); break; }
+          const task = C.makeTask({ title: q.title, tier: q.tier, category: q.category, date: day });
+          s.tasks.push(task);
+          const before = s.ledger.length, earned = C.completeTask(s, task.id);
+          task.archived = true;
+          ctx.save(); ctx.render(); ctx.celebrate(earned, s.ledger.slice(before).filter(e => e.kind === 'bonus')); break;
+        }
+        case 'x-quick-del': extra.quick = (extra.quick || []).filter(q => q.id !== id); saveExtra(); ctx.render(); break;
+        case 'x-reward-idea': { const r = GEN.REWARD_IDEAS[Number(b.dataset.i)]; if (r && !s.rewards.some(x => x.title === r[0] && !x.archived)) { s.rewards.push({ id: C.uid(), title: r[0], cost: r[1], archived: false }); ctx.save(); ctx.render(); ctx.toast('Nagroda dodana.'); } break; }
+        case 'x-fact-next': factOffset++; ctx.render(); break;
+        case 'x-fact-reset': factOffset = 0; ctx.render(); break;
+        case 'x-diy-task': {
+          const d = DIY.find(d => d.id === id); if (!d) break;
+          s.tasks.push(C.makeTask({ title: d.title, tier: 'normal', category: 'self', steps: d.steps, date: today() }));
+          ctx.save(); ctx.render(); ctx.toast('Dodane do planu na dziś.'); break;
+        }
+        case 'x-minimal': { s.settings.minimal = !s.settings.minimal; ctx.save(); ctx.render(); ctx.toast(s.settings.minimal ? 'Tryb minimalny włączony.' : 'Wszystkie funkcje z powrotem.'); break; }
         case 'x-boss-drop': { const boss = extra.bosses.find(x => x.id === id); if (boss) { boss.archived = true; saveExtra(); ctx.render(); ctx.toast('Wyprawa porzucona. Zdobyte nagrody zostają.'); } break; }
       }
     });

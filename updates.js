@@ -1,4 +1,4 @@
-const VERSION='2.4.2';
+const VERSION='2.5.0';
 let registration,changed=false,checking=false,notice;
 function offerUpdate(){
  changed=true;
@@ -11,13 +11,10 @@ function offerUpdate(){
  notice.append(label,apply,later);document.body.append(notice);
  updateSettings();
 }
-function updateSettings(){
- const form=document.getElementById('settings-form');if(!form)return;
- let area=document.getElementById('app-update-settings');
- if(!area){
- area=document.createElement('section');area.id='app-update-settings';area.style.cssText='display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:space-between;margin:0 0 18px;padding:12px 14px;border:1px solid #ffffff1f;border-radius:14px;background:#ffffff06';
+function makeArea(){
+ const area=document.createElement('section');area.dataset.updateArea='1';area.style.cssText='display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:space-between;margin:0 0 18px;padding:12px 14px;border:1px solid #ffffff1f;border-radius:14px;background:#ffffff06';
  const info=document.createElement('p');info.className='subtext subtitle';info.style.margin='0';info.textContent='Wersja '+VERSION;
- const button=document.createElement('button');button.type='button';button.className='btn';button.id='app-update-check';
+ const button=document.createElement('button');button.type='button';button.className='btn';button.dataset.updateCheck='1';button.textContent=changed?'Wczytaj nową wersję':'Sprawdź aktualizację';
  button.addEventListener('click',async()=>{
  if(changed){location.reload();return;}
  if(checking)return;checking=true;button.disabled=true;button.textContent='Sprawdzam…';
@@ -30,11 +27,14 @@ function updateSettings(){
  }catch{button.textContent='Brak połączenia · spróbuj ponownie';}
  finally{checking=false;button.disabled=false;if(changed)button.textContent='Wczytaj nową wersję';}
  });
- area.append(info,button);form.before(area);
- }
- const button=area.querySelector('button');
- if(changed&&button.textContent!=='Wczytaj nową wersję')button.textContent='Wczytaj nową wersję';
- else if(!button.textContent)button.textContent='Sprawdź aktualizację';
+ area.append(info,button);return area;
+}
+function updateSettings(){
+ const slot=document.getElementById('app-update-slot');
+ if(slot&&!slot.firstElementChild)slot.append(makeArea());
+ const form=document.getElementById('settings-form');
+ if(form&&!form.parentElement.querySelector(':scope > [data-update-area]'))form.before(makeArea());
+ if(changed)document.querySelectorAll('[data-update-check]').forEach(b=>{if(b.textContent!=='Wczytaj nową wersję')b.textContent='Wczytaj nową wersję';});
 }
 if('serviceWorker' in navigator&&location.protocol!=='file:'){
  const hadController=!!navigator.serviceWorker.controller;

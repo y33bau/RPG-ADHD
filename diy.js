@@ -1,0 +1,13 @@
+// Do-it-yourself productivity hacks: cheap, physical, no app needed.
+export const DIY = [
+  { id: 'two-min', title: 'Reguła dwóch minut', why: 'Start jest najtrudniejszy. Dwie minuty to za mało, żeby się bać.', steps: ['Wybierz rzecz, której unikasz', 'Nastaw minutnik na 2 minuty', 'Zacznij i pozwól sobie przestać po sygnale'] },
+  { id: 'kitchen-timer', title: 'Kuchenny minutnik zamiast telefonu', why: 'Telefon kusi powiadomieniami. Zwykły minutnik tylko odlicza.', steps: ['Postaw minutnik na biurku', 'Nastaw 25 minut pracy', 'Po sygnale 5 minut przerwy bez ekranu'] },
+  { id: 'start-zone', title: 'Strefa startu przy drzwiach', why: 'Rzeczy w jednym miejscu to mniej szukania i mniej stresu przy wyjściu.', steps: ['Wybierz półkę lub koszyk przy drzwiach', 'Połóż tam klucze, portfel, dokumenty i ładowarkę', 'Odkładaj tam zawsze, od razu po powrocie'] },
+  { id: 'one-sheet', title: 'Karteczka „Jedno wielkie dziś”', why: 'Trzy rzeczy na kartce widać lepiej niż trzydzieści w głowie.', steps: ['Weź karteczkę samoprzylepną', 'Napisz maksymalnie 3 rzeczy na dziś', 'Przyklej ją tam, gdzie siadasz do pracy'] },
+  { id: 'site-visit', title: 'Własna checklista oględzin', why: 'Gotowa lista oszczędza pamięć i pilnuje, żeby nic nie umknęło.', steps: ['Wypisz, co zawsze trzeba sprawdzić i sfotografować', 'Zapisz ją w notatkach w telefonie', 'Przed każdym wyjazdem przejrzyj ją w minutę'] },
+  { id: 'call-block', title: 'Blok telefonów', why: 'Wszystkie rozmowy naraz to jeden próg startu zamiast pięciu.', steps: ['Zbierz numery do wykonania', 'Wybierz jedno okno 30 minut', 'Dzwoń kolejno, po każdym zapisz jedno zdanie'] },
+  { id: 'bundle', title: 'Nagroda razem z nudnym zadaniem', why: 'Połączenie nudy z przyjemnością ułatwia start.', steps: ['Wybierz przyjemność, np. ulubiony podcast', 'Pozwól sobie na nią tylko podczas tego zadania', 'Zacznij zadanie razem z włączeniem podcastu'] },
+  { id: 'paper-box', title: 'Pudełko „do podpisu i wysłania”', why: 'Papiery bez domu zalegają na biurku i rosną.', steps: ['Postaw otwarte pudełko na biurku', 'Wrzucaj do niego wszystko, co czeka na decyzję', 'Raz w tygodniu opróżnij je w 15 minut'] },
+  { id: 'next-step', title: 'Zapisz następny krok przed zakończeniem pracy', why: 'Jutro wystarczy przeczytać jedno zdanie i ruszyć.', steps: ['Przed wyjściem od biurka napisz, od czego zaczniesz', 'Zostaw kartkę na klawiaturze', 'Rano zacznij dokładnie od tego'] },
+  { id: 'body-double', title: 'Praca „obok kogoś”', why: 'Obecność drugiej osoby (nawet w ciszy) pomaga wytrwać.', steps: ['Umów się z kimś na wspólną godzinę pracy', 'Każdy robi swoje, kamerka lub ten sam pokój', 'Na koniec jedno zdanie, co się udało'] },
+];
