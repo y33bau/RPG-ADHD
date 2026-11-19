@@ -19,6 +19,7 @@ function fill() {
   extra.badges ??= {};
   extra.routines ??= defaultRoutines();
   extra.prefs ??= { ambient: false };
+  extra.names ??= {};
 }
 
 export function reloadExtra(raw) {

@@ -347,7 +347,7 @@ export function plannerView(state) {
 let nowSkip = 0;
 
 export function nowCard(state) {
-  const n = P.nextThing(state, { skip: nowSkip });
+  const n = P.nextThing(state, { skip: nowSkip, names: extra.names });
   if (!n) return '';
   const done = n.kind === 'task' ? '<button class="btn" data-action="complete" data-id="' + esc(n.task.id) + '">Już zrobione ✓</button>' : '';
   return '<section class="panel x-now"><div class="eyebrow">CO TERAZ?</div><p class="x-now-hint">Zrób dziś tylko jedną z tych rzeczy. Resztę możesz zostawić na później.</p><h2 class="x-now-title">' + esc(n.title) + '</h2>' +
@@ -376,7 +376,7 @@ export function guardCard(state) {
 let genOpts = { area: 'life', minutes: 15, energy: 'medium', seed: 1 };
 
 export function generatorView(state) {
-  const ideas = GEN.suggest({ ...genOpts, count: 3 });
+  const ideas = GEN.suggest({ ...genOpts, count: 3, names: extra.names });
   const seg = (key, items) => '<div class="x-chips" role="group">' + items.map(([v, l]) => '<button class="x-chip' + (genOpts[key] === v ? ' on' : '') + '" data-action="x-gen-opt" data-key="' + key + '" data-v="' + v + '" aria-pressed="' + (genOpts[key] === v) + '">' + l + '</button>').join('') + '</div>';
   return '<section class="panel x-intro"><div class="section-line"><div><div class="eyebrow">NIE WIESZ, OD CZEGO ZACZĄĆ?</div><h2>Generator zadań</h2></div></div><label class="x-sr">Obszar</label>' + seg('area', GEN.AREAS) + '<label class="x-sr">Czas</label>' + seg('minutes', [[5, '5 min'], [15, '15 min'], [30, '30 min']]) + '<label class="x-sr">Energia</label>' + seg('energy', [['low', 'Niska'], ['medium', 'W sam raz'], ['high', 'Mam moc']]) +
     '<div class="x-note-actions" style="margin-top:14px"><button class="btn purple" data-action="x-gen-roll">✧ Wylosuj inne</button></div></section>' +
@@ -403,6 +403,16 @@ export function rewardIdeas(state) {
   const ideas = GEN.REWARD_IDEAS.map((r, i) => [r, i]).filter(([r]) => !have.has(r[0]));
   if (!ideas.length) return '';
   return '<section class="panel"><div class="section-line"><h3>Pomysły na nagrody</h3><span class="tiny muted">dotknij, by dodać</span></div><div class="x-chips">' + ideas.map(([r, i]) => '<button class="x-chip" data-action="x-reward-idea" data-i="' + i + '">＋ ' + esc(r[0]) + ' · ' + r[1] + '</button>').join('') + '</div></section>';
+}
+
+/* ───────────── Names (stay on the device) ───────────── */
+
+export function namesCard() {
+  const n = extra.names || {};
+  const sample = GEN.personalize('Zrób {partner:dat} mały, miły gest. Pobaw się z {kid:ins}.', n);
+  return '<section class="panel"><div class="section-line"><div><div class="eyebrow">IMIONA W ZADANIACH</div><h3>Zadania mówią Twoim językiem</h3></div></div><p class="subtext tiny">Wpisz imię w mianowniku, a odmienię je sam. Jeśli odmiana wyjdzie źle, wpisz pięć form po przecinku: mianownik, dopełniacz, celownik, biernik, narzędnik. Imiona zostają tylko na Twoim urządzeniu.</p>' +
+    '<form id="x-names-form" class="x-quick-form">' + GEN.NAME_FIELDS.map(([k, label]) => '<label class="field">' + label + '<input name="' + k + '" maxlength="150" value="' + esc(n[k] || '') + '" placeholder="' + esc(GEN.NAME_FIELDS.find(f => f[0] === k)[2][0]) + '" autocomplete="off"></label>').join('') +
+    '<p class="subtext tiny">Podgląd: ' + esc(sample) + '</p><button class="btn primary" type="submit">Zapisz imiona</button></form></section>';
 }
 
 /* ───────────── Facts and DIY ───────────── */
@@ -463,6 +473,11 @@ export function init(ctx, doc = globalThis.document) {
         const tier = Object.hasOwn(C.TIERS, data.get('tier')) ? data.get('tier') : 'normal';
         extra.quick.push({ id: 'u-' + C.uid(), title, category, tier });
         saveExtra(); ctx.render(); ctx.toast('Dodane do szybkich punktów.');
+      }
+      if (id === 'x-names-form') {
+        extra.names = {};
+        for (const [k] of GEN.NAME_FIELDS) { const v = String(data.get(k) || '').trim().slice(0, 150); if (v) extra.names[k] = v; }
+        saveExtra(); ctx.render(); ctx.toast('Zapisane. Zadania będą używać tych imion.');
       }
       if (id === 'x-habit-form') {
         const name = String(data.get('name') || '').trim().slice(0, 50);
@@ -532,7 +547,7 @@ export function init(ctx, doc = globalThis.document) {
         case 'x-blow': strike(ctx, id, Number(b.dataset.i)); break;
         case 'x-now-next': nowSkip++; ctx.render(); break;
         case 'x-now-start': {
-          const n = P.nextThing(s, { skip: nowSkip }); if (!n) break;
+          const n = P.nextThing(s, { skip: nowSkip, names: extra.names }); if (!n) break;
           let taskId = n.task?.id;
           if (n.kind === 'idea') {
             const t = C.makeTask({ title: n.idea.t, tier: n.idea.tier, category: GEN.CATEGORY[n.area] || 'life', steps: n.idea.steps || [], date: today() });
@@ -549,7 +564,7 @@ export function init(ctx, doc = globalThis.document) {
         case 'x-gen-opt': { const v = b.dataset.key === 'minutes' ? Number(b.dataset.v) : b.dataset.v; genOpts = { ...genOpts, [b.dataset.key]: v, seed: genOpts.seed }; ctx.render(); break; }
         case 'x-gen-roll': genOpts = { ...genOpts, seed: genOpts.seed + 1 }; ctx.render(); break;
         case 'x-gen-add': {
-          const x = GEN.suggest({ ...genOpts, count: 3 })[Number(b.dataset.i)]; if (!x) break;
+          const x = GEN.suggest({ ...genOpts, count: 3, names: extra.names })[Number(b.dataset.i)]; if (!x) break;
           const cat = GEN.CATEGORY[genOpts.area] || 'life';
           s.tasks.push(C.makeTask({ title: x.t, tier: x.tier, category: cat, steps: x.steps || [], date: today() }));
           ctx.save(); ctx.render(); ctx.toast('Dodane na dziś. Zacznij od dwóch minut.'); break;

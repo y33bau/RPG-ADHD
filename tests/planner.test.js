@@ -76,3 +76,14 @@ test('"what now" gives one open task first, then ideas, and cycles', () => {
   const empty = nextThing(C.fresh(at('2026-11-18T08:00:00')), { now: at('2026-11-18T10:00:00') });
   assert.equal(empty.kind, 'idea');
 });
+
+import { personalize, declineName, parseNames } from '../generator.js';
+test('names are declined or overridden, and neutral wording is the fallback', () => {
+  assert.equal(personalize('Spacer z {dog:ins}', {}), 'Spacer z psem');
+  assert.equal(personalize('Spacer z {dog:ins}', { dog: 'Mika' }), 'Spacer z Miką');
+  assert.equal(personalize('Przeczytaj {kid:dat}', { kid: 'Olaf' }), 'Przeczytaj Olafowi');
+  assert.equal(personalize('Zapytaj {partner:acc}', { partner: 'Klaudia' }), 'Zapytaj Klaudię');
+  assert.equal(personalize('{pets:gen}', { pets: 'świnki, świnek, świnkom, świnki, świnkami' }), 'świnek');
+  assert.equal(parseNames('  '), null);
+  assert.deepEqual(declineName('Marek'), ['Marek', 'Marka', 'Markowi', 'Marka', 'Markiem']);
+});

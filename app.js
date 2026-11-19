@@ -108,7 +108,7 @@ function worldView(){
   calendar:()=>'<div class="x-slots"><div data-life-slot id="slot-calendar"></div></div>',
   facts:()=>X.factsView(),
   diy:()=>X.diyView(),
-  settings:()=>'<section class="panel"><h2>Ustawienia</h2><div id="app-update-slot"></div><p id="connection" class="subtext">● Zapis na urządzeniu</p><div class="x-note-actions"><button class="btn primary" data-action="settings">Ustawienia i kopie danych</button><button class="btn" data-action="x-minimal" aria-pressed="'+!!state.settings.minimal+'">Tryb minimalny: '+(state.settings.minimal?'włączony':'wyłączony')+'</button></div><p class="subtext tiny">Tryb minimalny ukrywa dodatki i zostawia plan, skupienie, zadania, bazę i nagrody.</p></section>'
+  settings:()=>'<section class="panel"><h2>Ustawienia</h2><div id="app-update-slot"></div><p id="connection" class="subtext">● Zapis na urządzeniu</p><div class="x-note-actions"><button class="btn primary" data-action="settings">Ustawienia i kopie danych</button><button class="btn" data-action="x-minimal" aria-pressed="'+!!state.settings.minimal+'">Tryb minimalny: '+(state.settings.minimal?'włączony':'wyłączony')+'</button></div><p class="subtext tiny">Tryb minimalny ukrywa dodatki i zostawia plan, skupienie, zadania, bazę i nagrody.</p></section>'+X.namesCard()
  };
  return '<div class="page-heading"><h1>Więcej</h1></div>'+X.subnav('world',sub.world,!!state.settings.minimal)+subBody('world',slots);
 }

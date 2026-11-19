@@ -25,18 +25,18 @@ export const CATALOG = {
     { t: 'Zrób generalne porządki w jednym pomieszczeniu', tier: 'big', min: 30, energy: 'high' },
   ],
   family: [
-    { t: 'Zrób spokojny spacer z psem', tier: 'normal', min: 15, energy: 'medium' },
-    { t: 'Pobaw się z psem przez pięć minut', tier: 'micro', min: 5, energy: 'low' },
-    { t: 'Sprawdź, czy zwierzaki mają świeżą wodę i jedzenie', tier: 'micro', min: 5, energy: 'low' },
-    { t: 'Poświęć chwilę na spokojną obserwację zwierzaków', tier: 'micro', min: 5, energy: 'low' },
-    { t: 'Zapytaj dziecko, co dziś najbardziej mu się podobało', tier: 'micro', min: 5, energy: 'low' },
-    { t: 'Pobaw się z dzieckiem przez 10 minut, to ono wybiera', tier: 'micro', min: 10, energy: 'low' },
+    { t: 'Zrób spokojny spacer z {dog:ins}', tier: 'normal', min: 15, energy: 'medium' },
+    { t: 'Pobaw się z {dog:ins} przez pięć minut', tier: 'micro', min: 5, energy: 'low' },
+    { t: 'Sprawdź, czy {pets:nom} mają świeżą wodę i jedzenie', tier: 'micro', min: 5, energy: 'low' },
+    { t: 'Poświęć chwilę na spokojną obserwację {pets:gen}', tier: 'micro', min: 5, energy: 'low' },
+    { t: 'Zapytaj {kid:acc}, co dziś najbardziej mu się podobało', tier: 'micro', min: 5, energy: 'low' },
+    { t: 'Pobaw się z {kid:ins} przez 10 minut, niech wybiera zabawę', tier: 'micro', min: 10, energy: 'low' },
     { t: 'Zbudujcie coś razem z samochodzików lub klocków', tier: 'normal', min: 15, energy: 'medium' },
     { t: 'Wymyśl krótką zabawę w superbohatera', tier: 'micro', min: 5, energy: 'low' },
-    { t: 'Przeczytaj dziecku krótką historię', tier: 'micro', min: 10, energy: 'low' },
+    { t: 'Przeczytaj {kid:dat} krótką historię', tier: 'micro', min: 10, energy: 'low' },
     { t: 'Przygotujcie razem prostą przekąskę', tier: 'normal', min: 15, energy: 'medium' },
-    { t: 'Zrób partnerce małe, miłe coś', tier: 'micro', min: 5, energy: 'low' },
-    { t: 'Zapytaj partnerkę, jak minął jej dzień, i posłuchaj', tier: 'micro', min: 5, energy: 'low' },
+    { t: 'Zrób {partner:dat} mały, miły gest', tier: 'micro', min: 5, energy: 'low' },
+    { t: 'Zapytaj {partner:acc}, jak minął jej dzień, i posłuchaj', tier: 'micro', min: 5, energy: 'low' },
     { t: 'Zaplanujcie razem jedną przyjemną rzecz na ten tydzień', tier: 'normal', min: 15, energy: 'low' },
     { t: 'Wyślij bliskiej osobie wiadomość bez szczególnej okazji', tier: 'micro', min: 5, energy: 'low' },
     { t: 'Wybierz jedną małą rzecz, która ułatwi jutro domownikom dzień', tier: 'micro', min: 5, energy: 'low' },
@@ -97,16 +97,59 @@ function rng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6d2b79f5) >>>
 const LEVEL = { low: 0, medium: 1, high: 2 };
 
 /** Picks up to `count` ideas that fit the time and the energy. The same seed gives the same result. */
-export function suggest({ area = 'life', minutes = 15, energy = 'medium', count = 3, seed = 1 } = {}) {
+export function suggest({ area = 'life', minutes = 15, energy = 'medium', count = 3, seed = 1, names = {} } = {}) {
   const pool = (CATALOG[area] || CATALOG.life).filter(x => x.min <= minutes && LEVEL[x.energy] <= LEVEL[energy]);
   const rand = rng(seed), out = [];
   const bag = [...pool];
   while (out.length < count && bag.length) out.push(bag.splice(Math.floor(rand() * bag.length), 1)[0]);
-  return out;
+  return out.map(x => ({ ...x, t: personalize(x.t, names) }));
 }
 
 /** Turns a vague task into four or five small steps. */
 export function breakdown(title) {
   const t = String(title).trim().replace(/[.!?]+$/, '').slice(0, 90);
   return ['Przygotować miejsce i rzeczy', 'Zacząć na 2 minuty: ' + t, 'Zrobić główną część', 'Sprawdzić, czy jest „wystarczająco dobrze”', 'Posprzątać po sobie i odhaczyć'];
+}
+
+/* ───────── Names ─────────
+   Names stay on the device. Each person has five Polish forms: nom, gen, dat, acc, ins. */
+export const NAME_FIELDS = [
+  ['dog', 'Pies lub inne zwierzę domowe', ['pies', 'psa', 'psu', 'psa', 'psem']],
+  ['pets', 'Pozostałe zwierzaki (liczba mnoga)', ['zwierzaki', 'zwierzaków', 'zwierzakom', 'zwierzaki', 'zwierzakami']],
+  ['kid', 'Dziecko', ['dziecko', 'dziecka', 'dziecku', 'dziecko', 'dzieckiem']],
+  ['partner', 'Partner lub partnerka', ['partnerka', 'partnerki', 'partnerce', 'partnerkę', 'partnerką']],
+];
+const FORMS = ['nom', 'gen', 'dat', 'acc', 'ins'];
+
+/** Best-effort Polish declension of a first name. The user can always override it with five forms. */
+export function declineName(raw) {
+  const n = String(raw || '').trim().slice(0, 30);
+  if (!n) return null;
+  const last = n.slice(-1).toLowerCase();
+  if (last === 'a') {
+    const stem = n.slice(0, -1), end = stem.slice(-1).toLowerCase();
+    const soft = ['k', 'g'].includes(end);
+    const gen = soft || ['l', 'i'].includes(end) ? stem + 'i' : stem + 'y';
+    const dat = stem.slice(-1).toLowerCase() === 'i' ? stem + 'i' : end === 'k' ? stem.slice(0, -1) + 'ce' : end === 'g' ? stem.slice(0, -1) + 'dze' : stem + 'ie';
+    return [n, gen, dat, stem + 'ę', stem + 'ą'];
+  }
+  if (/[aeiouyąęó]$/i.test(n)) return [n, n, n, n, n];
+  const base = /ek$/i.test(n) ? n.slice(0, -2) + 'k' : n;
+  return [n, base + 'a', base + 'owi', base + 'a', base + (/[kg]$/i.test(base) ? 'iem' : 'em')];
+}
+
+/** Turns "Olaf" or "Olaf, Olafa, Olafowi, Olafa, Olafem" into five forms; empty means "use the neutral wording". */
+export function parseNames(raw) {
+  const parts = String(raw || '').split(',').map(x => x.trim().slice(0, 30)).filter(Boolean);
+  if (!parts.length) return null;
+  return parts.length >= 5 ? parts.slice(0, 5) : declineName(parts[0]);
+}
+
+export function personalize(text, names = {}) {
+  return String(text).replace(/\{(\w+):(\w+)\}/g, (m, who, form) => {
+    const idx = FORMS.indexOf(form), field = NAME_FIELDS.find(f => f[0] === who);
+    if (idx < 0 || !field) return m;
+    const forms = parseNames(names[who]) || field[2];
+    return forms[idx];
+  });
 }

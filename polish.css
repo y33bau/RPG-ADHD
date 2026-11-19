@@ -34,7 +34,8 @@ h1{background:linear-gradient(120deg,#fff 30%,#cfc5ff 100%);-webkit-background-c
 .nav-item{position:relative;transition:background .25s,color .25s}
 .nav-item.active .nav-ico{transform:translateY(-1px) scale(1.08);filter:drop-shadow(0 0 8px #bbabff88)}
 .nav-item.active{background:linear-gradient(145deg,#c0b0ff1f,#b4efd90c)}
-.sidebar .nav-item.active:before{content:"";position:absolute;left:-24px;top:22%;bottom:22%;width:3px;border-radius:0 3px 3px 0;background:linear-gradient(var(--purple),var(--mint));box-shadow:0 0 14px #bbabff88}
+.nav-item.active:before{display:none}
+@media(min-width:851px){.sidebar .nav-item.active:before{display:block;content:"";position:absolute;left:-24px;top:22%;bottom:22%;width:3px;border-radius:0 3px 3px 0;background:linear-gradient(var(--purple),var(--mint));box-shadow:0 0 14px #bbabff88}}
 .brand-symbol{box-shadow:0 8px 26px -6px #bbabff88,inset 0 1px 0 #fff7}
 @media(max-width:850px){
  .sidebar{background:#12162af0;box-shadow:0 -14px 40px -10px #000a}
@@ -91,3 +92,69 @@ body.calm .panel:before,body.calm .mobile-add,body.calm .fill,body.calm .level-e
 body.calm h1,body.calm .hero h2,body.calm .x-fact-text{background:none;color:var(--text)}
 @media(prefers-reduced-motion:reduce){main.enter>*,main.enter *{animation:none!important}.fill,.mobile-add,.level-emblem,.x-guard,.hero:after{animation:none!important}}
 .skip:not(:focus){clip-path:inset(50%);width:1px;height:1px;overflow:hidden;white-space:nowrap}
+
+/* ───────── Round 2: more life, more luxury ───────── */
+@property --ang{syntax:"<angle>";inherits:false;initial-value:0deg}
+body:after{content:"";position:fixed;inset:0;pointer-events:none;z-index:200;opacity:.045;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+/* spotlight that follows the pointer */
+.panel{--mx:50%;--my:0%}
+.panel:after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .35s;background:radial-gradient(420px circle at var(--mx) var(--my),#ffffff12,transparent 60%)}
+.panel:hover:after{opacity:1}
+/* rotating gradient edge on the hero cards */
+.x-now,.hero{isolation:isolate}
+.x-now:before{background:conic-gradient(from var(--ang),#b4efd9,#bbabff,#edb8d5,#f3d49b,#b4efd9);padding:1.5px;opacity:1;animation:spin 7s linear infinite}
+.x-now .x-now-go{animation:breathe-btn 3s ease-in-out infinite}
+.x-now-title{animation:rise-in .7s var(--ease) both}
+/* floating light orbs behind content */
+main:before,main:after{content:"";position:fixed;z-index:-1;border-radius:50%;filter:blur(70px);pointer-events:none;opacity:.5}
+main:before{width:340px;height:340px;left:8%;top:12%;background:#8b73e033;animation:drift 22s ease-in-out infinite}
+main:after{width:300px;height:300px;right:6%;bottom:8%;background:#4fd1b226;animation:drift 28s ease-in-out infinite reverse}
+/* base scene alive */
+.scene{animation:bob 6s ease-in-out infinite;transform-origin:50% 80%}
+.scene [fill="#fff"],.scene circle{animation:twinkle 3.2s ease-in-out infinite}
+.scene circle:nth-of-type(2n){animation-delay:-1.1s}.scene circle:nth-of-type(3n){animation-delay:-2s}
+/* streak flame / level */
+.level-emblem:before{content:"";position:absolute;inset:-4px;border-radius:21px;background:conic-gradient(from var(--ang),#bbabff00,#bbabffaa,#b4efd9aa,#bbabff00 70%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;padding:1.5px;animation:spin 5s linear infinite}
+.level-emblem{position:relative}
+/* tabs, nav, buttons */
+.nav-item:hover .nav-ico{transform:translateY(-2px) rotate(-6deg)}
+.x-subtab{position:relative}
+.x-subtab.on:after{content:"";position:absolute;left:22%;right:22%;bottom:3px;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--purple),var(--mint));animation:grow .45s var(--ease) both}
+.btn{position:relative;overflow:hidden}
+.ripple{position:absolute;border-radius:50%;pointer-events:none;background:#ffffff40;transform:scale(0);animation:ripple .65s ease-out forwards}
+.x-chip.on,.filter.selected{box-shadow:0 0 18px -6px #8deac099}
+.x-chip,.x-q,.x-subtab,.nav-item{transition:transform .25s var(--ease),background .25s,border-color .25s,box-shadow .3s}
+.x-chip:not(:disabled):hover,.x-q:not(:disabled):hover{transform:translateY(-2px) scale(1.02)}
+/* list items glide in with a short stagger on every re-render (quick, so it never feels slow) */
+.task-list>.task,.x-timeline>.x-block,.history-item,.x-note{animation:soft-in .35s var(--ease) both}
+.task-list>.task:nth-child(2),.x-timeline>*:nth-child(2){animation-delay:.04s}.task-list>.task:nth-child(3),.x-timeline>*:nth-child(3){animation-delay:.08s}.task-list>.task:nth-child(n+4),.x-timeline>*:nth-child(n+4){animation-delay:.12s}
+/* completion feedback */
+.task.done{animation:done-flash .8s ease-out}
+.toast.show{animation:toast-pop .5s cubic-bezier(.34,1.56,.64,1)}
+.confetti{box-shadow:0 0 10px currentColor}
+/* focus bar glow */
+.focus-bar{animation:glow-bar 3s ease-in-out infinite}
+.focus-time{text-shadow:0 0 24px #b4efd9aa}
+/* fact card sparkles */
+.x-fact:before{content:"✦";position:absolute;right:22px;top:16px;font-size:18px;color:#d8cfff;animation:twinkle 2.6s ease-in-out infinite}
+.x-fact:after{content:"✧";position:absolute;left:26px;bottom:18px;font-size:14px;color:#b4efd9;animation:twinkle 3.4s ease-in-out infinite -1s}
+.x-fact{animation:float-card 7s ease-in-out infinite}
+.x-q.done{animation:none}
+.x-guard:before{background:linear-gradient(160deg,#f3d49b55,transparent 40%)}
+@keyframes spin{to{--ang:360deg}}
+@keyframes drift{0%,100%{transform:translate(0,0)}33%{transform:translate(40px,-30px)}66%{transform:translate(-30px,25px)}}
+@keyframes bob{50%{transform:translateY(-5px)}}
+@keyframes twinkle{0%,100%{opacity:.35}50%{opacity:1}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:none}}
+@keyframes ripple{to{transform:scale(4);opacity:0}}
+@keyframes soft-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes done-flash{0%{background:#b4efd933}100%{background:#ffffff03}}
+@keyframes toast-pop{0%{transform:translate(-50%,16px) scale(.9)}100%{transform:translate(-50%,0) scale(1)}}
+@keyframes glow-bar{50%{box-shadow:0 15px 60px #0008,0 0 36px -8px #bbaaff88}}
+@keyframes float-card{50%{transform:translateY(-5px)}}
+@keyframes breathe-btn{50%{box-shadow:0 14px 40px -6px #8deac0cc,inset 0 1px 0 #ffffff77;transform:scale(1.015)}}
+body.calm:after,body.calm main:before,body.calm main:after{display:none}
+body.calm .scene,body.calm .x-fact,body.calm .x-fact:before,body.calm .x-fact:after,body.calm .x-now:before,body.calm .x-now .x-now-go,body.calm .focus-bar,body.calm .level-emblem:before,body.calm .x-subtab.on:after,body.calm .task-list>.task,body.calm .x-note{animation:none!important}
+@media(prefers-reduced-motion:reduce){main:before,main:after,.scene,.x-fact,.x-fact:before,.x-fact:after,.x-now:before,.x-now .x-now-go,.focus-bar,.level-emblem:before,.task-list>.task,.x-note,.x-subtab.on:after{animation:none!important}}
+
+.x-quick-form .field:first-of-type{margin-top:6px}.x-quick-form .subtext{margin:2px 0 4px}
