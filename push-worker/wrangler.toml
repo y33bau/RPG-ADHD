@@ -11,4 +11,4 @@ binding = "KV"
 
 [vars]
 ALLOWED_ORIGINS = "https://y33bau.github.io"
-VAPID_SUBJECT = "mailto:TWOJ-EMAIL@example.com"
+VAPID_SUBJECT = "https://y33bau.github.io/RPG-ADHD/"
