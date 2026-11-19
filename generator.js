@@ -15,18 +15,6 @@ export const CATALOG = {
     { t: 'Umyć łazienkę', tier: 'big', min: 30, energy: 'high', steps: ['Spryskać powierzchnie środkiem', 'Umyć umywalkę i lustro', 'Wyszorować toaletę i prysznic', 'Przetrzeć podłogę'] },
     { t: 'Generalne porządki w jednym pomieszczeniu', tier: 'big', min: 30, energy: 'high' },
   ],
-  work: [
-    { t: 'Odpisać na jednego maila', tier: 'micro', min: 5, energy: 'low' },
-    { t: 'Zadzwonić do klienta', tier: 'micro', min: 5, energy: 'low' },
-    { t: 'Zaplanować trasę oględzin na jutro', tier: 'micro', min: 5, energy: 'low' },
-    { t: 'Przejrzeć kalendarz na tydzień', tier: 'micro', min: 5, energy: 'low' },
-    { t: 'Wystawić fakturę', tier: 'micro', min: 10, energy: 'low' },
-    { t: 'Uzupełnić dokumentację zdjęciową', tier: 'normal', min: 15, energy: 'medium' },
-    { t: 'Sprawdzić księgę wieczystą', tier: 'normal', min: 15, energy: 'medium' },
-    { t: 'Uporządkować folder zlecenia', tier: 'normal', min: 15, energy: 'medium' },
-    { t: 'Dobrać nieruchomości porównawcze', tier: 'big', min: 30, energy: 'high', steps: ['Ustalić kryteria doboru', 'Wybrać kandydatów z bazy', 'Porównać cechy', 'Zapisać wnioski'] },
-    { t: 'Napisać jeden rozdział opisu', tier: 'big', min: 30, energy: 'high' },
-  ],
   self: [
     { t: 'Szklanka wody i trzy oddechy', tier: 'micro', min: 5, energy: 'low' },
     { t: 'Rozciąganie przez 5 minut', tier: 'micro', min: 5, energy: 'low' },
@@ -37,7 +25,7 @@ export const CATALOG = {
   ],
 };
 
-export const AREAS = [['life', 'Dom'], ['work', 'Praca'], ['self', 'Dla siebie']];
+export const AREAS = [['life', 'Dom'], ['self', 'Dla siebie']];
 
 /** Chores that can be logged in one tap. Each earns the normal reward of its size. */
 export const QUICK = [
@@ -47,11 +35,12 @@ export const QUICK = [
   { id: 'q-vacuum', title: 'Odkurzanie', category: 'life', tier: 'normal' },
   { id: 'q-cook', title: 'Ugotowanie obiadu', category: 'life', tier: 'normal' },
   { id: 'q-bath', title: 'Sprzątanie łazienki', category: 'life', tier: 'big' },
-  { id: 'q-call', title: 'Telefon do klienta', category: 'work', tier: 'micro' },
-  { id: 'q-mail', title: 'Odpowiedź na maila', category: 'work', tier: 'micro' },
-  { id: 'q-docs', title: 'Porządkowanie dokumentów', category: 'work', tier: 'normal' },
-  { id: 'q-visit', title: 'Oględziny nieruchomości', category: 'work', tier: 'big' },
-  { id: 'q-report', title: 'Praca nad operatem', category: 'work', tier: 'big' },
+  { id: 'q-shop', title: 'Zakupy', category: 'life', tier: 'normal' },
+  { id: 'q-plants', title: 'Podlanie kwiatów', category: 'life', tier: 'micro' },
+  { id: 'q-tidy', title: 'Szybki porządek w jednym miejscu', category: 'life', tier: 'micro' },
+  { id: 'q-stretch', title: 'Rozciąganie', category: 'self', tier: 'micro' },
+  { id: 'q-callfam', title: 'Telefon do bliskiej osoby', category: 'self', tier: 'micro' },
+  { id: 'q-read', title: 'Czytanie przez 15 minut', category: 'self', tier: 'normal' },
   { id: 'q-walk', title: 'Spacer', category: 'self', tier: 'normal' },
 ];
 

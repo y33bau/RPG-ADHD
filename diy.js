@@ -9,5 +9,5 @@ export const DIY = [
   { id: 'bundle', title: 'Nagroda razem z nudnym zadaniem', why: 'Połączenie nudy z przyjemnością ułatwia start.', steps: ['Wybierz przyjemność, np. ulubiony podcast', 'Pozwól sobie na nią tylko podczas tego zadania', 'Zacznij zadanie razem z włączeniem podcastu'] },
   { id: 'paper-box', title: 'Pudełko „do podpisu i wysłania”', why: 'Papiery bez domu zalegają na biurku i rosną.', steps: ['Postaw otwarte pudełko na biurku', 'Wrzucaj do niego wszystko, co czeka na decyzję', 'Raz w tygodniu opróżnij je w 15 minut'] },
   { id: 'next-step', title: 'Zapisz następny krok przed zakończeniem pracy', why: 'Jutro wystarczy przeczytać jedno zdanie i ruszyć.', steps: ['Przed wyjściem od biurka napisz, od czego zaczniesz', 'Zostaw kartkę na klawiaturze', 'Rano zacznij dokładnie od tego'] },
-  { id: 'body-double', title: 'Praca „obok kogoś”', why: 'Obecność drugiej osoby (nawet w ciszy) pomaga wytrwać.', steps: ['Umów się z kimś na wspólną godzinę pracy', 'Każdy robi swoje, kamerka lub ten sam pokój', 'Na koniec jedno zdanie, co się udało'] },
+  { id: 'body-double', title: 'Skupienie „obok kogoś”', why: 'Obecność drugiej osoby (nawet w ciszy) pomaga wytrwać.', steps: ['Umów się z kimś na wspólną godzinę skupienia', 'Każdy robi swoje, kamerka lub ten sam pokój', 'Na koniec jedno zdanie, co się udało'] },
 ];

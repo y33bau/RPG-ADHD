@@ -44,7 +44,7 @@ export function focusStats(state) {
 }
 
 export const ATTRIBUTES = [
-  { id: 'work', name: 'Intelekt', note: 'Praca i zawodowe kroki' },
+  { id: 'work', name: 'Intelekt', note: 'Starsze zadania z kategorii „Praca”' },
   { id: 'life', name: 'Wigor', note: 'Życie, dom, sprawy' },
   { id: 'self', name: 'Wytrwałość', note: 'Rzeczy dla siebie' },
 ];

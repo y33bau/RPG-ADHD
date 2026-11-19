@@ -388,13 +388,13 @@ const quickItems = () => GEN.QUICK.concat(extra.quick || []);
 
 export function quickView(state) {
   const day = today(), done = q => state.tasks.some(t => t.title === q.title && t.date === day && C.completion(state, t, day));
-  const groups = [['life', 'Dom'], ['work', 'Praca'], ['self', 'Dla siebie']];
-  return '<section class="panel x-intro"><div class="section-line"><div><div class="eyebrow">JEDNO DOTKNIĘCIE</div><h2>Szybkie punkty</h2></div></div><p class="subtext">Zrobiłeś coś w domu albo w pracy? Zapisz to i odbierz punkty. Każdą czynność możesz zapisać raz dziennie.</p></section>' +
+  const groups = [['life', 'Dom'], ['self', 'Dla siebie']];
+  return '<section class="panel x-intro"><div class="section-line"><div><div class="eyebrow">JEDNO DOTKNIĘCIE</div><h2>Szybkie punkty</h2></div></div><p class="subtext">Zrobiłeś coś w domu albo dla siebie? Zapisz to i odbierz punkty. Każdą czynność możesz zapisać raz dziennie.</p></section>' +
     groups.map(([cat, label]) => '<section class="panel"><div class="section-line"><h3>' + label + '</h3></div><div class="x-quick">' + quickItems().filter(q => q.category === cat).map(q => {
       const t = C.TIERS[q.tier], d = done(q);
       return '<button class="x-q' + (d ? ' done' : '') + '" data-action="x-quick" data-id="' + esc(q.id) + '" ' + (d ? 'disabled' : '') + '><span class="x-q-title">' + (d ? '✓ ' : '') + esc(q.title) + '</span><small>+' + t.xp + ' XP · +' + t.coins + ' monet</small></button>';
     }).join('') + '</div></section>').join('') +
-    '<section class="panel"><div class="section-line"><h3>Własna czynność</h3></div><form id="x-quick-form" class="x-quick-form"><label class="field">Nazwa<input name="title" maxlength="60" required placeholder="Np. Podlanie kwiatów"></label><div class="x-quick-row"><label class="field">Obszar<select name="category"><option value="life">Dom</option><option value="work">Praca</option><option value="self">Dla siebie</option></select></label><label class="field">Wielkość<select name="tier"><option value="micro">Mały krok</option><option value="normal" selected>Zadanie</option><option value="big">Wyzwanie</option></select></label></div><button class="btn primary" type="submit">＋ Dodaj do listy</button></form>' +
+    '<section class="panel"><div class="section-line"><h3>Własna czynność</h3></div><form id="x-quick-form" class="x-quick-form"><label class="field">Nazwa<input name="title" maxlength="60" required placeholder="Np. Podlanie kwiatów"></label><div class="x-quick-row"><label class="field">Obszar<select name="category"><option value="life">Dom</option><option value="self">Dla siebie</option></select></label><label class="field">Wielkość<select name="tier"><option value="micro">Mały krok</option><option value="normal" selected>Zadanie</option><option value="big">Wyzwanie</option></select></label></div><button class="btn primary" type="submit">＋ Dodaj do listy</button></form>' +
     ((extra.quick || []).length ? '<div class="x-chips" style="margin-top:12px">' + extra.quick.map(q => '<button class="x-chip" data-action="x-quick-del" data-id="' + esc(q.id) + '" aria-label="Usuń czynność ' + esc(q.title) + '">' + esc(q.title) + ' ×</button>').join('') + '</div>' : '') + '</section>';
 }
 
@@ -451,7 +451,7 @@ export function init(ctx, doc = globalThis.document) {
       if (id === 'x-split-form') {
         const title = String(data.get('title') || '').trim();
         if (!title) return;
-        ctx.state().tasks.push(C.makeTask({ title, tier: 'big', category: 'work', steps: GEN.breakdown(title) }));
+        ctx.state().tasks.push(C.makeTask({ title, tier: 'big', category: 'life', steps: GEN.breakdown(title) }));
         ctx.save(); ctx.render(); ctx.toast('Gotowe. Zadanie czeka w planie z małymi krokami.');
       }
       if (id === 'x-quick-form') {
@@ -459,7 +459,7 @@ export function init(ctx, doc = globalThis.document) {
         if (!title) return;
         extra.quick ??= [];
         if (extra.quick.length >= 20) throw Error('Możesz mieć maksymalnie 20 własnych czynności.');
-        const category = ['life', 'work', 'self'].includes(data.get('category')) ? data.get('category') : 'life';
+        const category = ['life', 'self'].includes(data.get('category')) ? data.get('category') : 'life';
         const tier = Object.hasOwn(C.TIERS, data.get('tier')) ? data.get('tier') : 'normal';
         extra.quick.push({ id: 'u-' + C.uid(), title, category, tier });
         saveExtra(); ctx.render(); ctx.toast('Dodane do szybkich punktów.');
