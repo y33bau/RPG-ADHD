@@ -1,24 +1,25 @@
 # Usługa push dla SYNAPSE (Cloudflare Workers)
 
+Działa jako worker **agent-synapse-push**: `https://agent-synapse-push.ad-szelag.workers.dev`.
 Wysyła przypomnienia (woda, mały krok), gdy aplikacja jest zamknięta. Przechowuje tylko identyfikator urządzenia, subskrypcję push i harmonogram. Nie zna Twoich zadań.
 
-## Wdrożenie bez terminala (przez panel Cloudflare)
+## Co jest w Cloudflare
 
-1. Scal gałąź z aplikacją do `main` w GitHubie.
-2. Cloudflare → **Workers & Pages** → **Create** → **Import a repository** → wybierz `RPG-ADHD`.
-3. Jako **Root directory** wpisz `push-worker`. Zatwierdź i poczekaj na pierwsze wdrożenie (Cloudflare sam utworzy magazyn KV).
-4. `VAPID_SUBJECT` w `wrangler.toml` wskazuje adres aplikacji, więc nie trzeba tam wpisywać e-maila.
-5. Worker → **Settings** → **Variables and Secrets** → dodaj **Secret** o nazwie `API_TOKEN`. Wymyśl losowy tekst, minimum 24 znaki, i go zapisz.
-6. Skopiuj adres workera (`https://synapse-push.TWOJA-NAZWA.workers.dev`).
+- **KV** `agent-synapse-subscriptions` (powiązanie `SUBSCRIPTIONS`): subskrypcje urządzeń.
+- **Zmienna** `ALLOWED_ORIGIN = https://y33bau.github.io`: tylko ta strona może rozmawiać z usługą.
+- **Sekrety:** `PUSH_ACCESS_TOKEN` (klucz wpisywany w aplikacji), `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`.
+- **Cron:** co 5 minut sprawdza harmonogramy i wysyła powiadomienia.
 
 ## Podłączenie w aplikacji
 
-Ustawienia → Powiadomienia i przypomnienia → Push przy zamkniętej aplikacji. Wklej adres i `API_TOKEN`, naciśnij **Połącz push**. Na iPhonie aplikacja musi być dodana do ekranu początkowego.
+Więcej → Ustawienia → Ustawienia i kopie danych → Push przy zamkniętej aplikacji. Wpisz adres usługi i `PUSH_ACCESS_TOKEN`, naciśnij **Połącz push**. Na iPhonie aplikacja musi być dodana do ekranu początkowego.
 
-## Jak to działa
+## Wdrożenie poprawek
 
-- Klucze VAPID tworzą się same przy pierwszym użyciu i leżą w Twoim KV.
-- Co 5 minut zadanie cron sprawdza harmonogramy i wysyła powiadomienia zaszyfrowane zgodnie z RFC 8291.
-- Wygasłe subskrypcje są usuwane automatycznie.
-- Pozwolone źródło zapytań to `ALLOWED_ORIGINS` (domyślnie Twoja strona na GitHub Pages).
-- Testy: `node --test push-worker/worker.test.mjs`.
+Ten plik to kopia kodu działającego w Cloudflare. Najprościej: panel Cloudflare → worker → **Edit code**, wklej zawartość `worker.js` wraz z funkcjami z `../notification-core.js` i kliknij **Deploy**. Z terminala: `npx wrangler deploy` w tym folderze.
+
+## Historia błędu (20.11.2026)
+
+Pierwsza wersja używała biblioteki `web-push` dla Node i opcji `redirect: "error"`, której Workers nie obsługują. Każda wysyłka kończyła się błędem. Obecna wersja używa tylko WebCrypto i `redirect: "manual"`.
+
+Testy: `node --test push-worker/worker.test.mjs`.

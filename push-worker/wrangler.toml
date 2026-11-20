@@ -1,14 +1,17 @@
-name = "synapse-push"
+# Deployed by hand as "agent-synapse-push" (https://agent-synapse-push.ad-szelag.workers.dev).
+name = "agent-synapse-push"
 main = "worker.js"
-compatibility_date = "2025-01-01"
+compatibility_date = "2026-11-01"
 
 [triggers]
 crons = ["*/5 * * * *"]
 
-# Cloudflare creates this KV namespace on the first deploy.
 [[kv_namespaces]]
-binding = "KV"
+binding = "SUBSCRIPTIONS"
+id = "26ad1a2232f04befac77559b2965d563"
 
 [vars]
-ALLOWED_ORIGINS = "https://y33bau.github.io"
-VAPID_SUBJECT = "https://y33bau.github.io/RPG-ADHD/"
+ALLOWED_ORIGIN = "https://y33bau.github.io"
+
+# Secrets (set in the dashboard or with `wrangler secret put`, never in this file):
+# PUSH_ACCESS_TOKEN, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_SUBJECT
