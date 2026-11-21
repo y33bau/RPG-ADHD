@@ -53,6 +53,7 @@ export function weekSummary(state, now = Date.now()) {
     activeDays: days.filter(d => perDay[d] > 0).length,
     best: perDay[best] ? { day: best, name: DAY_NAMES[new Date(best + 'T12:00:00').getDay()], count: perDay[best] } : null,
     proud: proud ? proud.e.title : null,
+    carry: carryOver(state, now),
   };
 }
 
@@ -63,3 +64,14 @@ export const summaryDue = (seenWeek, now = Date.now()) => [0, 1].includes(new Da
 
 /** Existing users skip onboarding: anyone with tasks or history already knows the app. */
 export const needsOnboarding = (state, extra) => !extra.onboarded && !state.tasks.length && state.ledger.length <= 1;
+
+/** One-off tasks that are due (today or earlier) and still open: they move on to the next week. */
+export function carryOver(state, now = Date.now()) {
+  const day = C.dayKey(now);
+  return state.tasks.filter(t => !t.archived && t.repeat === 'none' && t.date <= day && !C.completion(state, t, day)).map(t => t.title);
+}
+
+/** The week a new goal is for: on Sunday it is already the coming week. */
+export const goalWeek = (now = Date.now()) => weekKey(now + (new Date(now).getDay() === 0 ? 86400000 : 0));
+/** The goal to show now: set for this week, or (on Sunday) already for the next one. */
+export const activeGoal = (goal, now = Date.now()) => goal?.text && (goal.week === weekKey(now) || goal.week === goalWeek(now)) ? goal.text : '';

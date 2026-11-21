@@ -37,11 +37,24 @@ export function buildPlan(state, { minutes = 120, now = Date.now(), maxTasks = 6
   return { blocks, planned, total: list.length, left: list.length - planned, energy };
 }
 
+/** Part of the day by local hour: morning 5–12, afternoon 12–18, evening otherwise. */
+export function momentOf(now = Date.now()) { const h = new Date(now).getHours(); return h >= 5 && h < 12 ? 'morning' : h >= 12 && h < 18 ? 'afternoon' : 'evening'; }
+const MOMENT_FIT = { morning: { work: 2, life: 1, self: 0 }, afternoon: { work: 1, life: 1, self: 1 }, evening: { work: 0, life: 1, self: 2 } };
+const MOMENT_NOTE = { morning: 'dobre na poranek', afternoon: '', evening: 'dobre na wieczór' };
+/** How well a task fits this part of the day (higher is better). */
+export function fit(moment, task) { return MOMENT_FIT[moment]?.[task.category] ?? 1; }
+
 /** One single thing to do right now: open tasks first (in planner order), then fresh ideas. `skip` cycles through the options. */
 export function nextThing(state, { skip = 0, now = Date.now(), names = {} } = {}) {
   const day = C.dayKey(now);
   const byId = new Map(state.tasks.map(t => [t.id, t]));
+  const moment = momentOf(now);
   const options = buildPlan(state, { minutes: 24 * 60, now, maxTasks: 50 }).blocks.filter(b => b.type === 'task').map(b => ({ kind: 'task', task: byId.get(b.taskId), title: b.title, tier: b.tier }));
+  // Time of day: overdue things stay first, then what fits the moment (work in the morning, home and self in the evening).
+  const overdue = t => t.repeat === 'none' && t.date < day;
+  const late = o => (overdue(o.task) ? 0 : 1);
+  options.sort((a, b) => late(a) - late(b) || fit(moment, b.task) - fit(moment, a.task));
+  for (const o of options) o.why = overdue(o.task) ? 'czeka od ' + o.task.date.slice(8) + '.' + o.task.date.slice(5, 7) : fit(moment, o.task) > 0 ? MOMENT_NOTE[moment] : '';
   const seed = [...day].reduce((a, c) => a + c.charCodeAt(0), 0);
   const energy = state.minimum ? 'low' : state.energy || 'medium';
   for (const area of ['life', 'family', 'self']) for (const idea of suggest({ area, minutes: 15, energy, count: 2, seed, names })) options.push({ kind: 'idea', idea, area, title: idea.t, tier: idea.tier });

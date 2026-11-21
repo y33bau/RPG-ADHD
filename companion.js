@@ -2,7 +2,7 @@ import * as C from './core.js';
 import {companion as app} from './app-bridge.js';
 import {extra,saveExtra,reloadExtra} from './extra-store.js';
 import {pickTask,radar,funnel,phoneUrl,appendNote} from './companion-core.js';
-const ADHD=document.documentElement.dataset.product==='adhd',KEY=(ADHD?'adhd':'agent')+'_companion_v1';
+const ADHD=document.documentElement.dataset.product==='adhd',KEY=(ADHD?'adhd':'agent')+(globalThis.SYNAPSE_DEMO?'_companion_demo_v1':'_companion_v1');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let picked=null,sprint=[],cursor=0,field=false,recorder,recording=false,recordingUrl;
 function dialog(title,body){let d=document.getElementById('companion-dialog');d?.remove();d=document.createElement('dialog');d.id='companion-dialog';d.innerHTML='<div class="modal-head"><h2>'+esc(title)+'</h2><button class="btn" data-co="close">Zamknij</button></div>'+body;document.body.append(d);d.showModal();return d;}

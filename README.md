@@ -21,6 +21,15 @@ Osobista aplikacja produktywności z lekką warstwą RPG. Po polsku, na telefon 
 
 To narzędzie organizacyjne, nie pomiar dopaminy ani aplikacja medyczna. Tryb skupienia nie blokuje innych stron i aplikacji. Odpoczynek i podstawowe potrzeby nie wymagają monet.
 
+## Nowości w 3.4
+
+- **Tryb pokazowy**: `?demo=1` na końcu adresu (albo Ustawienia → Tryb pokazowy) otwiera aplikację z przykładowymi danymi. Twoje dane, kopie i synchronizacja zostają nietknięte; „Wyjdź” wraca do nich.
+- **„Co teraz?” według pory dnia**: rano najpierw praca, wieczorem dom i rzeczy dla siebie; zaległe jednorazowe zadania zawsze na początku.
+- **„Nie mogę ruszyć”**: pierwsza opcja to 2 minuty z nazwanym pierwszym krokiem.
+- **Podsumowanie tygodnia**: co przechodzi dalej, jeden cel na tydzień (widoczny na ekranie Dzisiaj) i obrazek „Mój tydzień” do udostępnienia.
+- **Przypomnienia o stałych porach** (np. 9:00 i 20:00). Push przy zamkniętej aplikacji wymaga zaktualizowania workera (`push-worker/worker.js`).
+- **Testy wyglądu**: `npm run test:ui` (Playwright, opcjonalnie axe-core) sprawdza każdy ekran na telefonie i komputerze i zapisuje zrzuty w `tests-ui/screenshots/`.
+
 ## Używanie
 
 Otwórz aplikację z hostingu HTTPS, np. GitHub Pages. Repozytorium jest statyczne: publikuj katalog główny, bez kompilacji.

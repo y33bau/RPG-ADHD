@@ -377,7 +377,7 @@ export function nowCard(state) {
   if (!n) return '';
   const done = n.kind === 'task' ? '<button class="btn" data-action="complete" data-id="' + esc(n.task.id) + '">Już zrobione ✓</button><button class="btn link" data-action="help" data-id="' + esc(n.task.id) + '">Nie mogę ruszyć</button>' : '';
   return '<section class="panel x-now">' + iskraSays(state) + '<div class="eyebrow">CO TERAZ?</div><h2 class="x-now-title">' + esc(n.title) + '</h2>' +
-    '<p class="x-now-meta">' + TIER_LABEL[n.tier] + ' · zaczynasz od 5 minut' + (n.kind === 'idea' ? ' · nowy pomysł' : '') + '</p>' +
+    '<p class="x-now-meta">' + TIER_LABEL[n.tier] + (n.why ? ' · ' + esc(n.why) : '') + ' · zaczynasz od 5 minut' + (n.kind === 'idea' ? ' · nowy pomysł' : '') + '</p>' +
     '<button class="btn primary x-now-go" data-action="x-now-start">▶ Zaczynam</button>' +
     '<div class="x-note-actions x-now-more"><button class="btn" data-action="x-now-next">Inna rzecz ↻</button>' + done + '</div><div class="x-now-links"><button class="btn link" data-action="already">＋ Już coś zrobiłem</button><button class="btn link" data-action="x-focus-open">◷ Samo skupienie</button></div></section>';
 }
@@ -498,7 +498,8 @@ function weekTeaser() {
 /** The "Now" tab: one thing to do, plus at most two small hints. */
 export function nowView(state) {
   if (state.focus || focusOpen) return (state.focus ? '' : '<button class="btn link x-back" data-action="x-focus-close">← Wróć do „Co teraz?”</button>') + focusView(state);
-  return weekTeaser() + nowCard(state) + ritualTeaser() + thoughtCard();
+  const goal = D.activeGoal(extra.weekGoal);
+  return weekTeaser() + (goal ? '<button class="x-goal-line" data-go="history:overview"><span aria-hidden="true">◎</span> Cel tygodnia: <strong>' + esc(goal) + '</strong></button>' : '') + nowCard(state) + ritualTeaser() + thoughtCard();
 }
 
 /* ───────────── Island ───────────── */
@@ -533,7 +534,10 @@ export function weekCard(state, { force = false } = {}) {
     '<div class="x-week-bars" aria-hidden="true">' + w.days.map(d => '<div class="x-week-bar"><i style="--h:' + Math.round(100 * w.perDay[d] / max) + '%"></i><small>' + short[new Date(d + 'T12:00:00').getDay()] + '</small></div>').join('') + '</div>' +
     '<div class="stats x-week-stats"><div class="stat"><strong>' + w.completed + '</strong><small>ukończone</small></div><div class="stat"><strong>' + w.focusMinutes + '</strong><small>min skupienia</small></div><div class="stat"><strong>' + w.activeDays + '/7</strong><small>aktywne dni</small></div></div>' +
     (w.best ? '<p class="subtext">Najlepszy dzień: <strong>' + w.best.name + '</strong> (' + w.best.count + ' ' + plural(w.best.count, 'krok', 'kroki', 'kroków') + ').</p>' : '<p class="subtext">W tym tygodniu było spokojnie. To też jest w porządku.</p>') +
-    (w.proud ? '<p class="x-week-proud">✦ Możesz być dumny z: <strong>' + esc(w.proud) + '</strong></p>' : '') + '</section>';
+    (w.proud ? '<p class="x-week-proud">✦ Możesz być dumny z: <strong>' + esc(w.proud) + '</strong></p>' : '') +
+    (w.carry.length ? '<p class="subtext x-week-carry">Przechodzi na kolejny tydzień (' + w.carry.length + '): ' + w.carry.slice(0, 3).map(esc).join(', ') + (w.carry.length > 3 ? ' i ' + (w.carry.length - 3) + ' ' + plural(w.carry.length - 3, 'inna', 'inne', 'innych') : '') + '. Bez długu, po prostu dalej.</p>' : '') +
+    '<form id="x-week-goal" class="x-week-goal"><label for="x-week-goal-input">Jeden cel na ' + (new Date().getDay() === 0 ? 'nowy' : 'ten') + ' tydzień</label><div class="x-inline"><input id="x-week-goal-input" name="goal" maxlength="120" placeholder="Np. dokończyć prezentację" value="' + esc(D.activeGoal(extra.weekGoal)) + '" autocomplete="off"><button class="btn" type="submit">Zapisz</button></div></form>' +
+    '<div class="x-note-actions x-week-actions"><button class="btn" data-action="x-week-share">↗ Zapisz obrazek tygodnia</button></div></section>';
 }
 
 /* ───────────── First run ───────────── */
@@ -657,6 +661,11 @@ export function init(ctx, doc = globalThis.document) {
         const title = String(data.get('title') || '').trim().slice(0, 120);
         if (title) finishOnboarding(ctx, title);
       }
+      if (id === 'x-week-goal') {
+        const text = String(data.get('goal') || '').trim().slice(0, 120);
+        if (text) extra.weekGoal = { week: D.goalWeek(), text }; else delete extra.weekGoal;
+        saveExtra(); ctx.render(); ctx.toast(text ? 'Cel tygodnia zapisany. Zobaczysz go na ekranie Dzisiaj.' : 'Cel tygodnia usunięty.');
+      }
       if (id === 'x-iskra-name') {
         const v = String(data.get('name') || '').trim().slice(0, 20);
         if (v && v !== 'Iskra') extra.iskraName = v; else delete extra.iskraName;
@@ -737,6 +746,7 @@ export function init(ctx, doc = globalThis.document) {
         case 'x-focus-close': focusOpen = false; ctx.render(); break;
         case 'x-ritual': ritualToggle(ctx, b.dataset.kind, b.dataset.item); break;
         case 'x-ritual-close': { const day = D.ritualDay(); extra.rituals[day] ??= {}; extra.rituals[day][b.dataset.kind + 'Closed'] = true; saveExtra(); ctx.render(); break; }
+        case 'x-week-share': import('./share.js').then(m => m.shareWeek(ctx.state(), { name: ctx.state().settings?.name || '' })).then(r => { if (r === 'downloaded') ctx.toast('Obrazek zapisany. Znajdziesz go w pobranych plikach.'); }).catch(() => ctx.toast('Nie udało się przygotować obrazka.')); break;
         case 'x-week-close': extra.prefs.weekSeen = D.summaryWeek(); saveExtra(); ctx.render(); break;
         case 'x-more': extra.prefs.planMore = !extra.prefs.planMore; saveExtra(); ctx.render(); break;
         case 'x-ob-skip': extra.onboarded = true; onboardStep = 0; saveExtra(); ctx.render(); break;

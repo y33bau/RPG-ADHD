@@ -120,8 +120,8 @@ export default {
         const schedule = validateReminders({ ...body.schedule, last: {} }, body.app);
         const old = await env.SUBSCRIPTIONS.get(id, 'json');
         const last = old?.app === body.app ? old.schedule.last : {};
-        const { enabled, water, work, start, end, waterEvery, workEvery, weekdays, zone } = schedule;
-        const entry = { app: body.app, subscription: body.subscription, schedule: { enabled, water, work, start, end, waterEvery, workEvery, weekdays, zone, last }, hydratedDay: /^\d{4}-\d{2}-\d{2}$/.test(body.hydratedDay || '') ? body.hydratedDay : null, updatedAt: Date.now() };
+        const { enabled, water, work, start, end, waterEvery, workEvery, weekdays, times, zone } = schedule;
+        const entry = { app: body.app, subscription: body.subscription, schedule: { enabled, water, work, start, end, waterEvery, workEvery, weekdays, times, zone, last }, hydratedDay: /^\d{4}-\d{2}-\d{2}$/.test(body.hydratedDay || '') ? body.hydratedDay : null, updatedAt: Date.now() };
         await env.SUBSCRIPTIONS.put(id, JSON.stringify(entry), { expirationTtl: TTL });
         return json({ ok: true }, 200, origin);
       }
