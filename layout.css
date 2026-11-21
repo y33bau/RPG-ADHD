@@ -1,0 +1,80 @@
+/* SYNAPSE 3.3: layout and header.
+   Loaded last. One page header pattern for every tab, a symmetric phone top bar
+   (settings · logo · sounds), even sub-tabs and spacing that lines up with the page edges. */
+:root{--gutter:24px;--bar-btn:42px}
+@media(max-width:620px){:root{--gutter:16px}}
+
+/* Sound icon: equaliser bars of different heights, so it does not read as "…". */
+.amb-bars{height:14px}
+.amb-bars i:nth-child(1){height:6px}.amb-bars i:nth-child(2){height:12px}.amb-bars i:nth-child(3){height:8px}.amb-bars i:nth-child(4){height:14px}
+
+/* Programmatic focus on <main> after switching tabs must not draw a frame around the page. */
+main:focus{outline:none}
+main:focus-visible{outline:none}
+
+/* ── Page header: title = menu label, one short line under it ── */
+.page-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin:0 0 20px}
+.page-title{min-width:0}
+.page-heading h1{margin:0;font-size:clamp(30px,4vw,40px);line-height:1.05;letter-spacing:-.035em}
+.page-heading .subtext{margin:8px 0 0;font-size:14px;line-height:1.45;color:#b4acd6;max-width:52ch}
+.page-heading .eyebrow{display:none}
+.page-heading>.btn{flex:none}
+
+/* ── Sub-tabs: equal segments that always fit, no hidden tab behind the edge ── */
+.x-subtabs{display:flex;gap:4px;margin:0 0 20px;overflow:visible}
+.x-subtab{flex:1 1 0;min-width:0;padding:9px 6px;font-size:13px;overflow:hidden;text-overflow:ellipsis}
+.x-subtab.on:after{left:30%;right:30%}
+
+/* ── Footer: one quiet line, desktop only ── */
+.page-footer{display:block;text-align:center;font-size:11px;letter-spacing:.04em;color:#6f6894;margin:40px auto 20px;padding-top:18px}
+
+/* ── Phone and tablet ── */
+@media(max-width:850px){
+ .workspace{padding-top:0;padding-left:max(var(--gutter),env(safe-area-inset-left,0px));padding-right:max(var(--gutter),env(safe-area-inset-right,0px))}
+ main{padding-top:14px}
+
+ /* Top bar: three equal zones, logo exactly in the middle. */
+ .appbar{display:grid;grid-template-columns:var(--bar-btn) 1fr var(--bar-btn);align-items:center;gap:12px;
+   margin:0 calc(-1 * var(--gutter)) 0;padding:calc(10px + env(safe-area-inset-top)) var(--gutter) 10px;
+   background:linear-gradient(180deg,#0d0a1ff5 0%,#0d0a1fd9 75%,#0d0a1f00 100%)}
+ .appbar-brand{justify-self:center;gap:9px;font-size:13px;letter-spacing:.28em;padding-left:.28em}
+ .appbar-brand .brand-symbol{width:30px;height:30px;border-radius:10px;font-size:16px;color:#fff}
+ .appbar-btn,.amb-host[data-host="top"] .amb-btn{width:var(--bar-btn);height:var(--bar-btn);border-radius:50%;display:grid;place-items:center;padding:0;
+   color:#e6dcff;background:linear-gradient(145deg,#241d4d,#15122f);border:1px solid #ff6ac833;box-shadow:0 8px 22px -12px #000c,inset 0 1px 0 #ffffff14;cursor:pointer;transition:transform .2s,box-shadow .3s}
+ .appbar-btn:active,.amb-host[data-host="top"] .amb-btn:active{transform:scale(.94)}
+ .appbar-btn:hover{box-shadow:0 8px 22px -12px #000c,0 0 0 1px #ff6ac866}
+ .amb-host[data-host="top"]{justify-self:end;width:var(--bar-btn);height:var(--bar-btn)}
+ .amb-host[data-host="top"] .amb-pop{top:52px;right:0;left:auto}
+ /* Sound icon reads as an equaliser, not as "…" */
+ .amb-host[data-host="top"] .amb-bars{height:14px;gap:2.5px}
+ .amb-host[data-host="top"] .amb-bars i{display:block;width:2.5px}
+ .filter-row{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-left:calc(-1 * var(--gutter));margin-right:calc(-1 * var(--gutter));padding:2px var(--gutter)}
+ .filter-row::-webkit-scrollbar{display:none}
+ .filter-row .filter{flex:none}
+
+ .x-subtabs{top:calc(62px + env(safe-area-inset-top));margin-left:0;margin-right:0}
+ .page-heading{margin-top:4px}
+ .page-heading h1{font-size:32px}
+ .page-heading .subtext{font-size:13.5px}
+ /* The big + in the bottom dock adds tasks on the phone, so the header button would only repeat it. */
+ .page-heading>.page-add{display:none}
+ .page-footer{display:none}
+}
+@media(max-width:380px){.x-subtab{font-size:12px;padding:9px 4px}}
+
+/* ── Island buildings on a phone: one tidy row per building instead of three squeezed columns ── */
+@media(max-width:620px){
+ main .room-grid,main .x-island~.room-grid,main .x-rooms-head+.room-grid{grid-template-columns:1fr;gap:10px}
+ main .room-grid .room-card{display:grid;grid-template-columns:40px 1fr auto;grid-template-areas:"sym name btn" "sym meta btn";align-items:center;column-gap:14px;row-gap:3px;text-align:left;padding:14px 14px 14px 16px}
+ main .room-grid .room-symbol{grid-area:sym;height:auto;margin:0;font-size:26px}
+ main .room-grid .room-card h2{grid-area:name;margin:0;font-size:16px;text-align:left}
+ main .room-grid .room-card .eyebrow{grid-area:meta;margin:0;text-align:left}
+ main .room-grid .room-level,main .room-grid .room-card p{display:none}
+ main .room-grid .room-card .btn{grid-area:btn;width:auto;min-width:104px;padding:8px 12px}
+}
+
+/* ── Desktop: header aligned with the content column ── */
+@media(min-width:851px){
+ main{padding-top:40px}
+ .page-heading{margin-bottom:24px}
+}

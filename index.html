@@ -15,6 +15,7 @@
 <link rel="stylesheet" href="./extras.css">
 <link rel="stylesheet" href="./polish.css">
 <link rel="stylesheet" href="./nav.css">
+<link rel="stylesheet" href="./layout.css">
 <script type="module" src="./app.js"></script><script type="module" src="./notifications.js"></script>
 <script type="module" src="./updates.js"></script><script type="module" src="./features.js"></script><script type="module" src="./companion.js"></script><script type="module" src="./sync.js"></script><script type="module" src="./storage-guard.js"></script></head>
 <body>
@@ -35,10 +36,10 @@
 <button class="settings-button" data-action="settings">⚙ <span>Ustawienia i kopia danych</span></button>
 </aside>
 <div class="workspace">
-<header class="appbar"><a class="appbar-brand" href="./"><span class="brand-symbol">✳</span><span>SYNAPSE</span></a><div class="amb-host" data-host="top"></div></header>
+<header class="appbar"><button class="appbar-btn" data-action="settings" aria-label="Ustawienia i kopia danych"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button><a class="appbar-brand" href="./" aria-label="SYNAPSE, strona główna"><span class="brand-symbol" aria-hidden="true">✳</span><span>SYNAPSE</span></a><div class="amb-host" data-host="top"></div></header>
 
 <main id="main" tabindex="-1"></main>
-<footer class="page-footer">Twój rytm. Twoje małe zwycięstwa. <span>SYNAPSE / 02</span></footer>
+<footer class="page-footer">SYNAPSE · Twój rytm. Twoje małe zwycięstwa.</footer>
 </div>
 </div>
 <button class="mobile-add" data-action="add" aria-label="Dodaj zadanie">+</button>
