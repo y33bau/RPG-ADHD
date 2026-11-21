@@ -79,9 +79,10 @@ function todayView(){
  const ob=notice?'':X.onboarding(state);if(ob)return '<div class="x-ob-wrap">'+ob+'</div>';
  return heading('Dzisiaj',greeting(),true)+
   (notice?'<p class="return-note">'+esc(notice)+'</p>':'')+
-  X.subnav('today',sub.today,!!state.settings.minimal)+subBody('today',{now:()=>X.nowView(state),plan:planBody,ritual:()=>X.ritualView(state)})+
-  // Date and weather sit below the main card: "Co teraz?" is the first thing on the screen.
-  '<div data-life-slot id="slot-weather"></div>';
+  X.subnav('today',sub.today,!!state.settings.minimal)+
+  // Date and weather: a slim strip right under the first tab, so it is visible without scrolling.
+  (X.currentSub('today',sub.today,!!state.settings.minimal)==='now'?'<div data-life-slot id="slot-weather" class="weather-strip-slot"></div>':'')+
+  subBody('today',{now:()=>X.nowView(state),plan:planBody,ritual:()=>X.ritualView(state)});
 
 }
 function taskList(){

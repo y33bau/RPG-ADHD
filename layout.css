@@ -78,3 +78,35 @@ main:focus-visible{outline:none}
  main{padding-top:40px}
  .page-heading{margin-bottom:24px}
 }
+
+/* ── Date and weather: slim strip under the first tab of Dzisiaj ── */
+.weather-strip-slot{margin:0 0 14px}
+#slot-weather .dashboard-weather{position:relative;grid-template-columns:minmax(0,1fr) auto 34px;gap:2px 12px;padding:10px 10px 10px 16px;border-radius:18px}
+#slot-weather .dashboard-weather h2{font-size:15px;line-height:1.25}
+#slot-weather .dashboard-weather p{margin:1px 0 0;font-size:12px}
+#slot-weather #life-weather{font-size:11px;line-height:1.25}
+#slot-weather #life-weather strong{font-size:18px;font-weight:650;color:#fff}
+#slot-weather .dashboard-weather details{grid-column:auto;position:static}
+#slot-weather .dashboard-weather summary{list-style:none;width:34px;height:34px;padding:0;border-radius:50%;display:grid;place-items:center;font-size:0;color:#cfc5ff;background:#ffffff08;border:1px solid #ffffff14}
+#slot-weather .dashboard-weather summary::-webkit-details-marker{display:none}
+#slot-weather .dashboard-weather summary::after{content:"⋯";font-size:18px;line-height:1}
+#slot-weather .dashboard-weather details[open] summary{background:#ff2ea61f;border-color:#ff6ac855}
+#slot-weather .dashboard-weather details .life-actions{position:absolute;z-index:25;right:0;top:calc(100% + 8px);margin:0;padding:10px;border-radius:16px;display:flex;align-items:center;gap:8px;background:#1c1740;border:1px solid #ff6ac82e;box-shadow:0 24px 50px -18px #000e}
+
+/* ── Phone dock: 2 tabs · add · 2 tabs, everything inside the bar ── */
+@media(max-width:850px){
+ #navigation .nav-item.nav-more{display:none}
+ .sidebar nav,#navigation{grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;align-items:center}
+ .sidebar{left:12px;right:12px;padding:6px;border-radius:26px}
+ #navigation .nav-item{height:58px;padding:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:10.5px;letter-spacing:.01em;border-radius:20px}
+ #navigation .nav-ico{width:22px;height:22px}
+ #navigation .nav-ico svg{width:22px;height:22px}
+ #navigation .nav-item.active .nav-ico{transform:none;filter:drop-shadow(0 0 6px #ff2ea6aa)}
+ #navigation .nav-item:hover .nav-ico{transform:none}
+ .nav-glider{border-radius:20px}
+ #navigation .nav-add{width:52px;height:52px;margin:0;border-radius:50%;font-size:28px;box-shadow:0 10px 24px -10px #ff2ea6,inset 0 1px 0 #fff6}
+ #navigation .nav-add:hover{box-shadow:0 12px 28px -10px #ff2ea6,0 0 0 1px #ff6ac888,inset 0 1px 0 #fff6}
+ /* "Więcej" moved to the top-left button: highlight it like a tab when it is open. */
+ .appbar-btn.active{color:#fff;background:linear-gradient(120deg,#ff2ea62e,#8b5cf640);border-color:#ff6ac866;box-shadow:0 0 0 1px #ff6ac855 inset,0 8px 22px -12px #ff2ea6}
+}
+@media(max-width:380px){#navigation .nav-item{font-size:10px}#navigation .nav-add{width:48px;height:48px}}
