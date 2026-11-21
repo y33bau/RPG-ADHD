@@ -23,7 +23,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:Synapse,system-
 
 /* Compact daily overview */
 .workspace{padding-top:clamp(24px,4vw,42px)}
-#slot-weather{margin-bottom:14px}
+#slot-weather{margin-top:14px}
 #slot-weather .dashboard-weather{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 14px;align-items:center;padding:14px 16px;border-radius:18px}
 .dashboard-weather h2{font-size:clamp(16px,3vw,22px);margin:0}
 .dashboard-weather h2::first-letter{text-transform:uppercase}
