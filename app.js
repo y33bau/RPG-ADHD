@@ -76,9 +76,10 @@ function subBody(name,map){const cur=X.currentSub(name,sub[name],!!state.setting
 function todayView(){
  const ob=notice?'':X.onboarding(state);if(ob)return '<div class="x-ob-wrap">'+ob+'</div>';
  return '<div class="page-heading"><h1>Dzisiaj</h1><button class="btn primary" data-action="add">＋ Dodaj zadanie</button></div>'+
-  '<div data-life-slot id="slot-weather"></div>'+
   (notice?'<p class="return-note">'+esc(notice)+'</p>':'')+
-  X.subnav('today',sub.today,!!state.settings.minimal)+subBody('today',{now:()=>X.nowView(state),plan:planBody,ritual:()=>X.ritualView(state)});
+  X.subnav('today',sub.today,!!state.settings.minimal)+subBody('today',{now:()=>X.nowView(state),plan:planBody,ritual:()=>X.ritualView(state)})+
+  // Date and weather sit below the main card: "Co teraz?" is the first thing on the screen.
+  '<div data-life-slot id="slot-weather"></div>';
 
 }
 function taskList(){

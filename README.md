@@ -108,3 +108,7 @@ Ustawienia → Powiadomienia i przypomnienia. Zgoda systemowa jest pytana dopier
 Prawdziwy Web Push jest obsługiwany przez service worker i panel połączenia. Usługa jest w katalogu push-worker (Cloudflare Workers, instrukcja w push-worker/README.md). Wystarczy ją wdrożyć i wpisać jej adres oraz klucz dostępu. Bez tego aplikacja uczciwie pokazuje, że działa tylko tryb lokalny. Serwer otrzymuje subskrypcję urządzenia i harmonogram, bez treści zadań, kontaktów i prowizji.
 
 Licznik wody na ekranie Dzisiaj: cel 2 l, 10 porcji po 200 ml, cofanie porcji i reset po lokalnej północy. Woda nie daje punktów ani monet.
+
+## Ochrona danych
+
+Plik `storage-guard.js` (identyczny w agent i RPG-ADHD) przy pierwszym zapisie prosi przeglądarkę o trwałe przechowywanie (`navigator.storage.persist()`). W Ustawieniach pokazuje, czy dane są chronione i kiedy pobrano ostatnią kopię. Gdy kopia jest starsza niż 7 dni, raz dziennie przypomina o niej krótkim komunikatem. Synchronizacja zapamiętuje skrót SHA-256 ostatniego stanu zamiast jego pełnej kopii, więc nie zajmuje drugi raz miejsca w localStorage.

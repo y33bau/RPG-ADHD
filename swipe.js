@@ -59,7 +59,7 @@
     try {
       if (learned) { localStorage.setItem(KEY, '3'); document.querySelector('.swipe-hint')?.remove(); return; }
       const n = Number(localStorage.getItem(KEY) || 0);
-      if (n >= 3 || !matchMedia('(pointer: coarse)').matches) return;
+      if (n >= 1 || !matchMedia('(pointer: coarse)').matches || document.querySelector('.x-ob-wrap')) return;
       localStorage.setItem(KEY, String(n + 1));
     } catch { return; }
     const el = document.createElement('div'); el.className = 'swipe-hint'; el.setAttribute('role', 'status');
@@ -67,5 +67,6 @@
     document.body.append(el);
     setTimeout(() => el.classList.add('out'), 4200); setTimeout(() => el.remove(), 4800);
   }
+  // Shown once, and never over the welcome screen.
   setTimeout(() => hint(false), 1500);
 })();
