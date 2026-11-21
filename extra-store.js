@@ -1,6 +1,6 @@
 // Shared store for add-on data (notes, moods, habits, bosses, routines...).
 // One object, one localStorage key: the synchronisation module already carries it between devices.
-const KEY = 'adhd_companion_v1';
+const KEY = globalThis.SYNAPSE_DEMO ? 'adhd_companion_demo_v1' : 'adhd_companion_v1';
 export const extra = {};
 
 export function defaultRoutines() {

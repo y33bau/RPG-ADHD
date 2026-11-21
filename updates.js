@@ -1,4 +1,4 @@
-const VERSION='3.3.0';
+const VERSION='3.4.0';
 let registration,changed=false,checking=false,notice;
 function offerUpdate(){
  changed=true;

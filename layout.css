@@ -110,3 +110,33 @@ main:focus-visible{outline:none}
  .appbar-btn.active{color:#fff;background:linear-gradient(120deg,#ff2ea62e,#8b5cf640);border-color:#ff6ac866;box-shadow:0 0 0 1px #ff6ac855 inset,0 8px 22px -12px #ff2ea6}
 }
 @media(max-width:380px){#navigation .nav-item{font-size:10px}#navigation .nav-add{width:48px;height:48px}}
+
+/* ── Demo mode banner ── */
+.demo-banner{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:nowrap;white-space:nowrap;margin:10px auto 0;max-width:1100px;padding:8px 10px 8px 16px;border-radius:999px;font-size:13px;color:#f4e8ff;
+  background:linear-gradient(120deg,#ff2ea626,#8b5cf633);border:1px solid #ff6ac855;box-shadow:0 10px 26px -16px #ff2ea6}
+.demo-banner b{color:#fff}
+.demo-exit{border:0;border-radius:999px;padding:6px 14px;font:inherit;font-weight:650;color:#fff;background:var(--neon);cursor:pointer}
+.demo #storage-guard{display:none}
+@media(max-width:850px){.demo-banner{margin:calc(8px + env(safe-area-inset-top)) 0 0;font-size:12px;justify-content:space-between}.demo-long{display:none}.demo .appbar{padding-top:8px}}
+
+/* ── Readability: readable text at least 12px, uppercase labels at least 11px ── */
+main .tiny,main .task-meta,main .progress-label,main .reward-label,main .history-item small,main .history-points,main .stat small,main .week-day,
+main .quick-card small,main .quick-card strong,main .field small,main .filter,main .segmented button,main .minimum,main .btn.small,
+main .x-week-bar small,main .x-place small,main .x-badge p,main .x-badge small,main .x-trophy small,main .x-duration small,main .x-legend,
+main .x-block-main small,main .x-q small,main .x-kind,main .water-footnote,main .base-caption,main .energy-row .tiny,main .x-now-meta,
+.focus-bar .btn,.focus-info small,dialog .field small,dialog .tiny,.amb-note{font-size:12px}
+main .tag{font-size:11px;padding:2px 8px}
+main .eyebrow,main .water-goal,main .x-rooms-head+.room-grid .eyebrow,main .x-thought .eyebrow,main .life-label,main .profile-top .eyebrow,main .water-heading .eyebrow,main .hero .eyebrow{font-size:11px}
+main small,main .muted{color:#b1a9d4}
+
+/* ── New bits: week goal, help, reminder times ── */
+.x-goal-line{display:flex;align-items:center;gap:8px;width:100%;margin:0 0 14px;padding:10px 14px;border-radius:14px;border:1px dashed #ff6ac855;background:#ff2ea60d;color:#e9dcff;font:inherit;font-size:13px;text-align:left;cursor:pointer}
+.x-goal-line strong{color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.x-week-goal{margin-top:16px;display:grid;gap:8px;font-size:13px;color:#cfc5ff}
+.x-week-goal .x-inline{display:flex;gap:8px}
+.x-week-goal input{flex:1;min-width:0;padding:10px 12px;border-radius:12px;border:1px solid #ffffff24;background:#0003;color:inherit;font:inherit}
+.x-week-actions{margin-top:14px}
+.x-week-carry{margin-top:10px}
+.help-option.help-main{border-color:#ff6ac866;background:linear-gradient(120deg,#ff2ea61f,#8b5cf62e)}
+.reminder-times{border:1px solid #ffffff1a;border-radius:14px;padding:12px 14px;margin:16px 0 0}
+.reminder-times legend{padding:0 6px;font-size:13px;font-weight:650}
