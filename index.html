@@ -15,6 +15,7 @@
 <link rel="stylesheet" href="./extras.css">
 <link rel="stylesheet" href="./polish.css">
 <link rel="stylesheet" href="./nav.css">
+<link rel="stylesheet" href="./layout.css">
 <script type="module" src="./app.js"></script><script type="module" src="./notifications.js"></script>
 <script type="module" src="./updates.js"></script><script type="module" src="./features.js"></script><script type="module" src="./companion.js"></script><script type="module" src="./sync.js"></script><script type="module" src="./storage-guard.js"></script></head>
 <body>
@@ -28,17 +29,17 @@
 <button class="nav-add" data-action="add" aria-label="Dodaj zadanie"><span aria-hidden="true">+</span></button>
 <button data-tab="base" class="nav-item"><span class="nav-ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17.5c2.2 1.6 4.6 2.2 9 2.2s6.8-.6 9-2.2"/><path d="M5.5 16.5c1-3.4 3.6-5.2 6.5-5.2s5.5 1.8 6.5 5.2"/><path d="M12 11.3V5.5"/><path d="M12 5.5c1.6-1.5 4-1.6 5.6-.6c-1.8.2-3.4 1-5.6 2.6M12 5.5c-1.6-1.5-4-1.6-5.6-.6c1.8.2 3.4 1 5.6 2.6"/></svg></span><span>Wyspa</span></button>
 <button data-tab="history" class="nav-item"><span class="nav-ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 17l5-5 3.5 3.5L20 7"/><path d="M15 7h5v5"/></svg></span><span>Postęp</span></button>
-<button data-tab="world" class="nav-item"><span class="nav-ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c3 3.2 3 13.8 0 17M12 3.5c-3 3.2-3 13.8 0 17"/></svg></span><span>Więcej</span></button>
+<button data-tab="world" class="nav-item nav-more"><span class="nav-ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c3 3.2 3 13.8 0 17M12 3.5c-3 3.2-3 13.8 0 17"/></svg></span><span>Więcej</span></button>
 </nav>
 <div class="sidebar-note"><span class="live-dot"></span> Każdy krok się liczy.<p>Możesz zacząć od nowa.<br>Twój dorobek zostaje.</p></div>
 <div class="amb-host" data-host="side"></div>
 <button class="settings-button" data-action="settings">⚙ <span>Ustawienia i kopia danych</span></button>
 </aside>
 <div class="workspace">
-<header class="appbar"><a class="appbar-brand" href="./"><span class="brand-symbol">✳</span><span>SYNAPSE</span></a><div class="amb-host" data-host="top"></div></header>
+<header class="appbar"><button class="appbar-btn" data-tab="world" aria-label="Więcej: wyprawy, kalendarz, ciekawostki i ustawienia"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="2"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="2"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="2"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="3.25"/></svg></button><a class="appbar-brand" href="./" aria-label="SYNAPSE, strona główna"><span class="brand-symbol" aria-hidden="true">✳</span><span>SYNAPSE</span></a><div class="amb-host" data-host="top"></div></header>
 
 <main id="main" tabindex="-1"></main>
-<footer class="page-footer">Twój rytm. Twoje małe zwycięstwa. <span>SYNAPSE / 02</span></footer>
+<footer class="page-footer">SYNAPSE · Twój rytm. Twoje małe zwycięstwa.</footer>
 </div>
 </div>
 <button class="mobile-add" data-action="add" aria-label="Dodaj zadanie">+</button>
